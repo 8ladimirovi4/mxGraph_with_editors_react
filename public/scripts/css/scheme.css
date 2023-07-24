@@ -1,0 +1,86 @@
+﻿
+body {
+   /* Отменяет выделение текста при long touch*/
+    user-select: none;
+}
+table.ptbl-default
+{
+    border-collapse: collapse;
+    border-style: hidden;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    table-layout: fixed;
+}
+table.ptbl-default td
+{
+    border: 1px solid gray;
+    text-align: left;
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+table.ptbl-default td.c-name
+{
+}
+table.ptbl-default td.c-value
+{
+    text-indent: 3px;
+}
+table.ptbl-default td.c-value input
+{
+    margin-left: 1px;
+}
+table.ptbl-default td.c-measure
+{
+    width:auto;
+    column-width:auto;
+}
+
+table.ptbl-borderless
+{
+    border-collapse: collapse;
+    border-style: hidden;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-spacing: 0;
+    line-height: 1.0 !important;
+    table-layout: fixed;
+}
+table.ptbl-borderless td
+{
+    display: table-cell;
+    border: none;
+    text-align: left;
+    padding: 0 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-clip: content-box;
+    table-layout: fixed;
+}
+table.ptbl-borderless td.c-name
+{
+}
+table.ptbl-borderless td.c-value
+{
+    text-indent: 3px;
+}
+table.ptbl-borderless td.c-value input
+{
+    margin-left: 1px;
+}
+table.ptbl-borderless td.c-measure
+{
+    width: auto;
+    column-width: auto;
+}
+div.mxRubberband {
+    position: absolute;
+    overflow: hidden;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #0000FF;
+    background: #0077FF;
+}

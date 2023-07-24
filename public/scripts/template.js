@@ -152,7 +152,7 @@ window.template = (function ()
         };
 
         const handleProjectEvent = (event) => {
-            this.projectEventsWindow.projectEventHandler(event);
+    
         };
 
         let popupWidth  = $(window).width() / 1.4;
@@ -826,7 +826,7 @@ window.template = (function ()
             }
         };
 
-        this.projectEventsWindow = new ProjectEventsWindow();
+    
 
         this.buildPageLayout = function (complete)
         {
@@ -1103,162 +1103,3 @@ window.template = (function ()
 /**
  * Class for the project events window component.
  */
-class ProjectEventsWindow {
-  id = "project-events-window";
-  LOG_START = "";
-  isLoadingState = false;
-
-  get progressLine() {
-    return $$(this.id + "-line");
-  }
-  get progressLineConfig() {
-    return {
-      id: this.id + "-line",
-      height: 16,
-      template: `<div class="line-loader-slider">
-                  <div class="line-loader-line"></div>
-                  <div class="line-loader-subline line-loader-inc"></div>
-                  <div class="line-loader-subline line-loader-dec"></div>
-                </div>`,
-    };
-  }
-
-  get progressLog() {
-    return $$(this.id + "-log");
-  }
-  get progressLogConfig() {
-    return {
-      view: "textarea",
-      id: this.id + "-log",
-      height: 400,
-      readonly: true,
-      value: this.LOG_START,
-    };
-  }
-
-  get completeButton() {
-    return $$(this.id + "-done");
-  }
-  get completeButtonConfig() {
-    return {
-      view: "button",
-      id: this.id + "-done",
-      value: "Закрыть",
-      disabled: true,
-      width: 200,
-      click: () => this._closeWindow(),
-    };
-  }
-
-  get component() {
-    return $$(this.id);
-  }
-  get config() {
-    return {
-      view: "window",
-      id: this.id,
-      head:"Окно событий проекта",
-      modal: true,
-      position: "center",
-      width: 600,
-      body: {
-        padding: { bottom: 16 },
-        type: "clean",
-        rows: [
-          this.progressLineConfig,
-          this.progressLogConfig,
-          {
-            view: "align",
-            align: "top,center",
-            body: this.completeButtonConfig,
-          },
-          {},
-        ],
-      },
-    };
-  }
-
-  _eventCallbacks = [];
-
-  /* PUBLIC */
-
-  projectEventHandler(event) {
-    if (!event) return;
-
-    if (event.state > 1) {
-      // open window
-      if (!this.component || !this.component.isVisible())
-        this._openWindow();
-      // service is doing some work
-      this._setLoadingState();
-      // set header
-      switch (event.state) {
-        // case 1: // Busy
-        //   this._setWindowHeader("Выполняются действия с проектами");
-        //   break;
-        case 2: // SetupInProgress
-          this._setWindowHeader("Загрузка проекта");
-          break;
-        case 3: // SavingInProgress
-          this._setWindowHeader("Сохранение проекта");
-          break;
-        case 4: // BackupingInProgress
-          this._setWindowHeader("Создание РК проекта");
-          break;
-      }
-      // add message to log
-      if (event.message) {
-        this._addToLog(event.message);
-      }
-    } else if (this.component) {
-      // service is in idle state
-      this._resetLoadingState();
-    }
-
-    this._eventCallbacks.forEach(cb => cb(event));
-  }
-
-  subscribeToEvent(callback) {
-    this._eventCallbacks.push(callback);
-  }
-
-  /* PRIVATE */
-
-  _openWindow() {
-    webix.ui(this.config).show();
-  }
-
-  _closeWindow() {
-    this.component.close();
-  }
-
-  _setWindowHeader(text) {
-    this.component.getHead().setHTML(text);
-  }
-
-  _addToLog(message) {
-    const log = this.progressLog.getValue() + "\n" + message;
-    this.progressLog.setValue(log);
-    // auto scroll
-    const textArea = this.progressLog.getInputNode();
-    textArea.scrollTop = textArea.scrollHeight;
-  }
-
-  _clearLog() {
-    this.progressLog.setValue(this.LOG_START);
-  }
-
-  _setLoadingState() {
-    if (this.isLoadingState) return; // need to clear log only once
-    this.isLoadingState = true;
-    this.completeButton.disable();
-    this.progressLine.show();
-    this._clearLog();
-  }
-
-  _resetLoadingState() {
-    this.completeButton.enable();
-    this.progressLine.hide();
-    this.isLoadingState = false;
-  }
-}
