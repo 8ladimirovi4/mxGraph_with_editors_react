@@ -1,0 +1,250 @@
+﻿{
+  "product": "WebScadaMT",
+  "copyright": "ООО \"НТЦ \"Механотроника\"",
+  "common": {
+    "now": "Сейчас",
+    "ok": "OK",
+    "cancel": "Отмена",
+    "yes": "Да",
+    "no": "Нет",
+    "from": "От",
+    "to": "До",
+    "use": "Вкл.",
+    "on_off": "Вкл./Откл.",
+    "enable_switch": "Разрешить включение/отключение",
+    "type": "Тип",
+    "format": "Формат",
+    "number": "Номер",
+    "menu": "Меню",
+    "exit": "Выход",
+    "help": "Помощь",
+    "version": "Версия",
+    "login": "Логин",
+    "password": "Пароль",
+    "filter": "Фильтр",
+    "confirm": "Подтверждение",
+    "name": "Наименование",
+    "description": "Описание",
+    "value": "Значение",
+    "measure": "Ед. измерения",
+    "quality": "Качество",
+    "note": "Примечание",
+    "source": "Источник",
+    "timestamp": "Метка времени",
+    "address": "Адрес",
+    "port": "Порт",
+    "priority": "Приоритет",
+    "step": "Шаг",
+    "device": "Устройство",
+    "devices": "Устройства",
+    "object": "Объект",
+    "objects": "Объекты",
+    "script": "Скрипт",
+    "file": "Файл",
+    "editor": "Редактор",
+    "wait_timeout_s": "Время ожидания, с",
+    "change_date": "Дата изменения",
+    "start_date": "Начальная дата",
+    "end_date": "Конечная дата",
+    "records_per_page": "Количество записей на странице",
+    "user": "Пользователь",
+    "server": "Сервер",
+    "settings": "Настройки",
+
+    "parameter": "Параметр",
+    "parameters": "Параметры",
+    "page": "Страница",
+    "pages": "Страницы",
+    "group": "Группа",
+    "groups": "Группы",
+
+    "size": "Размер",
+    "size_bytes": "$t(common.size) (байт)",
+    "size_kbytes": "$t(common.size) (КБ)",
+    "size_mbytes": "$t(common.size) (МБ)",
+
+    "close": "Закрыть",
+    "open": "Открыть",
+    "show": "Показать",
+    "refresh": "Обновить",
+    "edit": "Редактировать",
+
+    "close_editor": "Закрыть редактор",
+
+    "download": "Скачать",
+    "download_file": "$t(common.download) файл",
+    "download_bin_file": "Скачать бинарный файл",
+
+    "upload": "Загрузить",
+    "upload_file": "$t(common.upload) файл",
+
+    "save": "Сохранить",
+    "save_as": "Сохранить как...",
+    "save_project": "$t(common.save) проект",
+
+    "save_settings_ok": "Настройки успешно сохранены",
+    "save_project_ok": "Проект успешно сохранён",
+
+    "execute": "Выполнить",
+    "execute_command": "$t(common.execute) команду",
+
+    "add": "Добавить",
+    "add_file": "$t(common.add) файл",
+    "add_channel": "$t(common.add) канал",
+    "add_group": "$t(common.add) группу",
+    "add_device": "$t(common.add) устройство",
+    "add_parameter": "$t(common.add) параметр",
+    "add_page": "$t(common.add) страницу",
+    "add_object": "$t(common.add) объект",
+
+    "delete": "Удалить",
+    "delete_file": "$t(common.delete) файл",
+    "delete_channel": "$t(common.delete) канал",
+    "delete_group": "$t(common.delete) группу",
+    "delete_device": "$t(common.delete) устройство",
+    "delete_parameter": "$t(common.delete) параметр",
+    "delete_page": "$t(common.delete) страницу",
+    "delete_object": "$t(common.delete) объект",
+
+    "delete_all": "$t(common.delete) все",
+    "delete_all_files": "$t(common.delete_all) файлы",
+    "delete_all_channels": "$t(common.delete_all) каналы",
+    "delete_all_groups": "$t(common.delete_all) группы",
+    "delete_all_devices": "$t(common.delete_all) устройства",
+    "delete_all_parameters": "$t(common.delete_all) параметры",
+    "delete_all_pages": "$t(common.delete_all) страницы",
+    "delete_all_objects": "$t(common.delete_all) объекты",
+
+    "states": {
+      "started": "Выполняется",
+      "stopped": "Остановлен",
+      "launching": "Запуск...",
+      "halting": "Останов...",
+      "failure": "Ошибка модуля",
+      "started_failure": "Выполняется с ошибками",
+      "rc": "Удалённое управление",
+      "rc_started": "Выполняется (удалённое управление)",
+      "rc_stopped": "Остановлен (удалённое управление)",
+      "rc_launching": "Запуск... (удалённое управление)",
+      "rc_halting": "Останов... (удалённое управление)",
+      "rc_failure": "Ошибка модуля (удалённое управление)",
+      "rc_started_failure": "Выполняется с ошибками (удалённое управление)"
+    },
+    "dpi": {
+      "error": "Ошибка",
+      "off": "Отключен",
+      "on": "Включен",
+      "damage": "Авария"
+    },
+    "events": {
+      "info": "Информация",
+      "alarm": "Тревога",
+      "event": "Событие",
+      "warning": "Предупреждение",
+      "damage": "Авария",
+      "error": "Ошибка"
+    },
+    "parities": {
+      "no": "Нет",
+      "odd": "Нечет",
+      "even": "Чёт",
+      "mark": "Маркер",
+      "space": "Пробел"
+    },
+    "cmd_confirmation": {
+      "unknown": "-------",
+      "error": "Ошибка",
+      "accepted": "Выполнена",
+      "running": "Выполняется"
+    },
+
+    "messages": {
+      "save_file_ok": "Файл успешно сохранён",
+      "file_not_selected": "Файл не выбран",
+      "file_not_found": "Файл не найден",
+      "files_are_differ": "Файлы отличаются",
+      "command_sent_to_server": "Команда передана серверу на выполнение",
+      "command_execution_success": "Команда успешно выполнена"
+    },
+
+    "errors": {
+      "browser_not_supported": "Извините! Ваш браузер не поддерживается",
+      "server_response": "Ошибка ответа сервера",
+      "server_connection": "Потеряна связь с сервером",
+      "support_only_files": "Поддерживаются только файлы",
+      "files_uploading": "Ошибка загрузки файлов на сервер",
+      "file_removing": "Ошибка удаления файла(-ов)",
+      "file_opening": "Ошибка открытия файла",
+      "get_supported_file_types": "Ошибка получения списка поддерживаемых типов файлов",
+      "save_settings": "Ошибка сохранения настроек",
+      "save_project": "Ошибка сохранения проекта",
+      "save_file": "Ошибка сохранения файла(-ов)",
+      "control_blocked": "Управление заблокировано",
+      "command_execution": "Ошибка выполнения команды",
+      "params_list_loading": "Ошибка загрузки списка параметров",
+      "files_list_loading": "Ошибка загрузки списка файлов",
+      "config_loading": "Ошибка загрузки конфигурации",
+      "not_supported": "В текущей версии не поддерживается",
+      "incorrect_value": "Некорректное значение",
+      "unknown_state": "Неизвестное состояние"
+    }
+  },
+
+  "template": {
+    "server_time": "Время сервера",
+    "current_user": "Текущий пользователь",
+    "main_server_state": "Состояние сервера",
+    "reserv_server_state": "Состояние резервного сервера",
+    "exit_confirm": "Выйти из системы",
+		"pages": {
+			"main": "Главная",
+			"polling": "Опрос",
+			"equipments": "Оборудование",
+			"schemes": "Мнемосхемы",
+			"db": "База данных",
+      "dba": "Обслуживание БД",
+			"users": "Пользователи",
+			"events": "События",
+			"reports": "Отчёты"
+		},
+    "alarms": {
+      "title": "Активные тревоги"
+    },
+    "notifications": {
+      "title": "Уведомления"
+    }
+  },
+
+  "files": {
+    "script_editor": "Редактор скриптов",
+    "duration_ms": "Длительность(мс)",
+    "dev": {
+      "name": "Устройства",
+      "desc": "Файлы конфигурации устройств"
+    },
+    "sscript": {
+      "name": "Скрипты (сервер)",
+      "desc": "Файлы скриптов (сервер)"
+    },
+    "cscript": {
+      "name": "Скрипты (клиент)",
+      "desc": "Файлы скриптов (клиент)"
+    },
+    "jrn": {
+      "name": "Журналы",
+      "desc": "Файлы журналов (сообщения/аварии)"
+    },
+    "osc": {
+      "name": "Осциллограммы",
+      "desc": "Файлы осциллограмм"
+    },
+    "user": {
+      "name": "Файлы",
+      "desc": "Файлы пользователя"
+    },
+    "log": {
+      "name": "Лог-файлы",
+      "desc": "Отладочные файлы"
+    }
+  }
+}

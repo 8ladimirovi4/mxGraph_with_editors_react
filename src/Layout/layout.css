@@ -1,0 +1,22 @@
+* {
+margin: 0 auto;
+padding: 0;
+}
+
+.header {
+    height: 10vh;
+    background-color: lightgray;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.body {
+    min-height: 80vh;
+}
+
+.footer {
+    height: 10vh;
+    background-color: lightgray;
+}
