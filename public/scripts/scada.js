@@ -36,26 +36,13 @@ if (typeof webix === 'object') {
     };
 
     let filesBundle = [
-      
         "thirdparty/moment/moment.min.js",
         "thirdparty/howler/howler.min.js",
         "scripts/client.js",
         "scripts/css/common.css",
-        // "thirdparty/signalr/signalr.min.js",
-        // "thirdparty/mxgraph/deflate/base64.js",
-        // "thirdparty/mxgraph/deflate/pako.min.js",
-        // "thirdparty/mxgraph/jscolor/jscolor.js",
-        // "thirdparty/mxgraph/sanitizer/sanitizer.min.js",
-        // "thirdparty/charts/Chart.bundle.min.js",
-        // "thirdparty/charts/plugins/chartjs-plugin-annotation.min.js",
-        // "scripts/view.js",
-        // "scripts/css/view.css",
-        // "scripts/css/scheme.css",
-        // "scripts/template.js"
     ]
     
     if (window.bundle != null) filesBundle = filesBundle.concat(window.bundle);
-
       let processPage = function (e) {
       /* LOCALIZATION INIT */
       if (window.i18next != null) {

@@ -133,6 +133,7 @@ $(window).on('appready', function (e)
                     name:'1x4kПС-1103510',
                     version: '3.0'
                 }
+                console.log('object')
                 buildViewer.apply(window, [r]);
             }
             LoadGraph()
