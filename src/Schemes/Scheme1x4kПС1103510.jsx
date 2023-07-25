@@ -11,6 +11,48 @@ function Scheme1x4kПС1103510() {
   const formRef = useRef();
 
   useEffect(() => {
+    webix.ui({
+      css: 'demoheader',
+      autoheight: true,
+      hidden: true, // set false to see the demo-banner
+      rows: [
+          {
+              height: 10
+          },
+          {
+              cols: [
+                  {
+                      rows:
+                          [
+                              {
+                                  borderless: true,
+                                  autoheight: true,
+                                  css: 'demo_template',
+                                  template: "<p align='right'>Это демонстрационная версия продукта. До окончания пробного периода осталось дней:</p>"
+                                      + "<p align='right'>Информацию о полной версии можно получить в коммерческом департаменте: sales.mt@systeme.ru 8 (800) 250-63-60</p>"
+                              }
+                          ]
+                  },
+                  {
+                      view: "template",
+                      css: 'demo_template',
+                      borderless: true,
+                      autoheight: true,
+                      width: 100,
+                      template: function (obj) {
+                         
+                          return "<p align='center' class=demorestborder> </p>";
+                      },
+                      
+                  }
+              ]
+          },
+          {
+              height: 10
+          }
+      ]
+  })
+      
 
    
     const buildViewer = (scheme) => {
@@ -24,7 +66,7 @@ function Scheme1x4kПС1103510() {
         // Adds bundle text to resources
         mxResources.parse(xhr[0].getText());
         // Configures the default graph theme
-        console.log(Graph.prototype.defaultThemeName)
+      
         themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
         // Build viewer
         window.viewer = new EditorUi(new Editor(true, themes), document.getElementById('viewer'), scheme);

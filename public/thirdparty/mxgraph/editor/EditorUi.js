@@ -2409,11 +2409,95 @@ EditorUi.prototype.refresh = function (sizeDidChange) {
 /**
  * Creates the required containers.
  */
-EditorUi.prototype.createDivs = function () {
-  var demobar = $$('demoheader');
-  this.demobarContainer = demobar || { $height: 0 };
 
-  var menubar = $$('placeholder_header');
+EditorUi.prototype.createDivs = function () {
+  //----->fix<------//
+  var demobar = webix.ui({
+    css: 'demoheader',
+    autoheight: true,
+    hidden: true, // set false to see the demo-banner
+    rows: [
+        {
+            height: 10
+        },
+        {
+            cols: [
+                {
+                    rows:
+                        [
+                            {
+                                borderless: true,
+                                autoheight: true,
+                                css: 'demo_template',
+                                template: "<p align='right'>Это демонстрационная версия продукта. До окончания пробного периода осталось дней:</p>"
+                                    + "<p align='right'>Информацию о полной версии можно получить в коммерческом департаменте: sales.mt@systeme.ru 8 (800) 250-63-60</p>"
+                            }
+                        ]
+                },
+                {
+                    view: "template",
+                    css: 'demo_template',
+                    borderless: true,
+                    autoheight: true,
+                    width: 100,
+                    template: function (obj) {
+                       
+                        return "<p align='center' class=demorestborder> </p>";
+                    },
+                    
+                }
+            ]
+        },
+        {
+            height: 10
+        }
+    ]
+})
+//----->fix<------//
+  this.demobarContainer = demobar || { $height: 0 };
+//----->fix<------//
+  var menubar = webix.ui({
+    css: 'demoheader',
+    autoheight: true,
+    hidden: true, // set false to see the demo-banner
+    rows: [
+        {
+            height: 10
+        },
+        {
+            cols: [
+                {
+                    rows:
+                        [
+                            {
+                                borderless: true,
+                                autoheight: true,
+                                css: 'demo_template',
+                                template: "<p align='right'>Это демонстрационная версия продукта. До окончания пробного периода осталось дней:</p>"
+                                    + "<p align='right'>Информацию о полной версии можно получить в коммерческом департаменте: sales.mt@systeme.ru 8 (800) 250-63-60</p>"
+                            }
+                        ]
+                },
+                {
+                    view: "template",
+                    css: 'demo_template',
+                    borderless: true,
+                    autoheight: true,
+                    width: 100,
+                    template: function (obj) {
+                       
+                        return "<p align='center' class=demorestborder> </p>";
+                    },
+                    
+                }
+            ]
+        },
+        {
+            height: 10
+        }
+    ]
+})
+//----->fix<------//
   if (menubar) {
     webix.html.addCss(menubar.getNode(), 'geMenubarContainer');
     this.menubarContainer = menubar.getNode();

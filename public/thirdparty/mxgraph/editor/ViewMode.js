@@ -206,6 +206,12 @@ ViewModeHandler.prototype.updateCellMapping = function (cell, value)
 
 ViewModeHandler.prototype.setupHubs = function ()
 {
+    //------>fix<------//
+    const template = {}
+    template.setupHubConnection = function (){
+
+    }
+      //------>fix<------//
     if (template)
     {
         // tags
