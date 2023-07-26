@@ -1,6 +1,7 @@
 import * as mxgraph from 'mxgraph';
 import Editor from './Editor'
-const { 
+
+let { 
     mxClient, 
     mxUtils, 
     mxResources, 
@@ -11,9 +12,11 @@ const {
     mxEventObject,
     mxCell,
     mxGeometry,
+    mxClipboard,
+    mxEventSource,
 } = mxgraph();
 
-function Actions(editorUi)
+export default function Actions(editorUi)
 {
     this.editorUi = editorUi;
     this.actions = new Object();

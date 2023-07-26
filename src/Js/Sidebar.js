@@ -1,3 +1,24 @@
+import * as mxgraph from 'mxgraph';
+import $ from "jquery";
+import Editor from './Editor'
+import Graph from './Graph'
+let { 
+    HoverIcons,
+    mxClient, 
+    mxUtils, 
+    mxResources, 
+    mxRectangle,
+    mxConstants,
+    mxEvent,
+    mxPoint,
+    mxDragSource,
+    mxPopupMenu,
+    mxStackLayout,
+    mxEventObject,
+    mxCell,
+    mxGeometry,
+} = mxgraph();
+
 /**
  * Construcs a new sidebar for the given editor.
  */
@@ -63,6 +84,7 @@ function Sidebar(editorUi, container)
     
     this.init();
 }
+export default Sidebar;
 /**
  * Adds all palettes to the sidebar.
  */

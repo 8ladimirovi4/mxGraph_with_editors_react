@@ -1,12 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as mxgraph from 'mxgraph';
 import './scheme.css';
+import '../Css/scheme.css';
+import '../Css/view.css'
+import '../Css/common.css'
+import Graph from '../Js/Graph'
+import Editor from '../Js/Editor'
+import EditorUi from '../Js/EditorUi'
+import * as mxgraph from 'mxgraph';
 import * as webix from 'webix/webix.js';
-const { mxClient, mxUtils, mxResources} = mxgraph();
+import 'webix/webix.css';
+const {
+$$
+} = webix
+
+
+const { 
+  mxClient, 
+  mxUtils, 
+  mxResources, 
+} = mxgraph();
 
 function Scheme1x4kПС1103510() {
-
- 
   const [schemeUI, setSchemeUI] = useState(null);
   const formRef = useRef();
 
@@ -91,31 +105,31 @@ function Scheme1x4kПС1103510() {
       });
       webix.require(
         [
-          '/thirdparty/signalr/signalr.min.js',
-          'thirdparty/mxgraph/deflate/base64.js',
-          'thirdparty/mxgraph/deflate/pako.min.js',
-          'thirdparty/mxgraph/jscolor/jscolor.js',
-          'thirdparty/mxgraph/sanitizer/sanitizer.min.js',
-          'thirdparty/charts/Chart.bundle.min.js',
-          'thirdparty/charts/plugins/chartjs-plugin-annotation.min.js',
-          'thirdparty/charts/Chart.min.css',
-          'scripts/css/view.css',
-          'scripts/css/scheme.css',
-          'scripts/scada.js',
-          '/thirdparty/mxgraph/mxClient.min.js',
-          '/thirdparty/mxgraph/editor/Init.js',
-          '/thirdparty/mxgraph/editor/EditorUi.js',
-          '/thirdparty/mxgraph/editor/Editor.js',
-          '/thirdparty/mxgraph/editor/Sidebar.js',
-          '/thirdparty/mxgraph/editor/Graph.js',
-          '/thirdparty/mxgraph/editor/Shapes.js',
-          '/thirdparty/mxgraph/editor/Bindings.js',
-          '/thirdparty/mxgraph/editor/Actions.js',
-          '/thirdparty/mxgraph/editor/Menus.js',
-          '/thirdparty/mxgraph/editor/Dialogs.js',
-          '/thirdparty/mxgraph/editor/ViewMode.js',
-          '/thirdparty/mxgraph/editor/Scripts.js',
-          '/thirdparty/mxgraph/editor/MarksService.js',
+          // '/thirdparty/signalr/signalr.min.js',
+          // 'thirdparty/mxgraph/deflate/base64.js',
+          // 'thirdparty/mxgraph/deflate/pako.min.js',
+          // 'thirdparty/mxgraph/jscolor/jscolor.js',
+          // 'thirdparty/mxgraph/sanitizer/sanitizer.min.js',
+          // 'thirdparty/charts/Chart.bundle.min.js',
+          // 'thirdparty/charts/plugins/chartjs-plugin-annotation.min.js',
+          // 'thirdparty/charts/Chart.min.css',
+          // 'scripts/css/view.css',
+          // 'scripts/css/scheme.css',
+          // 'scripts/scada.js',
+          // '/thirdparty/mxgraph/mxClient.min.js',
+          // '/thirdparty/mxgraph/editor/Init.js',
+          // '/thirdparty/mxgraph/editor/EditorUi.js',
+          // '/thirdparty/mxgraph/editor/Editor.js',
+          // '/thirdparty/mxgraph/editor/Sidebar.js',
+          // '/thirdparty/mxgraph/editor/Graph.js',
+          // '/thirdparty/mxgraph/editor/Shapes.js',
+          // '/thirdparty/mxgraph/editor/Bindings.js',
+          // '/thirdparty/mxgraph/editor/Actions.js',
+          // '/thirdparty/mxgraph/editor/Menus.js',
+          // '/thirdparty/mxgraph/editor/Dialogs.js',
+          // '/thirdparty/mxgraph/editor/ViewMode.js',
+          // '/thirdparty/mxgraph/editor/Scripts.js',
+          // '/thirdparty/mxgraph/editor/MarksService.js',
         ],
         function () {
           if (complete) complete(schemeUI);
