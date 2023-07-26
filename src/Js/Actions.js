@@ -1,5 +1,17 @@
 import * as mxgraph from 'mxgraph';
-import Editor from './Editor'
+import Editor, {PrintDialog, PageSetupDialog } from './Editor'
+import { 
+    ExportDialog, 
+    EditDiagramDialog, 
+    TextareaDialog, 
+    FilenameDialog, 
+    LayersWindow, 
+    SidebarWindow,
+    FormatWindow,
+    OutlineWindow,
+    BindingsWindow, 
+} from './Dialogs'
+import { ChangePageSetup } from './EditorUi'
 
 let { 
     mxClient, 

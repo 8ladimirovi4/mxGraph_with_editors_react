@@ -2973,7 +2973,7 @@ Graph.prototype.zapGremlins = function(text)
 /**
  * Hover icons are used for hover, vertex handler and drag from sidebar.
  */
-HoverIcons = function(graph)
+function HoverIcons(graph)
 {
     this.graph = graph;
     this.init();
@@ -8354,3 +8354,4 @@ if (typeof mxVertexHandler != 'undefined')
         };
     })();
 }
+

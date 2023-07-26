@@ -8430,3 +8430,5 @@ if (typeof mxVertexHandler != 'undefined')
         };
     })();
 }
+
+export { HoverIcons };

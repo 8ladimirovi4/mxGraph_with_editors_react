@@ -2,6 +2,7 @@ import * as mxgraph from 'mxgraph';
 import { Base64 } from 'js-base64';
 import Graph from './Graph'
 import { isNullOrEmpty } from './client'
+import { ChangePageSetup } from './EditorUi'
 let { 
     mxGraph, 
     mxGraphView, 
@@ -2119,4 +2120,4 @@ PageSetupDialog.getFormats = function()
 
 })();
 
-export { Dialog };
+export { Dialog, PrintDialog, PageSetupDialog, ErrorDialog, OpenFile};

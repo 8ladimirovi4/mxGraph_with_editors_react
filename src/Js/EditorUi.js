@@ -2,12 +2,13 @@ import * as mxgraph from 'mxgraph';
 import { Base64 } from 'js-base64';
 import { HELP, isNullOrEmpty, AJAX } from './client'
 import { API } from './scada'
-import Editor from './Editor'
-import Graph from './Graph'
+import Editor, { ErrorDialog, OpenFile, Dialog } from './Editor'
+import Graph, { HoverIcons } from './Graph'
 import Actions from './Actions'
+import ViewModeHandler from './ViewMode'
+import { ColorDialog, OpenDialog, FilenameDialog, LinkDialog, EditDataDialog } from './Dialogs'
 import * as webix from 'webix/webix.js';
 import $ from "jquery";
-
 let { 
   mxGraphModel, 
   mxClient, 
@@ -3490,3 +3491,5 @@ EditorUi.prototype.destroy = function () {
     if (c[i] != null && c[i].parentNode != null) c[i].parentNode.removeChild(c[i]);
   }
 };
+
+export { ChangePageSetup };

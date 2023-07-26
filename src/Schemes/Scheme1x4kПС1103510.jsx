@@ -9,11 +9,6 @@ import EditorUi from '../Js/EditorUi'
 import * as mxgraph from 'mxgraph';
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
-const {
-$$
-} = webix
-
-
 const { 
   mxClient, 
   mxUtils, 
@@ -23,7 +18,6 @@ const {
 function Scheme1x4kПС1103510() {
   const [schemeUI, setSchemeUI] = useState(null);
   const formRef = useRef();
-
   useEffect(() => {
     webix.ui({
       css: 'demoheader',

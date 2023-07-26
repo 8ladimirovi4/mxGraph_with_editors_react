@@ -1,4 +1,40 @@
-﻿/**
+﻿import $ from "jquery";
+import * as mxgraph from 'mxgraph';
+import Editor, { Dialog } from './Editor'
+import Sidebar from './Sidebar';
+import Graph from './Graph'
+import Format from './Format'
+import * as webix from 'webix/webix.js';
+import 'webix/webix.css';
+import { HELP, AJAX } from './client'
+import { API } from './scada'
+import jscolor from 'jscolor'
+const {
+$$
+} = webix
+
+let { 
+    mxGraphModel, 
+    mxClient, 
+    mxUtils, 
+    mxResources, 
+    mxRectangle,
+    mxConstants,
+    mxEvent,
+    mxPoint,
+    mxPopupMenu,
+    mxEventObject,
+    mxCodec,
+    mxCell,
+    mxImageExport,
+    mxOutline,
+    mxWindow,
+    mxXmlCanvas2D,
+    mxXmlRequest,
+    mxForm,
+} = mxgraph();
+
+/**
  * Fix minimize/maximize localization
  */
 function mtWindow(title, content, x, y, width, height, minimizable, moveable, replace, style)
@@ -788,7 +824,8 @@ var EditDiagramDialog = function(editorUi)
         }
             
         if (error != null)
-            messageError(error.message);
+        console.log('error')
+            // messageError(error.message);
     });
     okBtn.className = 'geBtn gePrimaryBtn';
     div.appendChild(okBtn);
@@ -1026,7 +1063,8 @@ var ExportDialog = function(editorUi)
 
     function checkValues()
     {
-        if (widthInput.value * heightInput.value > MAX_AREA || widthInput.value <= 0)
+        // if (widthInput.value * heightInput.value > MAX_AREA || widthInput.value <= 0)
+        if (widthInput.value * heightInput.value > 15000 * 15000 || widthInput.value <= 0)
         {
             widthInput.style.backgroundColor = 'red';
         }
@@ -1034,8 +1072,8 @@ var ExportDialog = function(editorUi)
         {
             widthInput.style.backgroundColor = '';
         }
-        
-        if (widthInput.value * heightInput.value > MAX_AREA || heightInput.value <= 0)
+        //if (widthInput.value * heightInput.value > MAX_AREA || heightInput.value <= 0)
+        if (widthInput.value * heightInput.value > 15000 * 15000 || heightInput.value <= 0)
         {
             heightInput.style.backgroundColor = 'red';
         }
@@ -1113,7 +1151,8 @@ var ExportDialog = function(editorUi)
     {
         if (parseInt(zoomInput.value) <= 0)
         {
-            messageError(mxResources.get('drawingEmpty'));
+            console.log(mxResources.get('drawingEmpty'))
+            // messageError(mxResources.get('drawingEmpty'));
         }
         else
         {
@@ -1206,10 +1245,11 @@ ExportDialog.exportFile = function(editorUi, name, format, bg, s, b)
         var h = Math.ceil(bounds.height * s / graph.view.scale + 2 * b);
         
         // Requests image if request is valid
-        if (param.length <= MAX_REQUEST_SIZE && w * h < MAX_AREA)
+        if (param.length <= 10485760 && w * h < 15000 * 15000)
         {
             editorUi.hideDialog();
-            var req = new mxXmlRequest(EXPORT_URL, 'format=' + format +
+           // var req = new mxXmlRequest(EXPORT_URL, 'format=' + format +
+           var req = new mxXmlRequest(null, 'format=' + format +
                 '&filename=' + encodeURIComponent(name) +
                 '&bg=' + ((bg != null) ? bg : 'none') +
                 '&w=' + w + '&h=' + h + '&' + param);
@@ -1217,7 +1257,8 @@ ExportDialog.exportFile = function(editorUi, name, format, bg, s, b)
         }
         else
         {
-            messageError(mxResources.get('drawingTooLarge'));
+            console.log(mxResources.get('drawingTooLarge'))
+            // messageError(mxResources.get('drawingTooLarge'));
         }
     }
 };
@@ -1229,18 +1270,22 @@ ExportDialog.exportFile = function(editorUi, name, format, bg, s, b)
  */
 ExportDialog.saveLocalFile = function(editorUi, data, filename, format)
 {
-    if (data.length < MAX_REQUEST_SIZE)
-    {
-        editorUi.hideDialog();
-        var req = new mxXmlRequest(SAVE_URL, 'xml=' + encodeURIComponent(data) + '&filename=' +
-            encodeURIComponent(filename) + '&format=' + format);
-        req.simulate(document, '_blank');
-    }
-    else
-    {
-        messageError(mxResources.get('drawingTooLarge'));
-        mxUtils.popup(xml);
-    }
+    //if (data.length < MAX_REQUEST_SIZE)
+    //----fix---//
+    // if (data.length < 10485760)
+    // {
+    //     editorUi.hideDialog();
+    //     var req = new mxXmlRequest(SAVE_URL, 'xml=' + encodeURIComponent(data) + '&filename=' +
+    //         encodeURIComponent(filename) + '&format=' + format);
+    //     req.simulate(document, '_blank');
+    // }
+    // else
+    // {
+    //     console.log(mxResources.get('drawingTooLarge'))
+    //     // messageError(mxResources.get('drawingTooLarge'));
+    //     mxUtils.popup(xml);
+    // }
+    //----fix---//
 };
 
 /**
@@ -1444,12 +1489,14 @@ var EditDataDialog = function(ui, cell)
             }
             catch (e)
             {
-                messageError(e.message);
+                console.log('error')
+                // messageError(e.message);
             }
         }
         else
         {
-            messageError(mxResources.get('invalidName'));
+            console.log(mxResources.get('invalidName'))
+            // messageError(mxResources.get('invalidName'));
         }
     });
     
@@ -1514,7 +1561,8 @@ var EditDataDialog = function(ui, cell)
         catch (e)
         {
             HELP.log(e);
-            messageError(e.message);
+            console.log('error')
+            // messageError(e.message);
         }
     });
     applyBtn.className = 'geBtn gePrimaryBtn';
@@ -2755,4 +2803,18 @@ var EquipmentWindow = function (editorUi, eqID)
     return window;
 };
 
-export { ExportDialog, EditDiagramDialog, }
+export { 
+    ExportDialog, 
+    EditDiagramDialog, 
+    TextareaDialog, 
+    FilenameDialog, 
+    LayersWindow, 
+    SidebarWindow, 
+    FormatWindow,
+    OutlineWindow,
+    BindingsWindow,
+    ColorDialog,
+    OpenDialog,
+    LinkDialog,
+    EditDataDialog,
+}

@@ -2702,3 +2702,4 @@ FilenameDialog.createTypeHint = function(ui, nameInput, hints)
 	};
 
 })();
+
