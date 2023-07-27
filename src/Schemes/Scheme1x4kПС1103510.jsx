@@ -19,7 +19,7 @@ const {
 
 function Scheme1x4kПС1103510() {
   const [schemeUI, setSchemeUI] = useState(null);
-  const formRef = useRef();
+  const formRef = useRef(null);
   useEffect(() => {
     webix.ui({
       css: 'demoheader',
@@ -95,12 +95,12 @@ function Scheme1x4kПС1103510() {
 
       let schemeUI = webix.ui({
         // id: 'contentview',
-        container: formRef.current,
+        // container: formRef.current,
         type: 'clean',
         template: "<div class='geViewer' id='viewer'></div>",
       });
-      webix.require(
-        [
+      // webix.require(
+      //   [
           // '/thirdparty/signalr/signalr.min.js',
           // 'thirdparty/mxgraph/deflate/base64.js',
           // 'thirdparty/mxgraph/deflate/pako.min.js',
@@ -126,11 +126,11 @@ function Scheme1x4kПС1103510() {
           // '/thirdparty/mxgraph/editor/ViewMode.js',
           // '/thirdparty/mxgraph/editor/Scripts.js',
           // '/thirdparty/mxgraph/editor/MarksService.js',
-        ],
-        function () {
-          if (complete) complete(schemeUI);
-        }
-      );
+    //     ],
+    //     function () {
+    //       if (complete) complete(schemeUI);
+    //     }
+    //   );
     };
 
     const buildTemplateComplete = () => {

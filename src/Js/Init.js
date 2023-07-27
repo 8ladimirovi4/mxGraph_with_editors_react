@@ -1,5 +1,5 @@
 import { $ } from 'jquery';
-import { API } from './scada'
+// import { API } from './scada'
 import { isNullOrEmpty, isDefined } from './client';
 import * as mxgraph from 'mxgraph';
 let { 
@@ -34,10 +34,11 @@ let {
 //// }
 //---fix---//
 // define API
-API.FUNC.schemeEqView     = "/equipments/view";
-API.FUNC.schemeExecCmd    = API.PREFIX + "scheme/execCmd";
-API.FUNC.schemeEquipments = API.PREFIX + "scheme/equipments";
-
+//---fix---//
+// API.FUNC.schemeEqView     = "/equipments/view";
+// API.FUNC.schemeExecCmd    = API.PREFIX + "scheme/execCmd";
+// API.FUNC.schemeEquipments = API.PREFIX + "scheme/equipments";
+//---fix---//
 // Fixes possible clipping issues in Chrome
 mxClient.NO_FO = true;
 

@@ -40,17 +40,17 @@ let {
  */
 
  export default function EditorUi (editor, container, scheme) {
-
-  mxEventSource.call(this);
-
-  this.destroyFunctions = [];
-
-  this.scheme = scheme;
-  this.container = container || document.body;
-  this.editor = editor || new Editor();
-  this.dialogs = [];
-
-  var graph = this.editor.graph;
+   mxEventSource.call(this);
+   
+   this.destroyFunctions = [];
+   
+   this.scheme = scheme;
+   this.container = container || document.body;
+   this.editor = editor || new Editor();
+   this.dialogs = [];
+   
+   var graph = this.editor.graph;
+   console.log(container)
 
   // Faster scrollwheel zoom is possible with CSS transforms
   if (graph.useCssTransforms) this.lazyZoomDelay = 0;
