@@ -5,6 +5,7 @@ import Graph from './Graph'
 import { FilenameDialog } from './Dialogs'
 import { ChangePageSetup } from './EditorUi'
 import { PageSetupDialog } from './Editor'
+import Menus from './Menus';
 let { 
     mxClient, 
     mxUtils, 

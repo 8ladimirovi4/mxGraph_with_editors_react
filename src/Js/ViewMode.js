@@ -2,6 +2,7 @@
 
 import * as mxgraph from 'mxgraph';
 import { HELP, isNullOrEmpty } from './client'
+import ScriptHandler from './Scripts';
 import Chart from "chart.js"
 let { 
     mxGraphModel, 

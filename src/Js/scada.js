@@ -1,12 +1,24 @@
 // import * as webix from 'webix/webix.js';
-import { HELP, isNullOrEmpty, AJAX } from './client'
+import 
+{ HELP, 
+  isNullOrEmpty, 
+  AJAX, 
+  parseBoolean, 
+  parseNumber, 
+  parseBooleanAsNumber,
+  isDefined,
+  GUID, 
+} from './client'
+import BindingsHandler from './Bindings';
 import i18next from 'i18next';
 import $ from "jquery";
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
+import moment from 'moment';
 const {
   $$
   } = webix
+  
 /*jshint unused:false,evil:true*/
 
 var appReady = document.createEvent('CustomEvent');
@@ -565,7 +577,8 @@ if (typeof webix === 'object') {
     logout: function () {
       //AJAX.post(API.FUNC.logout, null, HELP.pageReload, HELP.pageReload);
       AJAX.post(API.FUNC.logout, null, null, () => {
-        location.href = '/';
+        // location.href = '/';
+        window.location.href = '/';
       });
     },
     refresh: function (callback) {
@@ -1167,7 +1180,8 @@ if (typeof webix === 'object') {
      */
     createPosterPropertiesWindow(poster, graph, cell, isReadonly, isNewPoster, schemeName) {
       if (!poster) {
-        messageError('Не удалось получить информацию о плакате');
+        console.log('Не удалось получить информацию о плакате')
+        // messageError('Не удалось получить информацию о плакате');
         return null;
       }
 
@@ -1590,7 +1604,8 @@ if (typeof webix === 'object') {
     },
     createMarkPropertiesWindow(dispatcherMark, graph, cell, isReadonly, isNewMark, schemeName) {
       if (!dispatcherMark) {
-        messageError('Не удалось получить информацию о пометке');
+        console.log('Не удалось получить информацию о пометке')
+        //messageError('Не удалось получить информацию о пометке');
         return null;
       }
 
@@ -1924,7 +1939,8 @@ if (typeof webix === 'object') {
 
     setupHubConnection: function (hubName, setupFunction) {
       // console.log(`Setup "${hubName}" connection`);
-      const hubConnection = new signalR.HubConnectionBuilder().withUrl(location.origin + '/' + hubName).build();
+      //const hubConnection = new signalR.HubConnectionBuilder().withUrl(location.origin + '/' + hubName).build();
+      const hubConnection = new signalR.HubConnectionBuilder().withUrl(window.location.origin + '/' + hubName).build();
       if (typeof setupFunction === 'function') setupFunction(hubConnection);
 
       //----->fix<-------//

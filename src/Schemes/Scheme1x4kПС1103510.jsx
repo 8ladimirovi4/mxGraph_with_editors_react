@@ -9,6 +9,8 @@ import EditorUi from '../Js/EditorUi'
 import * as mxgraph from 'mxgraph';
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
+
+
 const { 
   mxClient, 
   mxUtils, 

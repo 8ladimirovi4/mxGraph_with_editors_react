@@ -7,6 +7,9 @@ import Graph, { HoverIcons } from './Graph'
 import Actions from './Actions'
 import ViewModeHandler from './ViewMode'
 import { ColorDialog, OpenDialog, FilenameDialog, LinkDialog, EditDataDialog } from './Dialogs'
+import Menus from './Menus'
+import MarksService from './MarksService'
+import BindingsHandler from './Bindings'
 import * as webix from 'webix/webix.js';
 import $ from "jquery";
 let { 

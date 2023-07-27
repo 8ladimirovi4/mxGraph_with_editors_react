@@ -757,4 +757,16 @@ let HELP = {
         }
     };
 
-    export { HELP, AJAX, BASE64, DATA,  GUID, TIMEZONE, isNullOrEmpty }
+    export { HELP, 
+        AJAX, 
+        BASE64, 
+        DATA,  
+        GUID, 
+        TIMEZONE, 
+        isNullOrEmpty,
+        isDefined,
+        getExtension,
+        parseNumber,
+        parseBoolean,
+        parseBooleanAsNumber
+    }

@@ -4,6 +4,7 @@ import Editor, { Dialog } from './Editor'
 import Sidebar from './Sidebar';
 import Graph from './Graph'
 import Format from './Format'
+import BindingsHandler from "./Bindings";
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
 import { HELP, AJAX } from './client'
@@ -2626,10 +2627,11 @@ var BindingsWindow = function (editorUi, modal, w, h)
             if (header != null)
                 header.setHTML(title);
         };
-
-        var bindings = new Bindings(window, content);
-
+//---fix---//
+        // var bindings = new Bindings(window, content);
+        var bindings = new BindingsHandler(editorUi).Bindings(window, content);
         var editorUiIsEventIgnored = editorUi.keyHandler.isEventIgnored;
+        //---fix---//
         editorUi.keyHandler.isEventIgnored = function (evt)
         {
             let ignored = editorUiIsEventIgnored.apply(this, arguments);
