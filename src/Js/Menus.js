@@ -887,8 +887,12 @@ Menus.prototype.createPopupMenu = function (menu, cell, evt, bool) {
               let minDistance = Number.MAX_VALUE;
 
               if (handler.currentPoint) {
-                clickX = handler.currentPoint.x;
-                clickY = handler.currentPoint.y;
+                //---fix---//
+                let clickX = handler.currentPoint.x;
+                let clickY = handler.currentPoint.y;
+                 //---fix---//
+                // clickX = handler.currentPoint.x;
+                // clickY = handler.currentPoint.y;
 
                 if (clickX && clickY) {
                   for (var i = 0; i < abspoints.length; i++) {

@@ -1,4 +1,29 @@
-﻿/**
+﻿import { $ } from 'jquery';
+import * as mxgraph from 'mxgraph';
+import { API } from './scada';
+import Chart from 'chart.js'
+import moment from 'moment';
+import { Howl } from 'howler';
+import Menus from './Menus';
+import BindingsHandler from './Bindings';
+import { CameraWindow } from './Dialogs';
+import { template } from './template';
+import { isNullOrEmpty, GUID, AJAX, parseNumber } from './client';
+import { VCLASS } from './Init';
+
+let { 
+    mxGraph, 
+    mxUtils, 
+    mxConstants,
+    mxImage,
+    mxEvent,
+    mxCellRenderer,
+    mxPopupMenu,
+    mxEventSource,
+    mxCellOverlay,
+
+} = mxgraph();
+/**
  * Scripts support
  */
  export default function ScriptHandler (editorUI) {
@@ -568,7 +593,8 @@ ShapeAPI.prototype.execCommand = function (cell, cmd) {
   if (cell == null || cmd == null) return;
 
   if (cell.manual || cell.blocked || cell.service || !API.USER.hasPermission('scheme.exec_cmd')) {
-    messageError('Управление запрещено');
+    console.log('Управление запрещено')
+    //messageError('Управление запрещено');
     return;
   }
 
@@ -582,19 +608,26 @@ ShapeAPI.prototype.execCommand = function (cell, cmd) {
       null,
       { id: cmd.id, parent: cmd.parent },
       function (xhr, resp) {
-        if (resp === true) messageDebug(translate('common.messages.command_sent_to_server'));
-        else messageError(translate('common.errors.command_execution'));
+        if (resp === true) 
+        //messageDebug(translate('common.messages.command_sent_to_server'));
+        console.log('common.messages.command_sent_to_server')
+        //else messageError(translate('common.errors.command_execution'));
+        else console.log('common.errors.command_execution');
       },
       function (xhr, err) {
-        messageError(translate('common.errors.command_execution'));
+        console.log('common.errors.command_execution')
+        //messageError(translate('common.errors.command_execution'));
       }
     );
   };
 
   if (cmd.confirm != false) {
-    messageConfirm(translate('common.execute_command') + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
+    console.log('common.execute_command' + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
       if (result === true) postCommand(cmd);
-    });
+    })
+    // messageConfirm(translate('common.execute_command') + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
+    //   if (result === true) postCommand(cmd);
+    // });
   } else postCommand(cmd);
 };
 ShapeAPI.prototype.execAction = function (cell) {
@@ -3117,7 +3150,8 @@ BMRZScriptAPI.prototype.execAction = function (cell) {
 
   cell.config = cell.config || this.buildConfig(cell);
   if (cell.config == null) {
-    messageError('Ошибка параметризации');
+    console.log('Ошибка параметризации')
+    //messageError('Ошибка параметризации');
     return;
   }
 
@@ -3127,10 +3161,12 @@ BMRZScriptAPI.prototype.execAction = function (cell) {
     null,
     cell.config,
     function (xhr, resp) {
-      messageDebug(translate('common.messages.command_sent_to_server'));
+      console.log('common.messages.command_sent_to_server')
+      //messageDebug(translate('common.messages.command_sent_to_server'));
     },
     function (xhr, err) {
-      messageError(translate('common.errors.command_execution'));
+      console.log('common.errors.command_execution')
+      //messageError(translate('common.errors.command_execution'));
     }
   );
 };

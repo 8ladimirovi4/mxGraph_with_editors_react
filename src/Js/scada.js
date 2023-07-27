@@ -1,4 +1,14 @@
 // import * as webix from 'webix/webix.js';
+
+
+import BindingsHandler from './Bindings';
+import i18next from 'i18next';
+import $ from "jquery";
+import * as webix from 'webix/webix.js';
+import * as signalR from "@microsoft/signalr";
+import 'webix/webix.css';
+import moment from 'moment';
+import { Howl } from 'howler';
 import 
 { HELP, 
   isNullOrEmpty, 
@@ -9,12 +19,6 @@ import
   isDefined,
   GUID, 
 } from './client'
-import BindingsHandler from './Bindings';
-import i18next from 'i18next';
-import $ from "jquery";
-import * as webix from 'webix/webix.js';
-import 'webix/webix.css';
-import moment from 'moment';
 const {
   $$
   } = webix
@@ -454,7 +458,10 @@ if (typeof webix === 'object') {
         case type.Array:
           return [];
         default: {
-          HELP.log('Unknown value type:' + data.vtype);
+          //--->fix---//
+          //HELP.log('Unknown value type:' + data.vtype);
+          HELP.log('Unknown value type:');
+          //--->fix---//
           return null;
         }
       }
@@ -1381,6 +1388,9 @@ if (typeof webix === 'object') {
               };
 
               /* update cell */
+              //--->fix---//
+              let viewer = null
+              //--->fix---//
               const marksService = viewer.marksService; // TODO ref global variable
               /* update cell graphics */
               graph.cellRenderer.redrawShape(graph.view.getState(cell), true);
@@ -1797,6 +1807,9 @@ if (typeof webix === 'object') {
                 height: cell.geometry.height,
               };
               /* update cell */
+               //--->fix---//
+               let viewer = null
+               //--->fix---//
               const marksService = viewer.marksService; // TODO ref global variable
               /* update cell graphics */
               graph.cellRenderer.redrawShape(graph.view.getState(cell), true);
@@ -2058,7 +2071,7 @@ if (typeof webix === 'object') {
           // val = JSON.parse(id.responseText);
           
           //---->fix<------//
-           val = false
+           let val = false
            //---->fix<------//
 
           return val;
@@ -2072,7 +2085,7 @@ if (typeof webix === 'object') {
           // val = JSON.parse(dr.responseText);
 
            //---->fix<------//
-           val = false
+           let val = false
            //---->fix<------//
 
           return val;

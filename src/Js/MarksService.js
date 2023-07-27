@@ -1,6 +1,6 @@
 import * as mxgraph from 'mxgraph';
-import { HELP, AJAX } from './client'
 import { API } from './scada'
+import { HELP, AJAX } from './client'
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
 import { SidebarWindow } from './Dialogs'
@@ -362,7 +362,10 @@ MarksService.prototype.toggleMode = function () {
     if (postersData.length > 0) {
       AJAX.post(
         'api/scheme/posters',
-        'schemeId=' + viewer.scheme.id,
+        //--->fix---//
+         null,
+         //'schemeId=' + viewer.scheme.id,
+        //--->fix---//
         postersData,
         (xhr, res) => {},
         // (xhr, err) => messageError('Ошибка сохранения.')
@@ -373,7 +376,10 @@ MarksService.prototype.toggleMode = function () {
     if (dispatcherMarksData.length > 0) {
       AJAX.post(
         'api/scheme/marks',
-        'schemeId=' + viewer.scheme.id,
+       //--->fix---//
+       null,
+       //'schemeId=' + viewer.scheme.id,
+      //--->fix---//
         dispatcherMarksData,
         (xhr, res) => {},
         // (xhr, err) => messageError('Ошибка сохранения.')
@@ -409,7 +415,10 @@ MarksService.prototype.toggleMode = function () {
     if (posters.length > 0) {
       AJAX.patch(
         'api/scheme/posters',
-        'schemeId=' + viewer.scheme.id,
+        //--->fix---//
+        null,
+        //'schemeId=' + viewer.scheme.id,
+       //--->fix---//
         posters,
         (xhr, res) => {},
         // (xhr, err) => messageError('Ошибка сохранения.')
@@ -419,7 +428,10 @@ MarksService.prototype.toggleMode = function () {
     if (dispatcherMarks.length > 0) {
       AJAX.patch(
         'api/scheme/marks',
-        'schemeId=' + viewer.scheme.id,
+        //--->fix---//
+        null,
+        //'schemeId=' + viewer.scheme.id,
+       //--->fix---//
         dispatcherMarks,
         (xhr, res) => {},
         //(xhr, err) => messageError('Ошибка сохранения.')
@@ -449,7 +461,10 @@ MarksService.prototype.toggleMode = function () {
     if (postersIds.length > 0) {
       AJAX.delete(
         'api/scheme/posters',
-        'scheme=' + viewer.scheme.id,
+       //--->fix---//
+       null,
+       //'schemeId=' + viewer.scheme.id,
+      //--->fix---//
         postersIds,
         (xhr, res) => {
           if (res.posters.length > 0) {
@@ -465,7 +480,10 @@ MarksService.prototype.toggleMode = function () {
     if (dispatcherMarksIds.length > 0) {
       AJAX.delete(
         'api/scheme/marks',
-        'scheme=' + viewer.scheme.id,
+       //--->fix---//
+       null,
+       //'schemeId=' + viewer.scheme.id,
+      //--->fix---//
         dispatcherMarksIds,
         (xhr, res) => {
           if (res.dispatcherMarks.length > 0) {

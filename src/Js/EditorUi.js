@@ -1,7 +1,7 @@
 import * as mxgraph from 'mxgraph';
 import { Base64 } from 'js-base64';
-import { HELP, isNullOrEmpty, AJAX } from './client'
 import { API } from './scada'
+import { HELP, isNullOrEmpty, AJAX } from './client'
 import Editor, { ErrorDialog, OpenFile, Dialog } from './Editor'
 import Graph, { HoverIcons } from './Graph'
 import Actions from './Actions'
@@ -10,6 +10,7 @@ import { ColorDialog, OpenDialog, FilenameDialog, LinkDialog, EditDataDialog } f
 import Menus from './Menus'
 import MarksService from './MarksService'
 import BindingsHandler from './Bindings'
+import Toolbar from './Toolbar';
 import * as webix from 'webix/webix.js';
 import $ from "jquery";
 let { 
@@ -325,7 +326,11 @@ let {
   this.keyHandler = this.createKeyHandler(editor);
   // Getter for key handler
   this.getKeyHandler = function () {
-    return keyHandler;
+    //---fix---//
+    return this.keyHandler;
+    //return keyHandler;
+    //---fix---//
+   
   };
 
   // Stores the current style and assigns it to new cells
@@ -1492,43 +1497,47 @@ EditorUi.prototype.initCanvas = function () {
     var fadeThread2 = null;
 
     var fadeOut = mxUtils.bind(this, function (delay) {
-      if (fadeThread != null) {
-        window.clearTimeout(fadeThread);
-        fadeThead = null;
-      }
-      if (fadeThread2 != null) {
-        window.clearTimeout(fadeThread2);
-        fadeThead2 = null;
-      }
+      //---fix---//
+      // if (fadeThread != null) {
+      //   window.clearTimeout(fadeThread);
+      //   fadeThead = null;
+      // }
+      // if (fadeThread2 != null) {
+      //   window.clearTimeout(fadeThread2);
+      //   fadeThead2 = null;
+      // }
 
-      fadeThread = window.setTimeout(
-        mxUtils.bind(this, function () {
-          mxUtils.setOpacity(this.viewModeToolbar, 0);
-          fadeThread = null;
+      // fadeThread = window.setTimeout(
+      //   mxUtils.bind(this, function () {
+      //     mxUtils.setOpacity(this.viewModeToolbar, 0);
+      //     fadeThread = null;
 
-          fadeThread2 = window.setTimeout(
-            mxUtils.bind(this, function () {
-              this.viewModeToolbar.style.display = 'none';
-              fadeThread2 = null;
-            }),
-            600
-          );
-        }),
-        delay || 200
-      );
+      //     fadeThread2 = window.setTimeout(
+      //       mxUtils.bind(this, function () {
+      //         this.viewModeToolbar.style.display = 'none';
+      //         fadeThread2 = null;
+      //       }),
+      //       600
+      //     );
+      //   }),
+      //   delay || 200
+      // );
+        //---fix---//
     });
     var fadeIn = mxUtils.bind(this, function (opacity) {
-      if (fadeThread != null) {
-        window.clearTimeout(fadeThread);
-        fadeThead = null;
-      }
-      if (fadeThread2 != null) {
-        window.clearTimeout(fadeThread2);
-        fadeThead2 = null;
-      }
+      //---fix---//
+      // if (fadeThread != null) {
+      //   window.clearTimeout(fadeThread);
+      //   fadeThead = null;
+      // }
+      // if (fadeThread2 != null) {
+      //   window.clearTimeout(fadeThread2);
+      //   fadeThead2 = null;
+      // }
 
-      this.viewModeToolbar.style.display = '';
-      mxUtils.setOpacity(this.viewModeToolbar, opacity || 30);
+      // this.viewModeToolbar.style.display = '';
+      // mxUtils.setOpacity(this.viewModeToolbar, opacity || 30);
+      //---fix---//
     });
 
     this.layersDialog = null;

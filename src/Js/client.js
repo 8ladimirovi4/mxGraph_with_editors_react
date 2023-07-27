@@ -5,6 +5,8 @@
 
 /* Global objects & functions */
 
+
+
     const isDefined = function (obj)
     {
         return obj !== undefined && obj !== null && typeof obj !== 'undefined';
@@ -756,8 +758,9 @@ let HELP = {
             return offsetValues;
         }
     };
-
-    export { HELP, 
+   
+    export { 
+        HELP, 
         AJAX, 
         BASE64, 
         DATA,  
@@ -768,5 +771,6 @@ let HELP = {
         getExtension,
         parseNumber,
         parseBoolean,
-        parseBooleanAsNumber
+        parseBooleanAsNumber,
+        isFrame
     }

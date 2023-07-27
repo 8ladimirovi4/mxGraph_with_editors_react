@@ -1,5 +1,6 @@
 ﻿import $ from "jquery";
 import * as mxgraph from 'mxgraph';
+import { API } from './scada'
 import Editor, { Dialog } from './Editor'
 import Sidebar from './Sidebar';
 import Graph from './Graph'
@@ -8,7 +9,6 @@ import BindingsHandler from "./Bindings";
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
 import { HELP, AJAX } from './client'
-import { API } from './scada'
 import jscolor from 'jscolor'
 const {
 $$
@@ -2819,4 +2819,5 @@ export {
     OpenDialog,
     LinkDialog,
     EditDataDialog,
+    CameraWindow
 }

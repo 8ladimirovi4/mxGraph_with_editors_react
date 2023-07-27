@@ -1,8 +1,7 @@
 import { $ } from 'jquery';
-import * as mxgraph from 'mxgraph';
 import { API } from './scada'
 import { isNullOrEmpty, isDefined } from './client';
-
+import * as mxgraph from 'mxgraph';
 let { 
     
     mxGraphModel, 

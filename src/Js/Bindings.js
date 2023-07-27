@@ -1,6 +1,8 @@
 import $ from "jquery";
 import * as mxgraph from 'mxgraph';
 import { Base64 } from 'js-base64';
+import { API } from './scada'
+import { VCLASS } from './Init'
 import 
 { 
   HELP, 
@@ -11,8 +13,6 @@ import
   getExtension, 
   parseNumber 
 } from './client'
-import { API } from './scada'
-import { VCLASS } from './Init'
 import Chart from "chart.js"
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
