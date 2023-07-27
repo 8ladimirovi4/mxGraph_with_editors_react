@@ -17,7 +17,6 @@ let {
     mxObjectCodec,
     mxCodecRegistry,
     mxGenericChangeCodec,
-  
 } = mxgraph();
 
 
@@ -241,7 +240,6 @@ mxCell.prototype.setBindings = function (array)
 {
     // update cell runtime bindings
     this.bindings = new mxBindings(array);
-    console.log(this.bindings)
     // Clones the value for correct undo/redo
     //let cellValue = this.getValue().cloneNode(true);
     // update cell value

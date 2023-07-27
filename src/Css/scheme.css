@@ -84,3 +84,9 @@ div.mxRubberband {
     border-color: #0000FF;
     background: #0077FF;
 }
+svg {
+  z-index: -1  
+}
+.geDiagramContainer {
+    z-index: -1  
+}

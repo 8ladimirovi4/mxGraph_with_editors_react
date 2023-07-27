@@ -1762,22 +1762,22 @@ Graph.prototype.getPageLayout = function()
  */
 Graph.prototype.sanitizeHtml = function(value, editing)
 {
-    // // Uses https://code.google.com/p/google-caja/wiki/JsHtmlSanitizer
-    // // NOTE: Original minimized sanitizer was modified to support
-    // // data URIs for images, mailto and special data:-links.
-    // // LATER: Add MathML to whitelisted tags
-    // function urlX(link)
-    // {
-    //     if (link != null && link.toString().toLowerCase().substring(0, 11) !== 'javascript:')
-    //     {
-    //         return link;
-    //     }
+    // Uses https://code.google.com/p/google-caja/wiki/JsHtmlSanitizer
+    // NOTE: Original minimized sanitizer was modified to support
+    // data URIs for images, mailto and special data:-links.
+    // LATER: Add MathML to whitelisted tags
+    function urlX(link)
+    {
+        if (link != null && link.toString().toLowerCase().substring(0, 11) !== 'javascript:')
+        {
+            return link;
+        }
         
-    //     return null;
-    // };
-    // function idX(id) { return id };
-  
-    // return html_sanitize(value, urlX, idX);
+        return null;
+    };
+    function idX(id) { return id };
+    
+    return html_sanitize(value, urlX, idX);
 };
 
 /**
@@ -4919,10 +4919,10 @@ if (typeof mxVertexHandler != 'undefined')
          */
         Graph.prototype.processChange = function(change)
         {
-          
+            console.log('change',change)
             mxGraph.prototype.processChange.apply(this, arguments);
             
-            if ( change.cell != null &&
+            if (change instanceof mxValueChange && change.cell != null &&
                 change.cell.value != null && typeof(change.cell.value) == 'object')
             {
                 // Invalidates all descendants with placeholders
