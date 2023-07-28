@@ -29,7 +29,6 @@ let {
 } = mxgraph();
 
 export default function Actions(editorUi)
-
 {
     this.editorUi = editorUi;
     this.actions = new Object();

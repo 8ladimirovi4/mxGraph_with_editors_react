@@ -27,7 +27,6 @@ let {
  * Scripts support
  */
  export default function ScriptHandler (editorUI) {
-
   mxEventSource.call(this);
 
   this.ui = editorUI;
@@ -384,11 +383,11 @@ ScriptHandler.prototype.setup = function (cell) {
     if (isNullOrEmpty(name)) return null;
 
     // check binding
-    let scriptBinding = cell.getBinding('script');
-    if (scriptBinding != null) {
-      let scriptName = $(scriptBinding).attr('value');
-      if (!isNullOrEmpty(scriptName)) name = scriptName.toLowerCase();
-    }
+    // let scriptBinding = cell.getBinding('script');
+    // if (scriptBinding != null) {
+    //   let scriptName = $(scriptBinding).attr('value');
+    //   if (!isNullOrEmpty(scriptName)) name = scriptName.toLowerCase();
+    // }
 
     let factory = this.scriptors.get(name) || this.scriptors.get('custom');
     if (factory == null || typeof factory != 'function') return null;
@@ -1371,24 +1370,24 @@ TableScriptAPI.prototype.visit = function (cell, map) {
   });
   shapeVisit.apply(this, args);
 
-  let itemsBinding = cell.getBinding('items');
-  if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
-    let bind = JSON.parse(itemsBinding.value);
-    if (bind != null && bind.length > 0) {
-      for (let j = 0; j < bind.length; j++) {
-        let id = bind[j].id;
-        if (GUID.isValid(id)) map.eq.push(bind[j]);
-        else map.tag.push(bind[j]);
-      }
-    }
-  }
+  // let itemsBinding = cell.getBinding('items');
+  // if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
+  //   let bind = JSON.parse(itemsBinding.value);
+  //   if (bind != null && bind.length > 0) {
+  //     for (let j = 0; j < bind.length; j++) {
+  //       let id = bind[j].id;
+  //       if (GUID.isValid(id)) map.eq.push(bind[j]);
+  //       else map.tag.push(bind[j]);
+  //     }
+  //   }
+  // }
 };
 TableScriptAPI.prototype.setup = function (cell) {
   // find tables
-  if (cell.tables == null) {
-    cell.tables = $('table.tbl' + cell.id);
-    cell.container = cell.children[0];
-  }
+  // if (cell.tables == null) {
+  //   cell.tables = $('table.tbl' + cell.id);
+  //   cell.container = cell.children[0];
+  // }
 };
 TableScriptAPI.prototype.color = function (cell, binding, value) {
   if (cell == null || binding == null || value == null) return null;

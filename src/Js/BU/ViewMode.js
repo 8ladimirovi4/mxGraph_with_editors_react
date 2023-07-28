@@ -18,7 +18,6 @@ let {
 /**
  * View mode logic
  */
-
 export default function ViewModeHandler (editorUI)
 {
     mxEventSource.call(this);
@@ -205,13 +204,13 @@ ViewModeHandler.prototype.createMenubar = function ()
 
 ViewModeHandler.prototype.updateBindMapping = function (cell, value)
 {
-    cell.bindingMap[value] = cell.bindingMap[value] || [];
-    let bindings = cell.getBindingsByID(value);
-    bindings.forEach(function (b)
-    {
-        if (cell.bindingMap[value].indexOf(b) < 0)
-            cell.bindingMap[value].push(b);
-    });
+    // cell.bindingMap[value] = cell.bindingMap[value] || [];
+    // let bindings = cell.getBindingsByID(value);
+    // bindings.forEach(function (b)
+    // {
+    //     if (cell.bindingMap[value].indexOf(b) < 0)
+    //         cell.bindingMap[value].push(b);
+    // });
 }
 
 ViewModeHandler.prototype.updateCellMapping = function (cell, value)

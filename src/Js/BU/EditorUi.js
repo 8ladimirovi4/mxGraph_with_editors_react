@@ -40,7 +40,6 @@ let {
  */
 
  export default function EditorUi (editor, container, scheme) {
-
    mxEventSource.call(this);
    
    this.destroyFunctions = [];

@@ -18,7 +18,6 @@ let {
 
 
 export default function MarksService(editorUI) {
-
   this.ui = editorUI;
   this.editor = editorUI.editor;
   this.graph = editorUI.editor.graph;

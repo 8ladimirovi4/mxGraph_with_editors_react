@@ -35,7 +35,6 @@ let {
 } = mxgraph();
 
 export default function BindingsHandler (editorUi) {
- 
   webix.protoUI(
     {
       name: 'link',
