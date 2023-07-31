@@ -3,9 +3,7 @@ import './scheme.css';
 import '../Css/scheme.css';
 import '../Css/view.css'
 import '../Css/common.css'
-import Graph from '../Js/Graph'
-import EditorUi from '../Js/EditorUi'
-import Editor from '../Js/Editor'
+import { Graph, EditorUi, Editor } from '../Js/Patch'
 import * as mxgraph from 'mxgraph';
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';

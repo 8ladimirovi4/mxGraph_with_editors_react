@@ -1,7 +1,7 @@
 // import * as webix from 'webix/webix.js';
 
 
-import BindingsHandler from './Bindings';
+import { BindingsHandler } from './Patch';
 import i18next from 'i18next';
 import $ from "jquery";
 import * as webix from 'webix/webix.js';
