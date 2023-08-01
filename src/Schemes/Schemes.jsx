@@ -3,13 +3,12 @@ import './scheme.css';
 import '../Css/scheme.css';
 import '../Css/view.css'
 import '../Css/common.css'
-import Graph from '../Js/Graph'
-import EditorUi from '../Js/EditorUi'
-import Editor from '../Js/Editor'
+import { Graph } from '../Js/Patch'
+import { EditorUi } from '../Js/Patch'
+import { Editor } from '../Js/Patch'
 import * as mxgraph from 'mxgraph';
-import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
-
+import { useSelector } from "react-redux";
 
 const { 
   mxClient, 
@@ -17,11 +16,12 @@ const {
   mxResources, 
 } = mxgraph();
 
-function Scheme1x4kПС1103510() {
+function Schemes() {
 
   const formRef = useRef(null);
+  const link = useSelector(state => state.links.link)
+
   useEffect(() => {
-    
     const buildViewer = (scheme) => {
       mxResources.loadDefaultBundle = false;
       var bundle =
@@ -51,7 +51,8 @@ function Scheme1x4kПС1103510() {
       }
 
       const LoadGraph = async () => {
-        const response = await  fetch('/assets/1x4kПС-1103510.txt')
+        if(link){
+        const response = await  fetch(`/assets/${link}.txt`)
         const text = await response.text();
 
         const r = {
@@ -61,12 +62,22 @@ function Scheme1x4kПС1103510() {
           version: '3.0',
         };
         buildViewer(r);
+      }
       };
       LoadGraph();
 
-  }, []);
+  }, [link]);
 
-  return <div className='geViewer' id="viewer" ref={formRef}> </div>;
+  return (
+    <>
+{link 
+  ?
+  <div key={new Date()} className='geViewer' id="viewer" ref={formRef}> </div>
+  :
+  <div key={new Date()} ><b>Выберете схему</b></div>
+}
+</>
+  )
 };
 
-export default Scheme1x4kПС1103510
+export default Schemes

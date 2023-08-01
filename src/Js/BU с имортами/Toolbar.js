@@ -23,6 +23,7 @@ mxDefaultToolbar.prototype.addSeparator = function (icon)
  * Construcs a new toolbar for the given editor.
  */
 export default function Toolbar(editorUi, container)
+
 {
     this.editorUi = editorUi;
     this.container = container;

@@ -110,6 +110,7 @@ mxVmlCanvas2D.prototype.createTransparentFill = function ()
  * Defines graph class.
  */
   export default function Graph (container, model, renderHint, stylesheet, themes)
+
 {
     mxGraph.call(this, container, model, renderHint, stylesheet);
     

@@ -18,6 +18,7 @@ let {
 /**
  * View mode logic
  */
+
 export default function ViewModeHandler (editorUI)
 {
     mxEventSource.call(this);

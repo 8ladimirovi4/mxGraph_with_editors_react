@@ -20,6 +20,7 @@ let {
  * Constructs a new graph menu
  */
 export default function Menus (editorUi) {
+
   this.editorUi = editorUi;
   this.menus = new Object();
   this.init();

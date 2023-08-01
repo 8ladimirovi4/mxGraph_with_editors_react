@@ -85,8 +85,9 @@ div.mxRubberband {
     background: #0077FF;
 }
 svg {
-  z-index: -1  
+  z-index: 0
 }
 .geDiagramContainer {
-    z-index: -1  
+    z-index: -1;  
 }
+

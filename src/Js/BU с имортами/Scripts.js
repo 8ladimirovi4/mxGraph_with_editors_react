@@ -27,6 +27,7 @@ let {
  * Scripts support
  */
  export default function ScriptHandler (editorUI) {
+
   mxEventSource.call(this);
 
   this.ui = editorUI;

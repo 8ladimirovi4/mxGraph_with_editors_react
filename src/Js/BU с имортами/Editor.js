@@ -33,6 +33,7 @@ let {
  * Editor constructor executed on page load.
  */
   export default function Editor (viewMode, themes, model, graph)
+
 {
     mxEventSource.call(this);
     this.viewMode = (viewMode != null) ? viewMode : this.viewMode;

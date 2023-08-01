@@ -22,7 +22,7 @@ let {
 /**
  * Construcs a new sidebar for the given editor.
  */
-function Sidebar(editorUi, container)
+export default function Sidebar(editorUi, container)
 {
     this.editorUi = editorUi;
     this.container = container;
@@ -84,7 +84,7 @@ function Sidebar(editorUi, container)
     
     this.init();
 }
-export default Sidebar;
+
 /**
  * Adds all palettes to the sidebar.
  */

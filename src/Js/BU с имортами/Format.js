@@ -18,6 +18,7 @@ let {
 } = mxgraph();
 
 export default function Format(editorUi, container)
+
 {
     this.editorUi = editorUi;
     this.container = container;
