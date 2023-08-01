@@ -49,7 +49,7 @@ function Scheme1x4kПС1103510() {
       }
 
       const LoadGraph = async () => {
-        const response = await  fetch('/assets/1x4kПС-1103510.txt')
+        const response = await  fetch('/assets/ПС-110-35-10.txt')
         const text = await response.text();
 
         const r = {
