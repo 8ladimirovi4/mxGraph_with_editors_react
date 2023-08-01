@@ -371,7 +371,7 @@ mxCell.prototype.getBinding = function (name)
 {
     //if (this.bindings == null)
         //this.bindings = this.getBindings();
-    return this.bindings != null ? this.bindings.find(function (x) { return x.name == name; }) : null;
+    //return this.bindings != null ? this.bindings.find(function (x) { return x.name == name; }) : null;
 };
 mxCell.prototype.getBindingsByID = function (bindID)
 {
@@ -2550,7 +2550,6 @@ function Sidebar(editorUi, container)
     
     this.init();
 }
-export default Sidebar;
 /**
  * Adds all palettes to the sidebar.
  */
@@ -7271,9 +7270,7 @@ function BindingsHandler (editorUi) {
   
     let mxGraphViewValidatePosterState = mxGraphView.prototype.validateCellState;
     mxGraphView.prototype.validatePosterState = function (cell, recurse) {
-      console.log(context)
       let context = this.graph;
-      console.log(context)
       let state = this.getState(cell);
       if (state != null && context.model.isVertex(cell)) {
         let geom = context.getCellGeometry(cell);
