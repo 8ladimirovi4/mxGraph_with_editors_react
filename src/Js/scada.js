@@ -1401,6 +1401,7 @@ if (typeof webix === 'object') {
               }
               /* poster markup update */
               const editorUi = window.viewer;
+              console.log('editorUi', editorUi)
               const bindingsHandler = new BindingsHandler(editorUi);
 
               // init bindings

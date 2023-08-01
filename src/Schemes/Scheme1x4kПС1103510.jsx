@@ -3,7 +3,9 @@ import './scheme.css';
 import '../Css/scheme.css';
 import '../Css/view.css'
 import '../Css/common.css'
-import { Graph, EditorUi, Editor } from '../Js/Patch'
+import { Graph } from '../Js/Patch'
+import { EditorUi } from '../Js/Patch'
+import { Editor } from '../Js/Patch'
 import * as mxgraph from 'mxgraph';
 import * as webix from 'webix/webix.js';
 import 'webix/webix.css';
@@ -34,7 +36,12 @@ function Scheme1x4kПС1103510() {
     
         themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
         // Build viewer
+if(typeof scheme === "object"){
+  console.log('scheme recieved')
         window.viewer = new EditorUi(new Editor(true, themes), formRef.current, scheme);
+}else{
+  console.log('kek')
+}
       },
       function () {
        console.log('Ошибка загрузки ресурсных файлов.');

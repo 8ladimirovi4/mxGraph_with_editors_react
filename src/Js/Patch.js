@@ -402,7 +402,6 @@ mxCell.prototype.getBindingsByID = function (bindID)
     Graph.touchStyle = false;
 
     this.graph = graph || this.createGraph(themes, model);
-
     // override html rendering in cell
     this.graph.cellRenderer.getLabelValue = function(state)
     {
@@ -668,6 +667,7 @@ Editor.prototype.setGraphXml = function(node)
     if (node != null)
     {
         var dec = new mxCodec(node.ownerDocument);
+        console.log(dec)
     
         if (node.nodeName == 'mxGraphModel')
         {
@@ -34025,16 +34025,18 @@ ExportDialog.exportFile = function(editorUi, name, format, bg, s, b)
     
     if (format == 'xml')
     {
+       
         ExportDialog.saveLocalFile(editorUi, mxUtils.getXml(editorUi.editor.getGraphXml()), name, format);
     }
     else if (format == 'svg')
     {
+       
         ExportDialog.saveLocalFile(editorUi, mxUtils.getXml(graph.getSvg(bg, s, b)), name, format);
     }
     else
     {
         var bounds = graph.getGraphBounds();
-        
+        console.log('bounds', bounds)
         // New image export
         var xmlDoc = mxUtils.createXmlDocument();
         var root = xmlDoc.createElement('output');
@@ -39238,7 +39240,6 @@ PosterScriptAPI.prototype.setup = function (cell) {
   shapeSetup.apply(this, arguments);
 
   var bindingsHandler = new BindingsHandler(this.ui);
-
   // init bindings
   if (typeof BindingsHandler == 'function') {
     bindingsHandler.graph.view.validatePosterState(cell);
