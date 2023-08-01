@@ -116,9 +116,6 @@ const {
     $$
     } = webix
 //Init.js start
-
-
-
 // Workaround for allowing target="_blank" in HTML sanitizer
 // see https://code.google.com/p/google-caja/issues/detail?can=2&q=&colspec=ID%20Type%20Status%20Priority%20Owner%20Summary&groupby=&sort=&id=1296
 //---fix---//
@@ -133,11 +130,11 @@ const {
 //// }
 //---fix---//
 // define API
-//---fix---//
-// API.FUNC.schemeEqView     = "/equipments/view";
-// API.FUNC.schemeExecCmd    = API.PREFIX + "scheme/execCmd";
-// API.FUNC.schemeEquipments = API.PREFIX + "scheme/equipments";
-//---fix---//
+
+API.FUNC.schemeEqView     = "/equipments/view";
+API.FUNC.schemeExecCmd    = API.PREFIX + "scheme/execCmd";
+API.FUNC.schemeEquipments = API.PREFIX + "scheme/equipments";
+
 // Fixes possible clipping issues in Chrome
 mxClient.NO_FO = true;
 
@@ -249,6 +246,7 @@ var VCLASS = {
 
 function mxBindings (source)
 {
+  
     if (source != null && isDefined(source.length))
     {
         for (let i = 0; i < source.length; i++)
@@ -337,9 +335,9 @@ mxCodecRegistry.register(mxGenericChangeCodec(new mxBindingsChange(), 'bindings'
 
 mxCell.prototype.setBindings = function (array)
 {
+   
     // update cell runtime bindings
     this.bindings = new mxBindings(array);
-    console.log(this.bindings)
     // Clones the value for correct undo/redo
     //let cellValue = this.getValue().cloneNode(true);
     // update cell value
@@ -369,9 +367,14 @@ mxCell.prototype.setBindings = function (array)
 };
 mxCell.prototype.getBinding = function (name)
 {
-    //if (this.bindings == null)
-        //this.bindings = this.getBindings();
+    // if (this.bindings == null)
+    //     this.bindings = this.getBindings();
+
+   //---fix---//
+
     //return this.bindings != null ? this.bindings.find(function (x) { return x.name == name; }) : null;
+
+//---fix---//
 };
 mxCell.prototype.getBindingsByID = function (bindID)
 {
@@ -379,7 +382,6 @@ mxCell.prototype.getBindingsByID = function (bindID)
         return [];
     return this.bindings.filter(function (x) { return !isNullOrEmpty(x.value) && x.value.indexOf(bindID) > 0; });
 };
-
 
 
 //Init.js end
@@ -393,6 +395,8 @@ mxCell.prototype.getBindingsByID = function (bindID)
 /**
  * Editor constructor executed on page load.
  */
+  //export default function Editor (viewMode, themes, model, graph)
+
   function Editor (viewMode, themes, model, graph)
 {
     mxEventSource.call(this);
@@ -402,6 +406,7 @@ mxCell.prototype.getBindingsByID = function (bindID)
     Graph.touchStyle = false;
 
     this.graph = graph || this.createGraph(themes, model);
+
     // override html rendering in cell
     this.graph.cellRenderer.getLabelValue = function(state)
     {
@@ -419,7 +424,7 @@ mxCell.prototype.getBindingsByID = function (bindID)
                     result = state.view.graph.sanitizeHtml(result);
             }
         }
-        
+   
         return result;
     };
 
@@ -667,7 +672,6 @@ Editor.prototype.setGraphXml = function(node)
     if (node != null)
     {
         var dec = new mxCodec(node.ownerDocument);
-        console.log(dec)
     
         if (node.nodeName == 'mxGraphModel')
         {
@@ -758,7 +762,7 @@ Editor.prototype.getGraphXml = function(ignoreSelection)
     {
         node.setAttribute('background', this.graph.background);
     }
-    
+   
     return node;
 };
 
@@ -2488,6 +2492,7 @@ PageSetupDialog.getFormats = function()
 /**
  * Construcs a new sidebar for the given editor.
  */
+
 function Sidebar(editorUi, container)
 {
     this.editorUi = editorUi;
@@ -2550,6 +2555,7 @@ function Sidebar(editorUi, container)
     
     this.init();
 }
+//export default Sidebar;
 /**
  * Adds all palettes to the sidebar.
  */
@@ -2811,6 +2817,7 @@ Sidebar.prototype.addGeneralPalette = function(expand)
         this.addEntry('hyperlink', mxUtils.bind(this, function ()
         {
             var cell = new mxCell('WWW', new mxGeometry(0, 0, 40, 25), 'text;html=1;shape=label;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontColor=#0000EE;fontStyle=4;');
+            console.log(cell)
             cell.vertex = true;
             this.graph.setLinkForCell(cell, 'https://');
             return this.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Ссылка');
@@ -4221,6 +4228,7 @@ Sidebar.prototype.createVertexTemplateEntry = function (style, width, height, va
 Sidebar.prototype.createVertexTemplate = function(style, width, height, value, title, showLabel, showTitle, allowCellsInserted)
 {
     var cells = [new mxCell((value != null) ? value : '', new mxGeometry(0, 0, width, height), style)];
+    console.log(cells)
     cells[0].vertex = true;
     return this.createItem(cells, title, showLabel, showTitle, width, height, allowCellsInserted);
 };
@@ -4229,6 +4237,7 @@ Sidebar.prototype.createEdgeTemplateEntry = function(style, width, height, value
     return this.addEntry(title, mxUtils.bind(this, function()
     {
         var cell = new mxCell((value != null) ? value : '', new mxGeometry(0, 0, width, height), style);
+        console.log(cell)
         cell.geometry.setTerminalPoint(new mxPoint(0, height), true);
         cell.geometry.setTerminalPoint(new mxPoint(width, 0), false);
         cell.geometry.relative = true;
@@ -4404,2078 +4413,1172 @@ Sidebar.prototype.destroy = function()
 
 //Bindings.js start
 
-function BindingsHandler (editorUi) {
-    webix.protoUI(
-      {
-        name: 'link',
-        $init: function (config) {
-          this.config = config;
-          this.config.icon = 'wxi-trash';
-          this.config.readonly = true;
-          this.config.attributes = { drop_target: true };
-  
-          this.config.bind = mxUtils.bind(this, function (data) {
-            if (data == null) return;
-  
-            let form = this.getFormView();
-            if (form == null) return;
-  
-            let context = form.context;
-            if (context == null) return;
-  
-            let item = GUID.isValid(data.id)
-              ? context.eqTree.getItem(data.id)
-              : context.paramsList.find(function (item) {
-                  return item.n == data.id;
-                }, true);
-            if (item != null) {
-              item = mxUtils.clone(item);
-              form.blockEvent();
-              this.config.setValue(item);
-              form.unblockEvent();
-            }
-          });
-          this.config.setValue = mxUtils.bind(this, function (item) {
-            if (item == null) {
-              this.value = null;
-              this.setValue('');
-              return;
-            }
-            // tag
-            if (item.mid) {
-              this.value = { id: item.n };
-              this.setValue(item.n);
-              return;
-            }
-            // eq
-            if (item.$count == 0 || item.eq) {
-              let context = this.getFormView().context;
-              if (context != null) {
-                this.value = { id: item.id };
-                let parent = context.eqTree.findParentEquipment(item.id);
-                if (parent != null) this.value.parent = parent.id;
-  
-                let path = context.eqTree.buildPath(item.id);
-                this.setValue(path);
-              }
-              return;
-            }
-          });
-          this.config.getValue = mxUtils.bind(this, function () {
-            return this.value;
-          });
-          this.config.on = {
-            onFocus: function (current, prev) {
-              let dnd = webix.DragControl.getContext();
-              if (dnd != null) return;
-  
-              var form = current.getFormView();
-              if (form == null) return;
-  
-              var context = form.context;
-              context.currentView = this;
-  
-              var value = current.config.getValue();
-              if (value == null) return;
-              context.showItem(value.id);
-            },
-            onSearchIconClick: function (e) {
-              this.config.setValue(null);
-            },
-          };
-        },
-        $cssName: 'search',
-        $renderIcon: function (config) {
-          $(this.$view).attr('drop_target', true);
-          return '<span style="height:26px;padding-top:6px;" class="webix_input_icon ' + config.icon + '" title="Очистить привязку"></span>';
-        },
-      },
-      webix.ui.search
-    );
-    webix.protoUI(
-      {
-        name: 'param',
-        $init: function (config) {
-          this.config = config;
-          this.config.icon = 'wxi-trash';
-          this.config.readonly = false;
-  
-          this.config.bind = mxUtils.bind(this, function (data) {
-            if (data == null) return;
-  
-            let form = this.getFormView();
-            if (form == null) return;
-  
-            let context = form.context;
-            if (context == null) return;
-  
-            let item = data;
-            if (isDefined(data.id)) {
-              item = GUID.isValid(data.id)
-                ? context.eqTree.getItem(data.id)
-                : context.paramsList.find(function (item) {
-                    return item.n == data.id;
-                  }, true);
-            }
-  
-            if (item != null) {
-              item = mxUtils.clone(item);
-              this.config.setValue(item);
-            }
-          });
-          this.config.setValue = mxUtils.bind(this, function (item) {
-            try {
-              this.changing = true;
-              if (item == null) {
-                this.value = null;
-                // set display value
-                this.setValue('');
-                return;
-              }
-              // tag
-              if (item.mid) {
-                this.value = { id: item.n };
-                // set display value
-                this.setValue(item.n);
-                return;
-              }
-              // eq
-              if (item.$count == 0 || item.eq) {
-                let context = this.getFormView().context;
-                if (context != null) {
-                  this.value = { id: item.id };
-                  let parent = context.eqTree.findParentEquipment(item.id);
-                  if (parent != null) this.value.parent = parent.id;
-  
-                  let path = context.eqTree.buildPath(item.id);
-                  // set display value
-                  this.setValue(path);
-                }
-                return;
-              }
-              // text
-              if (isDefined(item.text)) {
-                // set custom value
-                this.value = item;
-                // set display value
-                this.setValue(item.text);
-              }
-            } finally {
-              this.changing = false;
-            }
-          });
-          this.config.getValue = mxUtils.bind(this, function () {
-            return this.value;
-          });
-          this.config.on = $.extend(this.config.on || {}, {
-            onFocus: function (current, prev) {
-              let dnd = webix.DragControl.getContext();
-              if (dnd != null) return;
-  
-              var form = current.getFormView();
-              if (form == null) return;
-  
-              var context = form.context;
-              context.currentView = this;
-  
-              var value = current.config.getValue();
-              if (value == null) return;
-              context.showItem(value.id);
-            },
-            onChange: function (newv, oldv) {
-              if (!this.changing) this.config.setValue({ text: newv });
-            },
-            onSearchIconClick: function (e) {
-              this.config.setValue(null);
-            },
-          });
-        },
-        $cssName: 'search',
-        $renderIcon: function (config) {
-          return '<span style="height:26px;padding-top:6px;" class="webix_input_icon ' + config.icon + '" title="Очистить"></span>';
-        },
-      },
-      webix.ui.search
-    );
-    webix.protoUI(
-      {
-        name: 'path',
-        $init: function (config) {
-          this.config = config;
-          this.config.icon = 'wxi-folder-open';
-          this.config.readonly = false;
-  
-          this.config.bind = mxUtils.bind(this, function (data) {
-            if (data == null) return;
-  
-            let form = this.getFormView();
-            if (form == null) return;
-  
-            let context = form.context;
-            if (context == null) return;
-  
-            let item = data;
-            if (item != null) {
-              item = mxUtils.clone(item);
-              this.config.setValue(item);
-            }
-          });
-          this.config.setValue = mxUtils.bind(this, function (item) {
-            try {
-              this.changing = true;
-              if (item == null) {
-                this.value = null;
-                // set display value
-                this.setValue('');
-                return;
-              }
-              // text
-              if (isDefined(item.text)) {
-                // set custom value
-                this.value = item;
-                // set display value
-                this.setValue(item.text);
-              }
-            } finally {
-              this.changing = false;
-            }
-          });
-          this.config.getValue = mxUtils.bind(this, function () {
-            return this.value;
-          });
-          this.config.on = $.extend(this.config.on || {}, {
-            onChange: function (newv, oldv) {
-              if (!this.changing) this.config.setValue({ text: newv });
-            },
-            onSearchIconClick: function (e) {
-              let context = this;
-              let queryID = GUID.newID();
-  
-              // save current timeout
-              let savedTimeout = AJAX.getTimeout();
-              // temporary reset timeout
-              AJAX.setTimeout(0);
-              AJAX.post(
-                '/linkmt/file/select/' + this.config.ext,
-                null,
-                queryID,
-                function (xhr, resp) {
-                  if (!isNullOrEmpty(resp)) context.config.setValue({ text: resp });
-                },
-                function (xhr, err) {
-                  console.log('Ошибка выбора файла.')
-                  // messageError('Ошибка выбора файла.');
-                },
-                function (xhr) {
-                  // restore current timeout
-                  AJAX.setTimeout(savedTimeout);
-                }
-              );
-            },
-          });
-        },
-        $cssName: 'search',
-        $renderIcon: function (config) {
-          return '<span style="height:26px;padding-top:6px;padding-right:3px;" class="webix_input_icon ' + config.icon + '" title="Выбрать"></span>';
-        },
-      },
-      webix.ui.search
-    );
-    webix.protoUI(
-      {
-        name: 'editlist',
-      },
-      webix.EditAbility,
-      webix.ui.list
-    );
-  
-    this.ui = editorUi;
-    this.editor = this.ui.editor;
-    this.graph = this.editor.graph;
-    (function () {
-        function Bindings (window, container) {
-        this.window = window;
-        this.container = container;
-        this.titleBase = mxResources.get('bindings');
-  
-        webix.require(
-          ['/js/common/params_tree.js'],
-          mxUtils.bind(this, function () {
-            this.init();
-          })
-        );
-      };
-  
-      Bindings.prototype.ui = editorUi;
-      Bindings.prototype.editor = editorUi.editor;
-      Bindings.prototype.graph = editorUi.editor.graph;
-  
-      Bindings.prototype.init = function () {
-        //---fix---//
-        // var paramsView = paramstree.buildList({
-        //   css: 'params_tree_acc',
-        //   callback: mxUtils.bind(this, function (items) {
-        //     if (!items || items.length != 1) return;
-  
-        //     if (this.currentView != null) {
-        //       let itemToSet = items[0];
-        //       let setValueAction = this.currentView.config.setValue || this.currentView.setValue;
-        //       if (setValueAction) setValueAction.call(this.currentView, itemToSet);
-        //     }
-        //   }),
-        // });
-    //---fix---//
-        let properties = {
-          view: 'form',
-          id: 'properties',
-          borderless: false,
-          margin: 0,
-          padding: 8,
-          scroll: false,
-          width: 400,
-          drag: 'target',
-          complexData: false, // !!!! REQUIRED !!!
-          elements: [],
-          elementsConfig: {
-            checkValue: '1',
-            uncheckValue: '0',
-          },
-          on: {
-            onChange: function (val, prev) {
-              var ui = this.context.ui;
-              var graph = this.context.graph;
-  
-              if (graph && graph.isEnabled()) {
-                if (!this.context.validate()) return;
-  
-                try {
-                  graph.model.beginUpdate();
-  
-                  var bindings = [];
-                  var getValue = function (el) {
-                    if (el == null) return null;
-                    let getValueAction = el.config.getValue || el.getValue;
-                    if (getValueAction == null) return null;
-                    return getValueAction.call(el);
-                  };
-  
-                  this.getValues(function (el) {
-                    var value = getValue(el);
-  
-                    // check linked value
-                    if (!isNullOrEmpty(el.config.link)) {
-                      let linkedElement = this.elements[el.config.link];
-                      if (linkedElement == null) return;
-                      let res = getValue(linkedElement);
-                      if (isNullOrEmpty(res)) return;
-                    }
-  
-                    // check defaults
-                    if (value == el.config.default) return;
-  
-                    var item = { name: el.config.name, value: JSON.stringify(value) };
-                    bindings.push(item);
-                  });
-  
-                  // update cell bindings
-                  graph.model.setBindings(this.targetCell, bindings);
-  
-                  // rebuild view
-                  if (this.targetCell.onBindingsUpdated) this.targetCell.onBindingsUpdated();
-                } catch (e) {
-                  ui.handleError(e);
-                } finally {
-                  graph.model.endUpdate();
-                }
-              }
-            },
-          },
-        };
-        let resizer = {
-          view: 'resizer',
-          hidden: true,
-        };
-        let params = {
-          id: 'params',
-          gravity: 1,
-          hidden: true,
-          rows: [
-            {
-              view: 'tabbar',
-              id: 'paramsTab',
-              multiview: true,
-              bottomOffset: 1,
-              height: 30,
-              options: [
-                { id: 'eqTree', value: 'Оборудование' },
-                { id: 'params_tree_list', value: 'Параметры' },
-              ],
-            },
-            {
-              cells: [
-                {
-                  view: 'tree',
-                  id: 'eqTree',
-                  select: true,
-                  drag: 'source',
-                  scroll: 'auto',
-                  navigation: true,
-                  template: function (obj, common) {
-                    let tmpl = common.icon(obj, common) + common.folder(obj, common);
-                    return tmpl + '<span>' + (obj.eq ? '<b>' + obj.desc + '</b>' : obj.desc) + '</span>';
-                  },
-                  type: {
-                    folder: function (obj) {
-                      if (obj.eq) return "<span class='webix_icon fas fa-cog'></span>";
-                      if (obj.jrn) return "<span class='webix_icon fas fa-list'></span>";
-                      if (obj.osc) return "<span class='webix_icon fas fa-image'></span>";
-                      if (obj.states) return "<span class='webix_icon fas fa-eye'></span>";
-                      if (obj.commands) return "<span class='webix_icon fas fa-bolt'></span>";
-                      if (obj.pages) return "<span class='webix_icon fas fa-tags'></span>";
-                      if (obj.page) return "<span class='webix_icon fas fa-columns'></span>";
-                      if (obj.oper) return "<span class='webix_icon fas fa-dot-circle'></span>";
-                      return "<span class='webix_icon wxi-angle-double-right'></span>";
-                    },
-                  },
-                  scheme: {
-                    $init: function (obj) {
-                      if (isNullOrEmpty(obj.desc)) obj.desc = obj.name;
-  
-                      if (obj.type != null) {
-                        obj.eq = true;
-                        obj.desc = obj.name;
-                      }
-  
-                      // pages
-                      if (obj.pages && obj.pages.length > 0) {
-                        if (!obj.data) obj.data = [];
-                        var pagesRoot = { desc: 'Страницы параметров', pages: true, data: [] };
-  
-                        for (let i = 0; i < obj.pages.length; i++) {
-                          var page = obj.pages[i];
-                          if (page && page.params && page.params.length > 0) pagesRoot.data.push({ desc: page.hdr, path: true, page: true, data: page.params });
-                        }
-  
-                        if (pagesRoot.data.length > 0) obj.data.unshift(pagesRoot);
-                      }
-                      // oper info
-                      if (obj.oper && obj.oper.length > 0) {
-                        if (!obj.data) obj.data = [];
-                        obj.data.unshift({ desc: 'Оперативная информация', path: true, oper: true, data: obj.oper });
-                      }
-                      // commands
-                      if (obj.commands && obj.commands.length > 0) {
-                        if (!obj.data) obj.data = [];
-  
-                        for (let i = 0; i < obj.commands.length; i++) obj.commands[i].cmd = true;
-  
-                        obj.data.unshift({ desc: 'Команды', path: true, commands: true, data: obj.commands });
-                      }
-                      // states
-                      if (obj.states && obj.states.length > 0) {
-                        if (!obj.data) obj.data = [];
-  
-                        for (let i = 0; i < obj.states.length; i++) obj.states[i].state = true;
-  
-                        obj.data.unshift({ desc: 'Состояния', path: true, states: true, data: obj.states });
-                      }
-                      // maintenance
-                      if (obj.maintenance?.parameters && obj.maintenance.parameters.length > 0) {
-                        if (!obj.data) obj.data = [];
-  
-                        obj.maintenance.parameters.forEach((p) => (p.state = true));
-  
-                        obj.data.unshift({ desc: 'Признаки обслуживания', path: true, states: true, data: obj.maintenance.parameters });
-                      }
-                    },
-                  },
-                  data: [],
-                },
-                //---fix---//
-                // paramsView,
-                 //---fix---//
-              ],
-            },
-          ],
-        };
-  
-        let elements = [
+//export default function BindingsHandler (editorUi) {
+    function BindingsHandler (editorUi) {
+        webix.protoUI(
           {
-            view: 'scrollview',
-            gravity: 1,
-            scroll: 'y',
-            body: properties,
+            name: 'link',
+            $init: function (config) {
+              this.config = config;
+              this.config.icon = 'wxi-trash';
+              this.config.readonly = true;
+              this.config.attributes = { drop_target: true };
+      
+              this.config.bind = mxUtils.bind(this, function (data) {
+                if (data == null) return;
+      
+                let form = this.getFormView();
+                if (form == null) return;
+      
+                let context = form.context;
+                if (context == null) return;
+      
+                let item = GUID.isValid(data.id)
+                  ? context.eqTree.getItem(data.id)
+                  : context.paramsList.find(function (item) {
+                      return item.n == data.id;
+                    }, true);
+                if (item != null) {
+                  item = mxUtils.clone(item);
+                  form.blockEvent();
+                  this.config.setValue(item);
+                  form.unblockEvent();
+                }
+              });
+              this.config.setValue = mxUtils.bind(this, function (item) {
+                if (item == null) {
+                  this.value = null;
+                  this.setValue('');
+                  return;
+                }
+                // tag
+                if (item.mid) {
+                  this.value = { id: item.n };
+                  this.setValue(item.n);
+                  return;
+                }
+                // eq
+                if (item.$count == 0 || item.eq) {
+                  let context = this.getFormView().context;
+                  if (context != null) {
+                    this.value = { id: item.id };
+                    let parent = context.eqTree.findParentEquipment(item.id);
+                    if (parent != null) this.value.parent = parent.id;
+      
+                    let path = context.eqTree.buildPath(item.id);
+                    this.setValue(path);
+                  }
+                  return;
+                }
+              });
+              this.config.getValue = mxUtils.bind(this, function () {
+                return this.value;
+              });
+              this.config.on = {
+                onFocus: function (current, prev) {
+                  let dnd = webix.DragControl.getContext();
+                  if (dnd != null) return;
+      
+                  var form = current.getFormView();
+                  if (form == null) return;
+      
+                  var context = form.context;
+                  context.currentView = this;
+      
+                  var value = current.config.getValue();
+                  if (value == null) return;
+                  context.showItem(value.id);
+                },
+                onSearchIconClick: function (e) {
+                  this.config.setValue(null);
+                },
+              };
+            },
+            $cssName: 'search',
+            $renderIcon: function (config) {
+              $(this.$view).attr('drop_target', true);
+              return '<span style="height:26px;padding-top:6px;" class="webix_input_icon ' + config.icon + '" title="Очистить привязку"></span>';
+            },
           },
-          // resizer, // resizer works bad
-          params,
-        ];
-        // @if !LINKMT
-        resizer.hidden = false;
-        params.hidden = false;
-        // @endif
-        this.layout = webix.ui({
-          type: 'form',
-          container: this.container,
-          cols: elements,
-        });
-  
-        // @if LINKMT
-        // strange bug with modality fix
-        this.layout.getNode().style['z-index'] = 10000;
-        // @endif
-  
-        this.adjust = mxUtils.bind(this, function () {
-          this.layout.adjust();
-        });
-        this.update = mxUtils.bind(this, function (sender, evt) {
-          this.refresh();
-        });
-  
-        this.graph.getModel().addListener(mxEvent.CHANGE, this.update);
-        this.graph.getSelectionModel().addListener(mxEvent.CHANGE, this.update);
-  
-        this.showItem = mxUtils.bind(this, function (id) {
-          if (isNullOrEmpty(id)) return;
-  
-          var isGuid = GUID.isValid(id);
-          if (isGuid) {
-            this.paramsTab.setValue('eqTree');
-            if (this.eqTree.exists(id)) {
-              this.eqTree.select(id);
-              let parent = this.eqTree.getParentId(id);
-              if (parent != null) this.eqTree.open(parent, true);
-              this.eqTree.showItem(id);
-            } else this.eqTree.unselectAll();
-          } else {
-            this.paramsTab.setValue('params_tree_list');
-            var targetItem = this.paramsList.find(function (item) {
-              return item.n == id;
-            }, true);
-            if (targetItem != null) {
-              this.paramsList.select(targetItem.id);
-              this.paramsList.showItem(targetItem.id);
-            } else this.paramsList.unselectAll();
-          }
-        });
-  
-        this.properties = $$('properties');
-        if (this.properties) this.properties.context = this;
-  
-        this.paramsList = $$('params_tree_list');
-        if (this.paramsList) this.paramsList.context = this;
-  
-        this.paramsTab = $$('paramsTab');
-        if (this.paramsTab) this.paramsTab.context = this;
-  
-        this.eqTree = $$('eqTree');
-        if (this.eqTree) {
-          this.eqTree.context = this;
-          this.eqTree.findParentEquipment = mxUtils.bind(this.eqTree, function (id) {
-            let self = this.getItem(id);
-            if (self == null) return null;
-            if (self.eq) return self;
-            let parentID = this.getParentId(id);
-            if (!isDefined(parentID)) return null;
-            let parent = this.getItem(parentID);
-            if (!parent) return null;
-            if (parent.eq) return parent;
-            return this.findParentEquipment(parent.id);
-          });
-          this.eqTree.buildPath = mxUtils.bind(this.eqTree, function (id) {
-            let item = this.getItem(id);
-            if (item == null) return null;
-  
-            var path = [item.desc];
-            let parent = this.getItem(this.getParentId(item.id));
-            while (parent) {
-              if (parent.eq || parent.path) path.push(parent.desc);
-              parent = this.getItem(this.getParentId(parent.id));
-            }
-            return path.reverse().join('\\');
-          });
-        }
-  
-        AJAX.get(
-          API.FUNC.schemeEquipments,
-          null,
-          mxUtils.bind(this, function (xhr, resp) {
-            this.equipments = resp;
-          }),
-          function (xhr, err) {
-            console.log('Ошибка загрузки списка оборудования')
-           // messageError('Ошибка загрузки списка оборудования');
+          webix.ui.search
+        );
+        webix.protoUI(
+          {
+            name: 'param',
+            $init: function (config) {
+              this.config = config;
+              this.config.icon = 'wxi-trash';
+              this.config.readonly = false;
+      
+              this.config.bind = mxUtils.bind(this, function (data) {
+                if (data == null) return;
+      
+                let form = this.getFormView();
+                if (form == null) return;
+      
+                let context = form.context;
+                if (context == null) return;
+      
+                let item = data;
+                if (isDefined(data.id)) {
+                  item = GUID.isValid(data.id)
+                    ? context.eqTree.getItem(data.id)
+                    : context.paramsList.find(function (item) {
+                        return item.n == data.id;
+                      }, true);
+                }
+      
+                if (item != null) {
+                  item = mxUtils.clone(item);
+                  this.config.setValue(item);
+                }
+              });
+              this.config.setValue = mxUtils.bind(this, function (item) {
+                try {
+                  this.changing = true;
+                  if (item == null) {
+                    this.value = null;
+                    // set display value
+                    this.setValue('');
+                    return;
+                  }
+                  // tag
+                  if (item.mid) {
+                    this.value = { id: item.n };
+                    // set display value
+                    this.setValue(item.n);
+                    return;
+                  }
+                  // eq
+                  if (item.$count == 0 || item.eq) {
+                    let context = this.getFormView().context;
+                    if (context != null) {
+                      this.value = { id: item.id };
+                      let parent = context.eqTree.findParentEquipment(item.id);
+                      if (parent != null) this.value.parent = parent.id;
+      
+                      let path = context.eqTree.buildPath(item.id);
+                      // set display value
+                      this.setValue(path);
+                    }
+                    return;
+                  }
+                  // text
+                  if (isDefined(item.text)) {
+                    // set custom value
+                    this.value = item;
+                    // set display value
+                    this.setValue(item.text);
+                  }
+                } finally {
+                  this.changing = false;
+                }
+              });
+              this.config.getValue = mxUtils.bind(this, function () {
+                return this.value;
+              });
+              this.config.on = $.extend(this.config.on || {}, {
+                onFocus: function (current, prev) {
+                  let dnd = webix.DragControl.getContext();
+                  if (dnd != null) return;
+      
+                  var form = current.getFormView();
+                  if (form == null) return;
+      
+                  var context = form.context;
+                  context.currentView = this;
+      
+                  var value = current.config.getValue();
+                  if (value == null) return;
+                  context.showItem(value.id);
+                },
+                onChange: function (newv, oldv) {
+                  if (!this.changing) this.config.setValue({ text: newv });
+                },
+                onSearchIconClick: function (e) {
+                  this.config.setValue(null);
+                },
+              });
+            },
+            $cssName: 'search',
+            $renderIcon: function (config) {
+              return '<span style="height:26px;padding-top:6px;" class="webix_input_icon ' + config.icon + '" title="Очистить"></span>';
+            },
           },
-          mxUtils.bind(this, function (xhr, status) {
-            if (!this.eqTree || !this.paramsTab) return;
-  
-            if (this.equipments == null) this.paramsTab.hideOption('eqTree');
-            else {
-              this.eqTree.parse(this.equipments);
-              if (this.eqTree.count() == 1) this.eqTree.open(this.eqTree.getFirstId());
-            }
-  
-            if (this.paramsList) {
-              this.paramsList.complete = this.update;
-              this.paramsList.callEvent('onViewShow');
-            }
-          })
+          webix.ui.search
         );
-  
-        webix.attachEvent(
-          'onFocusChange',
-          mxUtils.bind(this, function (current, prev) {
-            if (current && current.getFormView) {
-              let element = current.$view;
-              if (element && $(element).attr('drop_target')) this.currentView = current;
-            }
-          })
+        webix.protoUI(
+          {
+            name: 'path',
+            $init: function (config) {
+              this.config = config;
+              this.config.icon = 'wxi-folder-open';
+              this.config.readonly = false;
+      
+              this.config.bind = mxUtils.bind(this, function (data) {
+                if (data == null) return;
+      
+                let form = this.getFormView();
+                if (form == null) return;
+      
+                let context = form.context;
+                if (context == null) return;
+      
+                let item = data;
+                if (item != null) {
+                  item = mxUtils.clone(item);
+                  this.config.setValue(item);
+                }
+              });
+              this.config.setValue = mxUtils.bind(this, function (item) {
+                try {
+                  this.changing = true;
+                  if (item == null) {
+                    this.value = null;
+                    // set display value
+                    this.setValue('');
+                    return;
+                  }
+                  // text
+                  if (isDefined(item.text)) {
+                    // set custom value
+                    this.value = item;
+                    // set display value
+                    this.setValue(item.text);
+                  }
+                } finally {
+                  this.changing = false;
+                }
+              });
+              this.config.getValue = mxUtils.bind(this, function () {
+                return this.value;
+              });
+              this.config.on = $.extend(this.config.on || {}, {
+                onChange: function (newv, oldv) {
+                  if (!this.changing) this.config.setValue({ text: newv });
+                },
+                onSearchIconClick: function (e) {
+                  let context = this;
+                  let queryID = GUID.newID();
+      
+                  // save current timeout
+                  let savedTimeout = AJAX.getTimeout();
+                  // temporary reset timeout
+                  AJAX.setTimeout(0);
+                  AJAX.post(
+                    '/linkmt/file/select/' + this.config.ext,
+                    null,
+                    queryID,
+                    function (xhr, resp) {
+                      if (!isNullOrEmpty(resp)) context.config.setValue({ text: resp });
+                    },
+                    function (xhr, err) {
+                      console.log('Ошибка выбора файла.')
+                      // messageError('Ошибка выбора файла.');
+                    },
+                    function (xhr) {
+                      // restore current timeout
+                      AJAX.setTimeout(savedTimeout);
+                    }
+                  );
+                },
+              });
+            },
+            $cssName: 'search',
+            $renderIcon: function (config) {
+              return '<span style="height:26px;padding-top:6px;padding-right:3px;" class="webix_input_icon ' + config.icon + '" title="Выбрать"></span>';
+            },
+          },
+          webix.ui.search
         );
-  
-        this.dropLogic = {
-          $drop: mxUtils.bind(this, function (source, target, e) {
-            if (source !== target) {
-              var context = webix.DragControl.getContext();
-              for (let i = 0; i < context.source.length; i++) {
-                let item = context.from.getItem(context.source[i]);
-                if (item) {
-                  // only single tag or equipment item is accepted
-                  if (item.$count === 0 || item.eq) {
-                    let element = $(target); //$(e.target || e.srcElement);
-                    if (element && element.attr('drop_target')) {
-                      let focusedView = this.currentView; //webix.UIManager.getFocus();
-                      if (focusedView) {
-                        let setValueAction = focusedView.config.setValue || focusedView.setValue;
-                        if (setValueAction) setValueAction.call(focusedView, item);
-                      }
+        webix.protoUI(
+          {
+            name: 'editlist',
+          },
+          webix.EditAbility,
+          webix.ui.list
+        );
+      
+        this.ui = editorUi;
+        this.editor = this.ui.editor;
+        this.graph = this.editor.graph;
+        (function () {
+            function Bindings (window, container) {
+            this.window = window;
+            this.container = container;
+            this.titleBase = mxResources.get('bindings');
+      
+            webix.require(
+              ['/js/common/params_tree.js'],
+              mxUtils.bind(this, function () {
+                this.init();
+              })
+            );
+          };
+      
+          Bindings.prototype.ui = editorUi;
+          Bindings.prototype.editor = editorUi.editor;
+          Bindings.prototype.graph = editorUi.editor.graph;
+      
+          Bindings.prototype.init = function () {
+            //---fix---//
+            // var paramsView = paramstree.buildList({
+            //   css: 'params_tree_acc',
+            //   callback: mxUtils.bind(this, function (items) {
+            //     if (!items || items.length != 1) return;
+      
+            //     if (this.currentView != null) {
+            //       let itemToSet = items[0];
+            //       let setValueAction = this.currentView.config.setValue || this.currentView.setValue;
+            //       if (setValueAction) setValueAction.call(this.currentView, itemToSet);
+            //     }
+            //   }),
+            // });
+        //---fix---//
+            let properties = {
+              view: 'form',
+              id: 'properties',
+              borderless: false,
+              margin: 0,
+              padding: 8,
+              scroll: false,
+              width: 400,
+              drag: 'target',
+              complexData: false, // !!!! REQUIRED !!!
+              elements: [],
+              elementsConfig: {
+                checkValue: '1',
+                uncheckValue: '0',
+              },
+              on: {
+                onChange: function (val, prev) {
+                  var ui = this.context.ui;
+                  var graph = this.context.graph;
+      
+                  if (graph && graph.isEnabled()) {
+                    if (!this.context.validate()) return;
+      
+                    try {
+                      graph.model.beginUpdate();
+      
+                      var bindings = [];
+                      var getValue = function (el) {
+                        if (el == null) return null;
+                        let getValueAction = el.config.getValue || el.getValue;
+                        if (getValueAction == null) return null;
+                        return getValueAction.call(el);
+                      };
+      
+                      this.getValues(function (el) {
+                        var value = getValue(el);
+      
+                        // check linked value
+                        if (!isNullOrEmpty(el.config.link)) {
+                          let linkedElement = this.elements[el.config.link];
+                          if (linkedElement == null) return;
+                          let res = getValue(linkedElement);
+                          if (isNullOrEmpty(res)) return;
+                        }
+      
+                        // check defaults
+                        if (value == el.config.default) return;
+      
+                        var item = { name: el.config.name, value: JSON.stringify(value) };
+                        bindings.push(item);
+                      });
+      
+                      // update cell bindings
+                      graph.model.setBindings(this.targetCell, bindings);
+      
+                      // rebuild view
+                      if (this.targetCell.onBindingsUpdated) this.targetCell.onBindingsUpdated();
+                    } catch (e) {
+                      ui.handleError(e);
+                    } finally {
+                      graph.model.endUpdate();
                     }
                   }
-                }
-              }
-            }
-          }),
-          $dragIn: mxUtils.bind(this, function (source, target, e) {
-            if (source != target) {
-              let element = $(target);
-              if (element && element.attr('drop_target')) {
-                if (element.select) element.select();
-                if (element.focus) element.focus();
-                // find webix UI element
-                let viewID = $(element).attr('view_id');
-                if (!isNullOrEmpty(viewID)) {
-                  let view = $$(viewID);
-                  if (view && this.currentView != view) {
-                    if (view.focus) view.focus();
-                    webix.UIManager.setFocus(view);
-                    this.currentView = view;
-                  }
-                }
-              }
-              return source;
-            }
-          }),
-        };
-      };
-      Bindings.prototype.validate = function () {
-        return this.properties != null ? this.properties.validate() : false;
-      };
-      Bindings.prototype.refresh = function () {
-        if (!this.window.isVisible() || this.properties == null) return;
-  
-        var cells = this.graph.getSelectionCells();
-        if (cells.length != 1) {
-          // reset title & properties
-          this.properties.define('elements', []);
-          this.properties.reconstruct();
-          this.window.setTitle(this.titleBase);
-          this.properties.targetCell = null;
-          //webix.DragControl.unlink(this.properties);
-          return;
-        }
-  
-        var selectedCell = cells[0];
-        if (this.properties.targetCell != selectedCell) {
-          //webix.DragControl.unlink(this.properties);
-  
-          // reset title & properties
-          this.properties.define('elements', []);
-          this.properties.reconstruct();
-          this.window.setTitle(this.titleBase);
-  
-          // update title
-          var name = this.graph.getAttributeForCell(selectedCell, 'name', null);
-          if (name != null) {
-            // @if LINKMT
-            let cellValue = selectedCell.getValue();
-            if (cellValue != null && mxUtils.isNode(cellValue) && cellValue.nodeName.toLowerCase() == 'bmrz') name = 'IED';
+                },
+              },
+            };
+            let resizer = {
+              view: 'resizer',
+              hidden: true,
+            };
+            let params = {
+              id: 'params',
+              gravity: 1,
+              hidden: true,
+              rows: [
+                {
+                  view: 'tabbar',
+                  id: 'paramsTab',
+                  multiview: true,
+                  bottomOffset: 1,
+                  height: 30,
+                  options: [
+                    { id: 'eqTree', value: 'Оборудование' },
+                    { id: 'params_tree_list', value: 'Параметры' },
+                  ],
+                },
+                {
+                  cells: [
+                    {
+                      view: 'tree',
+                      id: 'eqTree',
+                      select: true,
+                      drag: 'source',
+                      scroll: 'auto',
+                      navigation: true,
+                      template: function (obj, common) {
+                        let tmpl = common.icon(obj, common) + common.folder(obj, common);
+                        return tmpl + '<span>' + (obj.eq ? '<b>' + obj.desc + '</b>' : obj.desc) + '</span>';
+                      },
+                      type: {
+                        folder: function (obj) {
+                          if (obj.eq) return "<span class='webix_icon fas fa-cog'></span>";
+                          if (obj.jrn) return "<span class='webix_icon fas fa-list'></span>";
+                          if (obj.osc) return "<span class='webix_icon fas fa-image'></span>";
+                          if (obj.states) return "<span class='webix_icon fas fa-eye'></span>";
+                          if (obj.commands) return "<span class='webix_icon fas fa-bolt'></span>";
+                          if (obj.pages) return "<span class='webix_icon fas fa-tags'></span>";
+                          if (obj.page) return "<span class='webix_icon fas fa-columns'></span>";
+                          if (obj.oper) return "<span class='webix_icon fas fa-dot-circle'></span>";
+                          return "<span class='webix_icon wxi-angle-double-right'></span>";
+                        },
+                      },
+                      scheme: {
+                        $init: function (obj) {
+                          if (isNullOrEmpty(obj.desc)) obj.desc = obj.name;
+      
+                          if (obj.type != null) {
+                            obj.eq = true;
+                            obj.desc = obj.name;
+                          }
+      
+                          // pages
+                          if (obj.pages && obj.pages.length > 0) {
+                            if (!obj.data) obj.data = [];
+                            var pagesRoot = { desc: 'Страницы параметров', pages: true, data: [] };
+      
+                            for (let i = 0; i < obj.pages.length; i++) {
+                              var page = obj.pages[i];
+                              if (page && page.params && page.params.length > 0) pagesRoot.data.push({ desc: page.hdr, path: true, page: true, data: page.params });
+                            }
+      
+                            if (pagesRoot.data.length > 0) obj.data.unshift(pagesRoot);
+                          }
+                          // oper info
+                          if (obj.oper && obj.oper.length > 0) {
+                            if (!obj.data) obj.data = [];
+                            obj.data.unshift({ desc: 'Оперативная информация', path: true, oper: true, data: obj.oper });
+                          }
+                          // commands
+                          if (obj.commands && obj.commands.length > 0) {
+                            if (!obj.data) obj.data = [];
+      
+                            for (let i = 0; i < obj.commands.length; i++) obj.commands[i].cmd = true;
+      
+                            obj.data.unshift({ desc: 'Команды', path: true, commands: true, data: obj.commands });
+                          }
+                          // states
+                          if (obj.states && obj.states.length > 0) {
+                            if (!obj.data) obj.data = [];
+      
+                            for (let i = 0; i < obj.states.length; i++) obj.states[i].state = true;
+      
+                            obj.data.unshift({ desc: 'Состояния', path: true, states: true, data: obj.states });
+                          }
+                          // maintenance
+                          if (obj.maintenance?.parameters && obj.maintenance.parameters.length > 0) {
+                            if (!obj.data) obj.data = [];
+      
+                            obj.maintenance.parameters.forEach((p) => (p.state = true));
+      
+                            obj.data.unshift({ desc: 'Признаки обслуживания', path: true, states: true, data: obj.maintenance.parameters });
+                          }
+                        },
+                      },
+                      data: [],
+                    },
+                    //---fix---//
+                    // paramsView,
+                     //---fix---//
+                  ],
+                },
+              ],
+            };
+      
+            let elements = [
+              {
+                view: 'scrollview',
+                gravity: 1,
+                scroll: 'y',
+                body: properties,
+              },
+              // resizer, // resizer works bad
+              params,
+            ];
+            // @if !LINKMT
+            resizer.hidden = false;
+            params.hidden = false;
             // @endif
-            this.window.setTitle(this.titleBase + ' - ' + name);
-          }
-  
-          if (this.container.clientHeight > 0) {
-            var bindings = this.getForCell(selectedCell);
-            if (bindings != null) {
-              this.properties.targetCell = selectedCell;
-  
-              this.properties.define('elements', bindings);
-              this.properties.reconstruct();
-  
-              for (let id in this.properties.elements) {
-                let el = this.properties.elements[id];
-                el.context = this;
-                webix.DragControl.addDrop(el.$view, this.dropLogic);
+            this.layout = webix.ui({
+              type: 'form',
+              container: this.container,
+              cols: elements,
+            });
+      
+            // @if LINKMT
+            // strange bug with modality fix
+            this.layout.getNode().style['z-index'] = 10000;
+            // @endif
+      
+            this.adjust = mxUtils.bind(this, function () {
+              this.layout.adjust();
+            });
+            this.update = mxUtils.bind(this, function (sender, evt) {
+              this.refresh();
+            });
+      
+            this.graph.getModel().addListener(mxEvent.CHANGE, this.update);
+            this.graph.getSelectionModel().addListener(mxEvent.CHANGE, this.update);
+      
+            this.showItem = mxUtils.bind(this, function (id) {
+              if (isNullOrEmpty(id)) return;
+      
+              var isGuid = GUID.isValid(id);
+              if (isGuid) {
+                this.paramsTab.setValue('eqTree');
+                if (this.eqTree.exists(id)) {
+                  this.eqTree.select(id);
+                  let parent = this.eqTree.getParentId(id);
+                  if (parent != null) this.eqTree.open(parent, true);
+                  this.eqTree.showItem(id);
+                } else this.eqTree.unselectAll();
+              } else {
+                this.paramsTab.setValue('params_tree_list');
+                var targetItem = this.paramsList.find(function (item) {
+                  return item.n == id;
+                }, true);
+                if (targetItem != null) {
+                  this.paramsList.select(targetItem.id);
+                  this.paramsList.showItem(targetItem.id);
+                } else this.paramsList.unselectAll();
               }
-  
-              this.properties.blockEvent();
-  
-              // read & apply element config
-              if (selectedCell.bindings != null) {
-                for (var i = 0; i < selectedCell.bindings.length; i++) {
-                  var item = selectedCell.bindings[i];
-                  if (item) {
-                    // read & apply all attributes
-                    let attrName = item.name;
-                    if (!isNullOrEmpty(attrName)) {
-                      let attrValue = item.value;
-                      if (!isNullOrEmpty(attrValue)) {
-                        var prop = this.properties.elements[attrName];
-                        if (prop) {
-                          let applyAction = prop.config.bind || prop.config.setValue || prop.setValue;
-                          if (applyAction != null) {
-                            // block events
-                            if (prop.blockEvent) prop.blockEvent();
-                            // apply value
-                            applyAction.call(prop, JSON.parse(attrValue));
-                            // restore events
-                            if (prop.unblockEvent) prop.unblockEvent();
+            });
+      
+            this.properties = $$('properties');
+            if (this.properties) this.properties.context = this;
+      
+            this.paramsList = $$('params_tree_list');
+            if (this.paramsList) this.paramsList.context = this;
+      
+            this.paramsTab = $$('paramsTab');
+            if (this.paramsTab) this.paramsTab.context = this;
+      
+            this.eqTree = $$('eqTree');
+            if (this.eqTree) {
+              this.eqTree.context = this;
+              this.eqTree.findParentEquipment = mxUtils.bind(this.eqTree, function (id) {
+                let self = this.getItem(id);
+                if (self == null) return null;
+                if (self.eq) return self;
+                let parentID = this.getParentId(id);
+                if (!isDefined(parentID)) return null;
+                let parent = this.getItem(parentID);
+                if (!parent) return null;
+                if (parent.eq) return parent;
+                return this.findParentEquipment(parent.id);
+              });
+              this.eqTree.buildPath = mxUtils.bind(this.eqTree, function (id) {
+                let item = this.getItem(id);
+                if (item == null) return null;
+      
+                var path = [item.desc];
+                let parent = this.getItem(this.getParentId(item.id));
+                while (parent) {
+                  if (parent.eq || parent.path) path.push(parent.desc);
+                  parent = this.getItem(this.getParentId(parent.id));
+                }
+                return path.reverse().join('\\');
+              });
+            }
+      
+            AJAX.get(
+              API.FUNC.schemeEquipments,
+              null,
+              mxUtils.bind(this, function (xhr, resp) {
+                this.equipments = resp;
+              }),
+              function (xhr, err) {
+                console.log('Ошибка загрузки списка оборудования')
+               // messageError('Ошибка загрузки списка оборудования');
+              },
+              mxUtils.bind(this, function (xhr, status) {
+                if (!this.eqTree || !this.paramsTab) return;
+      
+                if (this.equipments == null) this.paramsTab.hideOption('eqTree');
+                else {
+                  this.eqTree.parse(this.equipments);
+                  if (this.eqTree.count() == 1) this.eqTree.open(this.eqTree.getFirstId());
+                }
+      
+                if (this.paramsList) {
+                  this.paramsList.complete = this.update;
+                  this.paramsList.callEvent('onViewShow');
+                }
+              })
+            );
+      
+            webix.attachEvent(
+              'onFocusChange',
+              mxUtils.bind(this, function (current, prev) {
+                if (current && current.getFormView) {
+                  let element = current.$view;
+                  if (element && $(element).attr('drop_target')) this.currentView = current;
+                }
+              })
+            );
+      
+            this.dropLogic = {
+              $drop: mxUtils.bind(this, function (source, target, e) {
+                if (source !== target) {
+                  var context = webix.DragControl.getContext();
+                  for (let i = 0; i < context.source.length; i++) {
+                    let item = context.from.getItem(context.source[i]);
+                    if (item) {
+                      // only single tag or equipment item is accepted
+                      if (item.$count === 0 || item.eq) {
+                        let element = $(target); //$(e.target || e.srcElement);
+                        if (element && element.attr('drop_target')) {
+                          let focusedView = this.currentView; //webix.UIManager.getFocus();
+                          if (focusedView) {
+                            let setValueAction = focusedView.config.setValue || focusedView.setValue;
+                            if (setValueAction) setValueAction.call(focusedView, item);
                           }
                         }
                       }
                     }
                   }
                 }
-              }
-  
-              // custom ready event
-              for (let id in this.properties.elements) {
-                let el = this.properties.elements[id];
-                if (el != null && el.callEvent) el.callEvent('onReady', []);
-              }
-  
-              this.properties.unblockEvent();
-            }
-          }
-        }
-      };
-      Bindings.prototype.getForCell = function (cell) {
-        var bindings = [];
-  
-        var style = this.graph.getCellStyle(cell);
-        if (style == null || style.shape == null) return bindings;
-  
-        var cellValue = cell.getValue();
-        if (cellValue == null || !mxUtils.isNode(cellValue)) return bindings;
-  
-        //let cellType = style.shape.toLowerCase();
-        let cellType = cellValue.nodeName.toLowerCase();
-        let cellGeom = this.graph.getCellGeometry(cell);
-  
-        var context = this;
-        var onHandler = {
-          onFocus: function (current_view, prev_view) {
-            if (context.currentView != current_view) {
-              context.currentView = current_view;
-              if (context.currentView.focus) context.currentView.focus();
-              webix.UIManager.setFocus(context.currentView);
-            }
-          },
-        };
-        var onColorPickerHandler = {
-          onFocus: function (current_view, prev_view) {
-            if (context.currentView != current_view) {
-              context.currentView = current_view;
-              if (context.currentView.focus) context.currentView.focus();
-              webix.UIManager.setFocus(context.currentView);
-            }
-          },
-          onChange: function (val, prev) {},
-        };
-  
-        var state = {
-          cols: [
-            { view: 'label', label: 'Состояние:', width: 110 },
-            { view: 'link', name: 'state' },
-          ],
-        };
-        var vclass = {
-          cols: [
-            { view: 'label', label: 'Класс напр-я:', width: 110 },
-            {
-              view: 'richselect',
-              name: 'vclass',
-              default: 'V0',
-              value: 'V0',
-              on: onHandler,
-              options: {
-                data: VCLASS.getOptions(),
-                body: {
-                  template: function (obj, common) {
-                    let result = '<span>' + obj.value + '</span>';
-                    if (obj.id != 'V0') {
-                      let color = VCLASS.getColor(obj.id);
-                      result += '<span style="float:right;width:100px;text-align:center;color:#ffffff;background:' + color + '">' + color + '<span/>';
+              }),
+              $dragIn: mxUtils.bind(this, function (source, target, e) {
+                if (source != target) {
+                  let element = $(target);
+                  if (element && element.attr('drop_target')) {
+                    if (element.select) element.select();
+                    if (element.focus) element.focus();
+                    // find webix UI element
+                    let viewID = $(element).attr('view_id');
+                    if (!isNullOrEmpty(viewID)) {
+                      let view = $$(viewID);
+                      if (view && this.currentView != view) {
+                        if (view.focus) view.focus();
+                        webix.UIManager.setFocus(view);
+                        this.currentView = view;
+                      }
                     }
-                    return result;
-                  },
-                },
-              },
-            },
-          ],
-        };
-        var script = {
-          cols: [
-            { view: 'label', label: 'Скрипт:', width: 110 },
-            { view: 'richselect', /*name: "script", */ options: [cellType], value: cellType, on: onHandler, disabled: true },
-          ],
-        };
-  
-        var colors = {
-          view: 'accordion',
-          multi: true,
-          type: 'clean',
-          margin: 2,
-          rows: [],
-        };
-        var fillColor = {
-          view: 'accordionitem',
-          header: 'Цвет заливки:',
-          headerHeight: 22,
-          headerAltHeight: 22,
-          collapsed: true,
-          body: {
-            rows: [
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.fill.$1.val', link: 'color.fill.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.fill.$1' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.fill.$2.val', link: 'color.fill.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.fill.$2' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.fill.$3.val', link: 'color.fill.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.fill.$3' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.fill.$4.val', link: 'color.fill.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.fill.$4' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.fill.$5.val', link: 'color.fill.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.fill.$5' },
-                ],
-              },
-            ],
-          },
-        };
-        var borderColor = {
-          view: 'accordionitem',
-          header: 'Цвет контура:',
-          headerHeight: 22,
-          headerAltHeight: 22,
-          collapsed: true,
-          body: {
-            rows: [
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.brd.$1.val', link: 'color.brd.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.brd.$1' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.brd.$2.val', link: 'color.brd.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.brd.$2' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.brd.$3.val', link: 'color.brd.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.brd.$3' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.brd.$4.val', link: 'color.brd.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.brd.$4' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.brd.$5.val', link: 'color.brd.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.brd.$5' },
-                ],
-              },
-            ],
-          },
-        };
-        var fontColor = {
-          view: 'accordionitem',
-          header: 'Цвет шрифта:',
-          headerHeight: 22,
-          headerAltHeight: 22,
-          collapsed: true,
-          body: {
-            rows: [
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.font.$1.val', link: 'color.font.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.font.$1' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.font.$2.val', link: 'color.font.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.font.$2' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.font.$3.val', link: 'color.font.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.font.$3' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.font.$4.val', link: 'color.font.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.font.$4' },
-                ],
-              },
-              {
-                cols: [
-                  { view: 'colorpicker', name: 'color.font.$5.val', link: 'color.font.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
-                  { view: 'link', name: 'color.font.$5' },
-                ],
-              },
-            ],
-          },
-        };
-  
-        var visibility = {
-          cols: [
-            { view: 'label', label: 'Видимость:', width: 110 },
-            { view: 'link', name: 'visibility' },
-          ],
-        };
-        var label = {
-          cols: [
-            { view: 'label', label: 'Надпись:', width: 110 },
-            { view: 'link', name: 'label' },
-          ],
-        };
-        var header = {
-          cols: [
-            { view: 'label', label: 'Заголовок:', width: 110 },
-            { view: 'param', name: 'header' },
-          ],
-        };
-        var blinking = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Мигание:', width: 110 },
-                { view: 'link', name: 'blink' },
-              ],
-            },
-            {
-              cols: [{}, { view: 'label', label: 'мс:', align: 'right' }, { view: 'text', name: 'blink.speed', link: 'blink', value: 500, width: 80, type: 'number' }],
-            },
-          ],
-        };
-        var rotation = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Вращение:', width: 110 },
-                { view: 'link', name: 'rotation' },
-              ],
-            },
-            {
-              cols: [{}, { view: 'label', label: 'мс:', align: 'right' }, { view: 'text', name: 'rotation.speed', link: 'rotation', value: 100, width: 80, type: 'number' }],
-            },
-          ],
-        };
-        var turning = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Поворот:', width: 110 },
-                { view: 'link', name: 'turn' },
-              ],
-            },
-            {
-              cols: [{}, { view: 'label', label: 'град (0-360):', align: 'right' }, { view: 'text', name: 'turn.angle', link: 'turn', value: 90, width: 80, type: 'number' }],
-            },
-          ],
-        };
-        var shifting = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Сдвиг:', width: 110 },
-                { view: 'link', name: 'shift' },
-              ],
-            },
-            {
-              cols: [{}, { view: 'label', label: '∆x:', align: 'right', width: 25 }, { view: 'text', name: 'shift.dx', link: 'shift', value: 0, width: 80, type: 'number' }, { view: 'label', label: '∆y:', align: 'right', width: 25 }, { view: 'text', name: 'shift.dy', link: 'shift', value: 0, width: 80, type: 'number' }],
-            },
-          ],
-        };
-        var moving = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Перемещение:', width: 110 },
-                { view: 'link', name: 'move' },
-              ],
-            },
-            {
-              cols: [{}, { view: 'label', label: 'x:', align: 'right', width: 25 }, { view: 'text', name: 'move.x', link: 'move', value: cellGeom.x, width: 80, type: 'number' }, { view: 'label', label: 'y:', align: 'right', width: 25 }, { view: 'text', name: 'move.y', link: 'move', value: cellGeom.y, width: 80, type: 'number' }],
-            },
-          ],
-        };
-        var sound = {
-          cols: [
-            { view: 'label', label: 'Источник:', width: 110 },
-            {
-              cols: [
-                {
-                  view: 'label',
-                  id: 'play.name',
-                  name: 'play.name',
-                },
-                {
-                  view: 'text',
-                  id: 'play.data',
-                  name: 'play.data',
-                  hidden: true,
-                },
-                {
-                  view: 'uploader',
-                  value: 'Выбрать',
-                  apiOnly: true,
-                  width: 100,
-                  multiple: false,
-                  autosend: false, //!important
-                  accept: '.mp3,.ogg,.wav',
-                  on: {
-                    onBeforeFileAdd: function (item) {
-                      if (this.config.accept && this.config.accept !== '*') {
-                        let acceptedTypes = this.config.accept.split(',').map(function (x) {
-                          return x.trimFromStart('.');
-                        });
-                        if (acceptedTypes.indexOf(item.type.toLowerCase()) < 0) {
-                          console.log('common.errors.support_only_files' + ': ' + acceptedTypes.join(','))
-                         // messageError(translate('common.errors.support_only_files') + ': ' + acceptedTypes.join(','));
-                          this.files.clearAll();
-                          return false;
+                  }
+                  return source;
+                }
+              }),
+            };
+          };
+          Bindings.prototype.validate = function () {
+            return this.properties != null ? this.properties.validate() : false;
+          };
+          Bindings.prototype.refresh = function () {
+            if (!this.window.isVisible() || this.properties == null) return;
+      
+            var cells = this.graph.getSelectionCells();
+            if (cells.length != 1) {
+              // reset title & properties
+              this.properties.define('elements', []);
+              this.properties.reconstruct();
+              this.window.setTitle(this.titleBase);
+              this.properties.targetCell = null;
+              //webix.DragControl.unlink(this.properties);
+              return;
+            }
+      
+            var selectedCell = cells[0];
+            if (this.properties.targetCell != selectedCell) {
+              //webix.DragControl.unlink(this.properties);
+      
+              // reset title & properties
+              this.properties.define('elements', []);
+              this.properties.reconstruct();
+              this.window.setTitle(this.titleBase);
+      
+              // update title
+              var name = this.graph.getAttributeForCell(selectedCell, 'name', null);
+              if (name != null) {
+                // @if LINKMT
+                let cellValue = selectedCell.getValue();
+                if (cellValue != null && mxUtils.isNode(cellValue) && cellValue.nodeName.toLowerCase() == 'bmrz') name = 'IED';
+                // @endif
+                this.window.setTitle(this.titleBase + ' - ' + name);
+              }
+      
+              if (this.container.clientHeight > 0) {
+                var bindings = this.getForCell(selectedCell);
+                if (bindings != null) {
+                  this.properties.targetCell = selectedCell;
+      
+                  this.properties.define('elements', bindings);
+                  this.properties.reconstruct();
+      
+                  for (let id in this.properties.elements) {
+                    let el = this.properties.elements[id];
+                    el.context = this;
+                    webix.DragControl.addDrop(el.$view, this.dropLogic);
+                  }
+      
+                  this.properties.blockEvent();
+      
+                  // read & apply element config
+                  if (selectedCell.bindings != null) {
+                    for (var i = 0; i < selectedCell.bindings.length; i++) {
+                      var item = selectedCell.bindings[i];
+                      if (item) {
+                        // read & apply all attributes
+                        let attrName = item.name;
+                        if (!isNullOrEmpty(attrName)) {
+                          let attrValue = item.value;
+                          if (!isNullOrEmpty(attrValue)) {
+                            var prop = this.properties.elements[attrName];
+                            if (prop) {
+                              let applyAction = prop.config.bind || prop.config.setValue || prop.setValue;
+                              if (applyAction != null) {
+                                // block events
+                                if (prop.blockEvent) prop.blockEvent();
+                                // apply value
+                                applyAction.call(prop, JSON.parse(attrValue));
+                                // restore events
+                                if (prop.unblockEvent) prop.unblockEvent();
+                              }
+                            }
+                          }
                         }
                       }
-                    },
-                    onAfterFileAdd: function (item) {
-                      var inputs = this.$view.getElementsByTagName('INPUT');
-                      var fileList = inputs[inputs.length - 1].files;
-                      if (fileList && fileList.length > 0) {
-                        // last file is loaded by client
-                        if (this.files.count() === fileList.length) {
-                          var self = this;
-                          HELP.readBinaryFile(item.file, function (data) {
-                            let srcData = window.btoa ? window.btoa(data) : Base64.encode(data, true);
-                            $$('play.name').setValue(item.name);
-                            $$('play.data').setValue('data:' + item.file.type + ';base64,' + srcData);
-                            self.files.clearAll();
-                          });
+                    }
+                  }
+      
+                  // custom ready event
+                  for (let id in this.properties.elements) {
+                    let el = this.properties.elements[id];
+                    if (el != null && el.callEvent) el.callEvent('onReady', []);
+                  }
+      
+                  this.properties.unblockEvent();
+                }
+              }
+            }
+          };
+          Bindings.prototype.getForCell = function (cell) {
+            var bindings = [];
+      
+            var style = this.graph.getCellStyle(cell);
+            if (style == null || style.shape == null) return bindings;
+      
+            var cellValue = cell.getValue();
+            if (cellValue == null || !mxUtils.isNode(cellValue)) return bindings;
+      
+            //let cellType = style.shape.toLowerCase();
+            let cellType = cellValue.nodeName.toLowerCase();
+            let cellGeom = this.graph.getCellGeometry(cell);
+      
+            var context = this;
+            var onHandler = {
+              onFocus: function (current_view, prev_view) {
+                if (context.currentView != current_view) {
+                  context.currentView = current_view;
+                  if (context.currentView.focus) context.currentView.focus();
+                  webix.UIManager.setFocus(context.currentView);
+                }
+              },
+            };
+            var onColorPickerHandler = {
+              onFocus: function (current_view, prev_view) {
+                if (context.currentView != current_view) {
+                  context.currentView = current_view;
+                  if (context.currentView.focus) context.currentView.focus();
+                  webix.UIManager.setFocus(context.currentView);
+                }
+              },
+              onChange: function (val, prev) {},
+            };
+      
+            var state = {
+              cols: [
+                { view: 'label', label: 'Состояние:', width: 110 },
+                { view: 'link', name: 'state' },
+              ],
+            };
+            var vclass = {
+              cols: [
+                { view: 'label', label: 'Класс напр-я:', width: 110 },
+                {
+                  view: 'richselect',
+                  name: 'vclass',
+                  default: 'V0',
+                  value: 'V0',
+                  on: onHandler,
+                  options: {
+                    data: VCLASS.getOptions(),
+                    body: {
+                      template: function (obj, common) {
+                        let result = '<span>' + obj.value + '</span>';
+                        if (obj.id != 'V0') {
+                          let color = VCLASS.getColor(obj.id);
+                          result += '<span style="float:right;width:100px;text-align:center;color:#ffffff;background:' + color + '">' + color + '<span/>';
                         }
-                      }
+                        return result;
+                      },
                     },
                   },
                 },
               ],
-            },
-          ],
-        };
-        var commands = {
-          view: 'accordion',
-          multi: true,
-          type: 'clean',
-          margin: 2,
-          rows: [
-            {
+            };
+            var script = {
+              cols: [
+                { view: 'label', label: 'Скрипт:', width: 110 },
+                { view: 'richselect', /*name: "script", */ options: [cellType], value: cellType, on: onHandler, disabled: true },
+              ],
+            };
+      
+            var colors = {
+              view: 'accordion',
+              multi: true,
+              type: 'clean',
+              margin: 2,
+              rows: [],
+            };
+            var fillColor = {
               view: 'accordionitem',
-              header: 'Команды:',
+              header: 'Цвет заливки:',
               headerHeight: 22,
               headerAltHeight: 22,
               collapsed: true,
               body: {
-                view: 'forminput',
-                name: 'commands',
-                bind: function (data) {
-                  if (data == null || data.length == 0) return;
-  
-                  let list = this.queryView('editlist');
-                  list.blockEvent();
-  
-                  data.forEach(function (x) {
-                    let item = GUID.isValid(x.id)
-                      ? context.eqTree.getItem(x.id)
-                      : context.paramsList.find(function (item) {
-                          return item.n == x.id;
-                        }, true);
-                    if (item != null) {
-                      item = mxUtils.clone(item);
-                      // restore user description
-                      item.d = x.d;
-                      list.config.bind.call(list, item);
-                    }
-                  });
-  
-                  list.refresh();
-                  list.unblockEvent();
-                },
-                getValue: function () {
-                  let list = this.queryView('editlist');
-                  return list.config.getValue.call(list);
-                },
-                body: {
-                  view: 'editlist',
-                  select: true,
-                  navigation: true,
-                  drag: 'order',
-                  dragScroll: true,
-                  editable: true,
-                  editor: 'text',
-                  editValue: 'd',
-                  minHeight: 150,
-                  data: [],
-                  ready: function () {
-                    $(this.$view).attr('drop_target', true);
-                    webix.DragControl.addDrop(this.$view, context.dropLogic);
-  
-                    this.data.attachEvent(
-                      'onStoreUpdated',
-                      mxUtils.bind(this, function (id, obj, mode) {
-                        context.properties.callEvent('onChange');
-                      })
-                    );
-                  },
-                  bind: function (item) {
-                    this.data.blockEvent();
-                    this.config.setValue.call(this, item);
-                    this.data.unblockEvent();
-                  },
-                  setValue: function (item) {
-                    if (item == null) return;
-  
-                    let index = this.getIndexById(this.getSelectedId());
-  
-                    // tag
-                    if (item.mid) {
-                      if (item.vtype == API.ENUMS.TagValueType.Boolean) this.add({ id: item.n, val: item.n, d: item.d || item.n, confirm: true }, index);
-                      return;
-                    }
-                    // eq
-                    if (item.$count == 0 && item.cmd) {
-                      let path = context.eqTree.buildPath(item.id);
-                      let value = { id: item.id, val: path, d: item.d || item.desc, confirm: item.cnf };
-                      if (!item.eq) {
-                        let parent = context.eqTree.findParentEquipment(item.id);
-                        if (parent) value.parent = parent.id;
-                      }
-                      this.add(value, index);
-                      return;
-                    }
-                  },
-                  getValue: function () {
-                    return this.data.serialize(true);
-                  },
-                  on: {
-                    onFocus: onHandler.onFocus,
-                    onBeforeAdd: function (id, obj, index) {
-                      return !this.exists(id);
-                    },
-                    onSelectChange: function (ids) {
-                      if (ids == null || ids.length != 1) return;
-                      let item = this.getSelectedItem();
-                      if (item == null) return;
-                      context.showItem(item.id);
-                    },
-                  },
-                  onClick: {
-                    'wxi-close': function (evt, id) {
-                      this.remove(id);
-                    },
-                  },
-                  template: function (obj, common) {
-                    return obj.d + "<span class='webix_icon wxi-close' style='float:right;margin-top:5px' title='Удалить'></span>";
-                  },
-                },
-              },
-            },
-          ],
-        };
-        var action = {
-          rows: [
-            {
-              cols: [
-                { view: 'label', label: 'Действие:', width: 110 },
-                {
-                  view: 'richselect',
-                  id: 'action',
-                  name: 'action',
-                  value: 'none',
-                  default: 'none',
-                  options: [
-                    { id: 'none', value: 'Нет' },
-                    { id: 'exec', value: 'Выполнить' },
-                    { id: 'open', value: 'Открыть' },
-                    { id: 'goto', value: 'Переход' },
-                    { id: 'camera', value: 'IP-камера' },
-                    { id: 'eq', value: 'Оборудование' },
-                  ],
-                  on: {
-                    onReady: function () {
-                      let args = $$('action.args');
-                      let trigger = $$('action.trigger');
-                      if (args != null && trigger != null) {
-                        // reset
-                        args.enable();
-                        trigger.disable();
-                        args.define('readonly', false);
-                        $(args.$view).attr('drop_target', null);
-                        // apply
-                        switch (this.getValue()) {
-                          case 'none':
-                            args.disable();
-                            break;
-                          case 'eq':
-                            {
-                              args.define('readonly', true);
-                              $(args.$view).attr('drop_target', true);
-                              trigger.enable();
-                            }
-                            break;
-                          case 'exec':
-                            {
-                              args.define('readonly', true);
-                              $(args.$view).attr('drop_target', true);
-                            }
-                            break;
-                          case 'camera':
-                            {
-                              trigger.enable();
-                            }
-                            break;
-                          default:
-                            break;
-                        }
-                        args.refresh();
-                      }
-                    },
-                    onChange: function (newv, oldv) {
-                      this.callEvent('onReady', []);
-                      let args = $$('action.args');
-                      let trigger = $$('action.trigger');
-                      if (args != null && trigger != null) {
-                        args.config.setValue(null);
-                        trigger.config.setValue(null);
-                      }
-                    },
-                  },
-                },
-              ],
-            },
-            {
-              cols: [
-                { view: 'label', label: 'Аргумент:', width: 110 },
-                { view: 'param', id: 'action.args', name: 'action.args', on: onHandler },
-              ],
-            },
-            {
-              cols: [
-                { view: 'label', label: 'Триггер:', width: 110 },
-                { view: 'link', id: 'action.trigger', name: 'action.trigger', on: onHandler },
-              ],
-            },
-          ],
-        };
-  
-        switch (cellType) {
-          case 'switch':
-          case 'rollswitch':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(state);
-              bindings.push(vclass);
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Положение:', width: 110 },
-                  { view: 'checkbox', name: 'position', value: 1, default: 1, on: onHandler, tooltip: 'Отображать положение выключателя' },
-                ],
-              });
-              bindings.push(blinking);
-              bindings.push(rotation);
-              bindings.push(turning);
-              bindings.push(shifting);
-              bindings.push(moving);
-              bindings.push(action);
-              bindings.push(commands);
-  
-              colors.rows.push(fillColor);
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'separator':
-          case 'disconnector':
-          case 'rolldisconnector':
-          case 'ground':
-          case 'contactor':
-          case 'rollelement':
-          case 'actuator':
-          case 'simpleswitch':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(state);
-              bindings.push(vclass);
-              bindings.push(blinking);
-              bindings.push(rotation);
-              bindings.push(turning);
-              bindings.push(shifting);
-              bindings.push(moving);
-              bindings.push(action);
-              bindings.push(commands);
-  
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'wstar':
-          case 'wtriangle':
-          case 'wtorn':
-          case 'fuse':
-          case 'current_transformer':
-          case 'current_transformer_ru':
-          case 'current_transformer_fsk':
-          case 'reactor':
-          case 'opn':
-          case 'opn_nl':
-          case 'rezistor':
-          case 'condensator':
-          case 'inductance':
-          case 'ground1':
-          case 'cable_cone':
-          case 'ac':
-          case 'load':
-          case 'compensator':
-            {
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(vclass);
-              bindings.push(blinking);
-              bindings.push(rotation);
-              bindings.push(turning);
-              bindings.push(shifting);
-              bindings.push(moving);
-              bindings.push(action);
-              bindings.push(commands);
-  
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'bus':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(state);
-              bindings.push(vclass);
-              bindings.push(action);
-  
-              colors.rows.push(fillColor);
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'link':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(state);
-              bindings.push(vclass);
-  
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'sound':
-            {
-              bindings.push(script);
-              bindings.push(sound);
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Воспроизведение:', width: 145 },
-                  { view: 'link', name: 'play', on: onHandler },
-                ],
-              });
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Циклически:', width: 145 },
-                  { view: 'checkbox', name: 'play.cycle', link: 'play', value: 0, default: 0, on: onHandler, tooltip: 'Циклическое воспроизведение' },
-                ],
-              });
-            }
-            break;
-          case 'table':
-            {
-              let table_items = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
                 rows: [
                   {
-                    view: 'accordionitem',
-                    header: 'Список параметров:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: false,
-                    body: {
-                      view: 'forminput',
-                      name: 'items',
-                      bind: function (data) {
-                        if (data == null || data.length == 0) return;
-  
-                        let list = this.queryView('editlist');
-                        list.blockEvent();
-  
-                        data.forEach(function (x) {
-                          let item = GUID.isValid(x.id)
-                            ? context.eqTree.getItem(x.id)
-                            : context.paramsList.find(function (item) {
-                                return item.n == x.id;
-                              }, true);
-                          if (item != null) {
-                            item = mxUtils.clone(item);
-                            // restore user description
-                            item.d = x.d;
-                            list.config.bind.call(list, item);
-                          }
-                        });
-  
-                        list.refresh();
-                        list.unblockEvent();
-                      },
-                      getValue: function () {
-                        let list = this.queryView('editlist');
-                        return list.config.getValue.call(list);
-                      },
-                      body: {
-                        view: 'editlist',
-                        select: true,
-                        navigation: true,
-                        drag: 'order',
-                        dragScroll: true,
-                        editable: true,
-                        editor: 'text',
-                        editValue: 'd',
-                        data: [],
-                        ready: function () {
-                          $(this.$view).attr('drop_target', true);
-                          webix.DragControl.addDrop(this.$view, context.dropLogic);
-  
-                          this.data.attachEvent(
-                            'onStoreUpdated',
-                            mxUtils.bind(this, function (id, obj, mode) {
-                              context.properties.callEvent('onChange');
-                            })
-                          );
-                        },
-                        bind: function (item) {
-                          this.data.blockEvent();
-                          this.config.setValue.call(this, item);
-                          this.data.unblockEvent();
-                        },
-                        setValue: function (item) {
-                          if (item == null) return;
-  
-                          let index = this.getIndexById(this.getSelectedId());
-  
-                          // tag
-                          if (item.mid) {
-                            this.add({ id: item.n, val: item.n, d: item.d || item.n }, index);
-                            return;
-                          }
-                          // eq
-                          if (item.$count == 0 || item.eq) {
-                            let path = context.eqTree.buildPath(item.id);
-                            let value = { id: item.id, val: path, d: item.d || item.desc };
-                            if (!item.eq) {
-                              let parent = context.eqTree.findParentEquipment(item.id);
-                              if (parent) value.parent = parent.id;
-                            }
-                            this.add(value, index);
-                            return;
-                          }
-                        },
-                        getValue: function () {
-                          return this.data.serialize(true);
-                        },
-                        on: {
-                          onFocus: onHandler.onFocus,
-                          onBeforeAdd: function (id, obj, index) {
-                            return !this.exists(id);
-                          },
-                          onSelectChange: function (ids) {
-                            if (ids == null || ids.length != 1) return;
-                            let item = this.getSelectedItem();
-                            if (item == null) return;
-                            context.showItem(item.id);
-                          },
-                        },
-                        onClick: {
-                          'wxi-close': function (evt, id) {
-                            this.remove(id);
-                          },
-                        },
-                        template: function (obj, common) {
-                          return obj.d + "<span class='webix_icon wxi-close' style='float:right;margin-top:5px;margin-right:-10px' title='Удалить'></span>";
-                        },
-                      },
-                    },
+                    cols: [
+                      { view: 'colorpicker', name: 'color.fill.$1.val', link: 'color.fill.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.fill.$1' },
+                    ],
                   },
-                ],
-              };
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Стиль:', width: 110 },
                   {
-                    view: 'richselect',
-                    name: 'style',
-                    value: 'ptbl-default',
-                    default: 'ptbl-default',
-                    on: onHandler,
-                    tooltip: 'Стиль оформления таблицы',
-                    options: [
-                      { id: 'ptbl-default', value: 'Обычный' },
-                      { id: 'ptbl-borderless', value: 'Без сетки' },
+                    cols: [
+                      { view: 'colorpicker', name: 'color.fill.$2.val', link: 'color.fill.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.fill.$2' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.fill.$3.val', link: 'color.fill.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.fill.$3' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.fill.$4.val', link: 'color.fill.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.fill.$4' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.fill.$5.val', link: 'color.fill.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.fill.$5' },
                     ],
                   },
                 ],
-              });
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Ед. измерения:', width: 180 },
-                  { view: 'checkbox', name: 'measure', value: 0, default: 0, on: onHandler, tooltip: 'Отображать единицы измерения' },
-                ],
-              });
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Ширина столбцов:', width: 180 },
-                  {
-                    view: 'text',
-                    name: 'w1',
-                    value: 0,
-                    default: 0,
-                    width: 80,
-                    type: 'number',
-                    attributes: { step: 5, min: 0 },
-                    validate: function (obj) {
-                      return webix.rules.isNumber(obj) && obj >= 0;
-                    },
-                  },
-                  {
-                    view: 'text',
-                    name: 'w2',
-                    value: 0,
-                    default: 0,
-                    width: 80,
-                    type: 'number',
-                    attributes: { step: 5, min: 0 },
-                    validate: function (obj) {
-                      return webix.rules.isNumber(obj) && obj >= 0;
-                    },
-                  },
-                  {},
-                ],
-              });
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Размер шрифта ячеек:', width: 180 },
-                  {
-                    view: 'text',
-                    name: 'fontSize',
-                    value: 10,
-                    default: 10,
-                    width: 80,
-                    type: 'number',
-                    attributes: { step: 1, min: 1 },
-                    validate: function (obj) {
-                      return webix.rules.isNumber(obj) && obj > 0;
-                    },
-                  },
-                ],
-              });
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Длина дробной части:', width: 180 },
-                  {
-                    view: 'text',
-                    name: 'fractionLength',
-                    value: 6,
-                    default: 6,
-                    width: 80,
-                    type: 'number',
-                    attributes: { step: 1, min: 0, max: 99 },
-                    validate: function (obj) {
-                      return webix.rules.isNumber(obj) && obj >= 0 && obj < 100;
-                    },
-                  },
-                ],
-              });
-              bindings.push(table_items);
-  
-              var names_font_colors = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
+              },
+            };
+            var borderColor = {
+              view: 'accordionitem',
+              header: 'Цвет контура:',
+              headerHeight: 22,
+              headerAltHeight: 22,
+              collapsed: true,
+              body: {
                 rows: [
                   {
-                    view: 'accordionitem',
-                    header: 'Наименования:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: true,
-                    body: {
-                      view: 'forminput',
-                      body: {
-                        rows: [
-                          // font
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.name', editable: true, value: '#000000', default: '#000000', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.name.bad', editable: true, value: '#000000', default: '#000000', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.name.$1.val', link: 'color.font.name.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.font.name.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.name.$2.val', link: 'color.font.name.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.font.name.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.name.$3.val', link: 'color.font.name.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.font.name.$3' },
-                            ],
-                          },
-                          // fill
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.name', editable: true, value: '', default: '', on: onHandler, point: true },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.name.bad', editable: true, value: '', default: '', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.name.$1.val', link: 'color.fill.name.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.fill.name.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.name.$2.val', link: 'color.fill.name.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.fill.name.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.name.$3.val', link: 'color.fill.name.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.fill.name.$3' },
-                            ],
-                          },
-                        ],
-                      },
-                    },
+                    cols: [
+                      { view: 'colorpicker', name: 'color.brd.$1.val', link: 'color.brd.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.brd.$1' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.brd.$2.val', link: 'color.brd.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.brd.$2' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.brd.$3.val', link: 'color.brd.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.brd.$3' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.brd.$4.val', link: 'color.brd.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.brd.$4' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.brd.$5.val', link: 'color.brd.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.brd.$5' },
+                    ],
                   },
                 ],
-              };
-              bindings.push(names_font_colors);
-  
-              var values_font_colors = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
+              },
+            };
+            var fontColor = {
+              view: 'accordionitem',
+              header: 'Цвет шрифта:',
+              headerHeight: 22,
+              headerAltHeight: 22,
+              collapsed: true,
+              body: {
                 rows: [
                   {
-                    view: 'accordionitem',
-                    header: 'Значения:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: true,
-                    body: {
-                      view: 'forminput',
-                      body: {
-                        rows: [
-                          // font
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.value', editable: true, value: '#90EE90', default: '#90EE90', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.value.bad', editable: true, value: VCLASS.UNRELIABLE_INFO, default: VCLASS.UNRELIABLE_INFO, on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.value.$1.val', link: 'color.font.value.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.font.value.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.value.$2.val', link: 'color.font.value.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.font.value.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.value.$3.val', link: 'color.font.value.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.font.value.$3' },
-                            ],
-                          },
-                          // fill
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.value', editable: true, value: '#000000', default: '#000000', on: onHandler, point: true },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.value.bad', editable: true, value: '#808080', default: '#808080', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.value.$1.val', link: 'color.fill.value.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.fill.value.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.value.$2.val', link: 'color.fill.value.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.fill.value.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.value.$3.val', link: 'color.fill.value.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.fill.value.$3' },
-                            ],
-                          },
-                        ],
-                      },
-                    },
+                    cols: [
+                      { view: 'colorpicker', name: 'color.font.$1.val', link: 'color.font.$1', width: 100, editable: true, value: '#FF0000', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.font.$1' },
+                    ],
                   },
-                ],
-              };
-              bindings.push(values_font_colors);
-  
-              var measures_font_colors = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
-                rows: [
                   {
-                    view: 'accordionitem',
-                    header: 'Ед. измерения:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: true,
-                    body: {
-                      view: 'forminput',
-                      body: {
-                        rows: [
-                          // font
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.measure', editable: true, value: '#000000', default: '#000000', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.font.measure.bad', editable: true, value: '#000000', default: '#000000', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.measure.$1.val', link: 'color.font.measure.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.font.measure.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.measure.$2.val', link: 'color.font.measure.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.font.measure.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.font.measure.$3.val', link: 'color.font.measure.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.font.measure.$3' },
-                            ],
-                          },
-                          // fill
-                          {
-                            cols: [
-                              { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.measure', editable: true, value: '', default: '', on: onHandler, point: true },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'label', label: 'Плохое качество параметра:', width: 220 },
-                              { view: 'colorpicker', name: 'color.fill.measure.bad', editable: true, value: '', default: '', on: onHandler },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.measure.$1.val', link: 'color.fill.measure.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
-                              { view: 'link', name: 'color.fill.measure.$1' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.measure.$2.val', link: 'color.fill.measure.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
-                              { view: 'link', name: 'color.fill.measure.$2' },
-                            ],
-                          },
-                          {
-                            cols: [
-                              { view: 'colorpicker', name: 'color.fill.measure.$3.val', link: 'color.fill.measure.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
-                              { view: 'link', name: 'color.fill.measure.$3' },
-                            ],
-                          },
-                        ],
-                      },
-                    },
+                    cols: [
+                      { view: 'colorpicker', name: 'color.font.$2.val', link: 'color.font.$2', width: 100, editable: true, value: '#FFFF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.font.$2' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.font.$3.val', link: 'color.font.$3', width: 100, editable: true, value: '#00FF00', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.font.$3' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.font.$4.val', link: 'color.font.$4', width: 100, editable: true, value: '#CCCCCC', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.font.$4' },
+                    ],
+                  },
+                  {
+                    cols: [
+                      { view: 'colorpicker', name: 'color.font.$5.val', link: 'color.font.$5', width: 100, editable: true, value: '#0000FF', on: onColorPickerHandler },
+                      { view: 'link', name: 'color.font.$5' },
+                    ],
                   },
                 ],
-              };
-              bindings.push(measures_font_colors);
-            }
-            break;
-          case 'group':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-            }
-            break;
-          case 'button':
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(blinking);
-              bindings.push(rotation);
-              bindings.push(turning);
-              bindings.push(shifting);
-              bindings.push(moving);
-              bindings.push(action);
-              bindings.push(commands);
-  
-              colors.rows.push(fillColor);
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'chart':
-            {
-              let getRandomColor = function () {
-                var letters = '0123456789ABCDEF'.split('');
-                var color = '#';
-                for (var i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
-                return color;
-              };
-              let color_suggest = webix.ui({
-                view: 'suggest',
-                body: {
-                  view: 'colorboard',
-                  width: 235,
-                  height: 200,
-                  cols: 12,
-                  rows: 10,
+              },
+            };
+      
+            var visibility = {
+              cols: [
+                { view: 'label', label: 'Видимость:', width: 110 },
+                { view: 'link', name: 'visibility' },
+              ],
+            };
+            var label = {
+              cols: [
+                { view: 'label', label: 'Надпись:', width: 110 },
+                { view: 'link', name: 'label' },
+              ],
+            };
+            var header = {
+              cols: [
+                { view: 'label', label: 'Заголовок:', width: 110 },
+                { view: 'param', name: 'header' },
+              ],
+            };
+            var blinking = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Мигание:', width: 110 },
+                    { view: 'link', name: 'blink' },
+                  ],
                 },
-              });
-              let chart_items = {
-                view: 'forminput',
-                name: 'items',
-                bind: function (data) {
-                  if (data == null || data.length == 0) return;
-  
-                  let table = this.queryView('datatable');
-                  table.blockEvent();
-  
-                  data.forEach(function (x) {
-                    let item = GUID.isValid(x.id)
-                      ? context.eqTree.getItem(x.id)
-                      : context.paramsList.find(function (item) {
-                          return item.n == x.id;
-                        }, true);
-                    if (item != null) {
-                      item = mxUtils.clone(item);
-                      // restore user description
-                      $.extend(item, x);
-                      //item.d = x.d;
-                      table.config.bind.call(table, item);
-                    }
-                  });
-  
-                  table.refresh();
-                  table.unblockEvent();
+                {
+                  cols: [{}, { view: 'label', label: 'мс:', align: 'right' }, { view: 'text', name: 'blink.speed', link: 'blink', value: 500, width: 80, type: 'number' }],
                 },
-                getValue: function () {
-                  let table = this.queryView('datatable');
-                  return table.config.getValue.call(table);
+              ],
+            };
+            var rotation = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Вращение:', width: 110 },
+                    { view: 'link', name: 'rotation' },
+                  ],
                 },
-                body: {
-                  rows: [
-                    { view: 'label', label: 'Список сигналов:' },
+                {
+                  cols: [{}, { view: 'label', label: 'мс:', align: 'right' }, { view: 'text', name: 'rotation.speed', link: 'rotation', value: 100, width: 80, type: 'number' }],
+                },
+              ],
+            };
+            var turning = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Поворот:', width: 110 },
+                    { view: 'link', name: 'turn' },
+                  ],
+                },
+                {
+                  cols: [{}, { view: 'label', label: 'град (0-360):', align: 'right' }, { view: 'text', name: 'turn.angle', link: 'turn', value: 90, width: 80, type: 'number' }],
+                },
+              ],
+            };
+            var shifting = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Сдвиг:', width: 110 },
+                    { view: 'link', name: 'shift' },
+                  ],
+                },
+                {
+                  cols: [{}, { view: 'label', label: '∆x:', align: 'right', width: 25 }, { view: 'text', name: 'shift.dx', link: 'shift', value: 0, width: 80, type: 'number' }, { view: 'label', label: '∆y:', align: 'right', width: 25 }, { view: 'text', name: 'shift.dy', link: 'shift', value: 0, width: 80, type: 'number' }],
+                },
+              ],
+            };
+            var moving = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Перемещение:', width: 110 },
+                    { view: 'link', name: 'move' },
+                  ],
+                },
+                {
+                  cols: [{}, { view: 'label', label: 'x:', align: 'right', width: 25 }, { view: 'text', name: 'move.x', link: 'move', value: cellGeom.x, width: 80, type: 'number' }, { view: 'label', label: 'y:', align: 'right', width: 25 }, { view: 'text', name: 'move.y', link: 'move', value: cellGeom.y, width: 80, type: 'number' }],
+                },
+              ],
+            };
+            var sound = {
+              cols: [
+                { view: 'label', label: 'Источник:', width: 110 },
+                {
+                  cols: [
                     {
-                      view: 'datatable',
-                      resizeColumn: { size: 8 },
-                      resizeRow: false,
-                      editable: true,
-                      headerRowHeight: 30,
+                      view: 'label',
+                      id: 'play.name',
+                      name: 'play.name',
+                    },
+                    {
+                      view: 'text',
+                      id: 'play.data',
+                      name: 'play.data',
+                      hidden: true,
+                    },
+                    {
+                      view: 'uploader',
+                      value: 'Выбрать',
+                      apiOnly: true,
+                      width: 100,
+                      multiple: false,
+                      autosend: false, //!important
+                      accept: '.mp3,.ogg,.wav',
+                      on: {
+                        onBeforeFileAdd: function (item) {
+                          if (this.config.accept && this.config.accept !== '*') {
+                            let acceptedTypes = this.config.accept.split(',').map(function (x) {
+                              return x.trimFromStart('.');
+                            });
+                            if (acceptedTypes.indexOf(item.type.toLowerCase()) < 0) {
+                              console.log('common.errors.support_only_files' + ': ' + acceptedTypes.join(','))
+                             // messageError(translate('common.errors.support_only_files') + ': ' + acceptedTypes.join(','));
+                              this.files.clearAll();
+                              return false;
+                            }
+                          }
+                        },
+                        onAfterFileAdd: function (item) {
+                          var inputs = this.$view.getElementsByTagName('INPUT');
+                          var fileList = inputs[inputs.length - 1].files;
+                          if (fileList && fileList.length > 0) {
+                            // last file is loaded by client
+                            if (this.files.count() === fileList.length) {
+                              var self = this;
+                              HELP.readBinaryFile(item.file, function (data) {
+                                let srcData = window.btoa ? window.btoa(data) : Base64.encode(data, true);
+                                $$('play.name').setValue(item.name);
+                                $$('play.data').setValue('data:' + item.file.type + ';base64,' + srcData);
+                                self.files.clearAll();
+                              });
+                            }
+                          }
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            };
+            var commands = {
+              view: 'accordion',
+              multi: true,
+              type: 'clean',
+              margin: 2,
+              rows: [
+                {
+                  view: 'accordionitem',
+                  header: 'Команды:',
+                  headerHeight: 22,
+                  headerAltHeight: 22,
+                  collapsed: true,
+                  body: {
+                    view: 'forminput',
+                    name: 'commands',
+                    bind: function (data) {
+                      if (data == null || data.length == 0) return;
+      
+                      let list = this.queryView('editlist');
+                      list.blockEvent();
+      
+                      data.forEach(function (x) {
+                        let item = GUID.isValid(x.id)
+                          ? context.eqTree.getItem(x.id)
+                          : context.paramsList.find(function (item) {
+                              return item.n == x.id;
+                            }, true);
+                        if (item != null) {
+                          item = mxUtils.clone(item);
+                          // restore user description
+                          item.d = x.d;
+                          list.config.bind.call(list, item);
+                        }
+                      });
+      
+                      list.refresh();
+                      list.unblockEvent();
+                    },
+                    getValue: function () {
+                      let list = this.queryView('editlist');
+                      return list.config.getValue.call(list);
+                    },
+                    body: {
+                      view: 'editlist',
+                      select: true,
                       navigation: true,
-                      editaction: 'click',
-                      select: 'cell',
-                      rowHeight: 24,
-                      scrollX: true,
                       drag: 'order',
-                      dragColumn: 'order',
+                      dragScroll: true,
+                      editable: true,
+                      editor: 'text',
+                      editValue: 'd',
                       minHeight: 150,
                       data: [],
-                      scheme: {
-                        $init: function (obj) {
-                          // default type
-                          if (obj.view == null) obj.view = 2;
-                          // random color
-                          if (obj.color == null) obj.color = getRandomColor();
-                        },
-                        $serialize: function (obj) {
-                          let result = {
-                            id: obj.id,
-                            d: obj.d,
-                            view: obj.view,
-                            color: obj.color,
-                          };
-                          if (obj.parent != null) result.parent = obj.parent;
-                          return result;
-                        },
-                      },
-                      columns: [
-                        {
-                          id: 'd',
-                          header: 'Сигнал',
-                          minWidth: 50,
-                          fillspace: true,
-                          editor: 'text',
-                          sort: 'string',
-                        },
-                        {
-                          id: 'view',
-                          header: 'Тип',
-                          minWidth: 60,
-                          fillspace: true,
-                          value: 2,
-                          editor: 'select',
-                          options: [
-                            { id: 1, value: 'Точка' },
-                            { id: 2, value: 'Линия' },
-                            { id: 3, value: 'Линия с памятью' },
-                            { id: 4, value: 'Столбцы' },
-                          ],
-                        },
-                        {
-                          id: 'color',
-                          header: 'Цвет',
-                          width: 95,
-                          editor: 'text',
-                          liveEdit: true,
-                          tooltip: false,
-                          suggest: color_suggest,
-                          template: "<span style='background-color:#color#;border-style:solid;border-width:0.5px;border-color:#808080;border-radius:4px; padding-right:10px;cursor:pointer;'>&nbsp</span> #color#",
-                        },
-                        {
-                          id: 'trash',
-                          header: "<span class='webix_icon wxi-trash remove_all' title='" + 'common.delete_all' + "'></span>",
-                          width: 35,
-                          template: function (obj, common) {
-                            let span = $(common.trashIcon(obj, common));
-                            span.attr('title', 'common.delete');
-                            return span[0].outerHTML;
-                          },
-                        },
-                      ],
                       ready: function () {
                         $(this.$view).attr('drop_target', true);
                         webix.DragControl.addDrop(this.$view, context.dropLogic);
-  
+      
                         this.data.attachEvent(
                           'onStoreUpdated',
                           mxUtils.bind(this, function (id, obj, mode) {
@@ -6490,1224 +5593,2131 @@ function BindingsHandler (editorUi) {
                       },
                       setValue: function (item) {
                         if (item == null) return;
-  
-                        let value = {};
-                        $.extend(value, item);
-  
+      
+                        let index = this.getIndexById(this.getSelectedId());
+      
                         // tag
                         if (item.mid) {
-                          value.id = item.n;
-                          value.val = item.n;
-                          value.d = item.d || item.desc || item.n;
+                          if (item.vtype == API.ENUMS.TagValueType.Boolean) this.add({ id: item.n, val: item.n, d: item.d || item.n, confirm: true }, index);
+                          return;
                         }
                         // eq
-                        else if (item.$count == 0 || item.eq) {
-                          value.id = item.id;
-                          value.val = context.eqTree.buildPath(item.id);
-                          value.d = item.d || item.desc || item.n;
-  
+                        if (item.$count == 0 && item.cmd) {
+                          let path = context.eqTree.buildPath(item.id);
+                          let value = { id: item.id, val: path, d: item.d || item.desc, confirm: item.cnf };
                           if (!item.eq) {
                             let parent = context.eqTree.findParentEquipment(item.id);
                             if (parent) value.parent = parent.id;
                           }
-                        }
-  
-                        if (value != null && !$.isEmptyObject(value)) {
-                          let index = this.getIndexById(this.getSelectedId());
                           this.add(value, index);
+                          return;
                         }
                       },
                       getValue: function () {
-                        return this.serialize(true);
+                        return this.data.serialize(true);
                       },
                       on: {
                         onFocus: onHandler.onFocus,
-                        onAfterEditStart: function (cell) {
-                          let item = this.getItem(cell.row);
-                          if (!item) return false;
-  
-                          if (cell.column === 'color') {
-                            var editor = this.getEditor(cell);
-                            //show
-                            $$(editor.config.suggest).linkInput(editor.node);
-                            $$(editor.config.suggest).show(editor.node);
-                            $$(editor.config.suggest).getBody().setValue(item.color);
-                          }
-                          return true;
-                        },
-                        onLiveEdit: function (state, editor, ignoreUpdate) {
-                          let item = this.getItem(editor.row);
-                          if (!item) return;
-  
-                          if (editor.column === 'color') {
-                            item.color = state.value;
-                            // update editor
-                            editor.setValue(item.color);
-                            // update suggest
-                            var suggestView = $$(editor.config.suggest);
-                            suggestView.getBody().setValue(item.color);
-                          }
-                          return true;
-                        },
-                        onBeforeEditStop: function (state, editor, ignoreUpdate) {
-                          let item = this.getItem(editor.row);
-                          if (!item) return;
-  
-                          if (editor.column === 'color') {
-                            item.color = state.value;
-                            var suggestView = $$(editor.config.suggest);
-                            if (suggestView.isVisible()) {
-                              var color = suggestView.getBody().getValue();
-                              if (!isNullOrEmpty(color)) item.color = color;
-                            }
-                            state.value = item.color;
-                          }
-                        },
                         onBeforeAdd: function (id, obj, index) {
                           return !this.exists(id);
                         },
-                        onSelectChange: function () {
+                        onSelectChange: function (ids) {
+                          if (ids == null || ids.length != 1) return;
                           let item = this.getSelectedItem();
                           if (item == null) return;
                           context.showItem(item.id);
                         },
                       },
                       onClick: {
-                        'wxi-trash': function (evt, id) {
-                          this.remove(id.row);
-                          return false;
+                        'wxi-close': function (evt, id) {
+                          this.remove(id);
                         },
-                        remove_all: function (evt, id, trg) {
-                          let grid = this;
-                          grid.editStop();
-                          console.log('Удалить все сигналы', function (result) {
-                            if (result === true) grid.clearAll();
-                          })
-                          // messageConfirm('Удалить все сигналы', function (result) {
-                          //   if (result === true) grid.clearAll();
-                          // });
+                      },
+                      template: function (obj, common) {
+                        return obj.d + "<span class='webix_icon wxi-close' style='float:right;margin-top:5px' title='Удалить'></span>";
+                      },
+                    },
+                  },
+                },
+              ],
+            };
+            var action = {
+              rows: [
+                {
+                  cols: [
+                    { view: 'label', label: 'Действие:', width: 110 },
+                    {
+                      view: 'richselect',
+                      id: 'action',
+                      name: 'action',
+                      value: 'none',
+                      default: 'none',
+                      options: [
+                        { id: 'none', value: 'Нет' },
+                        { id: 'exec', value: 'Выполнить' },
+                        { id: 'open', value: 'Открыть' },
+                        { id: 'goto', value: 'Переход' },
+                        { id: 'camera', value: 'IP-камера' },
+                        { id: 'eq', value: 'Оборудование' },
+                      ],
+                      on: {
+                        onReady: function () {
+                          let args = $$('action.args');
+                          let trigger = $$('action.trigger');
+                          if (args != null && trigger != null) {
+                            // reset
+                            args.enable();
+                            trigger.disable();
+                            args.define('readonly', false);
+                            $(args.$view).attr('drop_target', null);
+                            // apply
+                            switch (this.getValue()) {
+                              case 'none':
+                                args.disable();
+                                break;
+                              case 'eq':
+                                {
+                                  args.define('readonly', true);
+                                  $(args.$view).attr('drop_target', true);
+                                  trigger.enable();
+                                }
+                                break;
+                              case 'exec':
+                                {
+                                  args.define('readonly', true);
+                                  $(args.$view).attr('drop_target', true);
+                                }
+                                break;
+                              case 'camera':
+                                {
+                                  trigger.enable();
+                                }
+                                break;
+                              default:
+                                break;
+                            }
+                            args.refresh();
+                          }
+                        },
+                        onChange: function (newv, oldv) {
+                          this.callEvent('onReady', []);
+                          let args = $$('action.args');
+                          let trigger = $$('action.trigger');
+                          if (args != null && trigger != null) {
+                            args.config.setValue(null);
+                            trigger.config.setValue(null);
+                          }
                         },
                       },
                     },
                   ],
                 },
-              };
-              let axisX = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
-                rows: [
-                  {
-                    view: 'accordionitem',
-                    header: 'Ось времени:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: true,
-                    body: {
-                      rows: [
-                        {
-                          cols: [
-                            { view: 'label', label: 'Ед. измерения:', width: 110 },
-                            {
-                              view: 'richselect',
-                              name: 'axisX.measure',
-                              value: 's',
-                              options: [
-                                { id: 'ms', value: 'Миллисекунды' },
-                                { id: 's', value: 'Секунды' },
-                                { id: 'mn', value: 'Минуты' },
-                                { id: 'h', value: 'Часы' },
-                                { id: 'd', value: 'Сутки' },
-                                { id: 'w', value: 'Неделя' },
-                                { id: 'm', value: 'Месяц' },
-                                { id: 'y', value: 'Год' },
-                              ],
-                            },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Ширина:', width: 110 },
-                            { view: 'text', type: 'number', name: 'axisX.scale', value: 30 },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Шаг сетки:', width: 110 },
-                            { view: 'text', type: 'number', name: 'axisX.step', value: 5 },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Надпись:', width: 110 },
-                            { view: 'param', name: 'axisX.label' },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                ],
-              };
-              let axisY = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
-                rows: [
-                  {
-                    view: 'accordionitem',
-                    header: 'Ось значений:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: true,
-                    body: {
-                      rows: [
-                        {
-                          cols: [
-                            { view: 'label', label: 'Макс. значение:', width: 120 },
-                            {
-                              view: 'checkbox',
-                              width: 30,
-                              name: 'axisY.max.show',
-                              value: 0,
-                              default: 0,
-                              tooltip: 'Отображать максимальное значение',
-                              on: {
-                                onFocus: onHandler.onFocus,
-                                onChange: function () {
-                                  this.callEvent('onReady', []);
-                                },
-                                onReady: function () {
-                                  $$('maxVal').define('disabled', this.getValue() != 1);
-                                  $$('maxVal').refresh();
-                                },
-                              },
-                            },
-                            { view: 'text', type: 'number', id: 'maxVal', name: 'axisY.max.value', value: 0, disabled: true },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Мин. значение:', width: 120 },
-                            {
-                              view: 'checkbox',
-                              width: 30,
-                              name: 'axisY.min.show',
-                              value: 0,
-                              default: 0,
-                              tooltip: 'Отображать минимальное значение',
-                              on: {
-                                onFocus: onHandler.onFocus,
-                                onChange: function (newv) {
-                                  this.callEvent('onReady', []);
-                                },
-                                onReady: function () {
-                                  $$('minVal').define('disabled', this.getValue() != 1);
-                                  $$('minVal').refresh();
-                                },
-                              },
-                            },
-                            { view: 'text', type: 'number', id: 'minVal', name: 'axisY.min.value', value: 0, disabled: true },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Надпись:', width: 120 },
-                            { view: 'param', name: 'axisY.label' },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                ],
-              };
-  
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(header);
-              bindings.push({
-                cols: [
-                  { view: 'label', label: 'Легенда:', width: 110 },
-                  { view: 'checkbox', name: 'legend', default: 1, value: 1, on: onHandler },
-                ],
-              });
-              bindings.push(chart_items);
-              bindings.push(axisX);
-              bindings.push(axisY);
-              //bindings.push(action);
-              colors.rows.push(fillColor);
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-          case 'bmrz':
-            {
-              var settings = {
-                view: 'accordion',
-                multi: true,
-                type: 'clean',
-                margin: 2,
-                rows: [
-                  {
-                    view: 'accordionitem',
-                    header: 'Настройки подключения:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: false,
-                    body: {
-                      id: 'settings',
-                      visibleBatch: 'usb',
-                      rows: [
-                        {
-                          cols: [
-                            { view: 'label', label: 'Тип:', width: 110 },
-                            {
-                              view: 'select',
-                              name: 'connection.type',
-                              options: [
-                                { id: 'usb', value: 'USB' },
-                                { id: 'com', value: 'RS485(MODBUS-MT)' },
-                                { id: 'eth', value: 'Ethernet(MODBUS-MT/TCP)' },
-                              ],
-                              on: {
-                                onReady: function () {
-                                  $$('settings').showBatch(this.getValue());
-                                },
-                                onChange: function (newv, oldv) {
-                                  $$('settings').showBatch(newv);
-                                },
-                              },
-                            },
-                          ],
-                        },
-                        {
-                          batch: 'usb',
-                          height: 1,
-                          template: '',
-                        },
-                        {
-                          batch: 'com',
-                          rows: [
-                            {
-                              cols: [
-                                { view: 'label', label: 'Порт:', width: 110 },
-                                { view: 'text', name: 'com.port', validate: API.SERIAL.validate_port, value: 'COM1', default: 'COM1' },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Адрес:', width: 110 },
-                                {
-                                  view: 'text',
-                                  name: 'com.address',
-                                  validate: function (v) {
-                                    return webix.rules.isNumber(v) && v > 0 && v < 248;
-                                  },
-                                  value: 55,
-                                  default: 55,
-                                },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Скорость:', width: 110 },
-                                { view: 'select', name: 'com.speed', options: API.SERIAL.baud_rates_array, value: 19200, default: 19200 },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Чётность:', width: 110 },
-                                { view: 'select', name: 'com.parity', options: API.SERIAL.parities_array, value: 0, default: 0 },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Стоп. биты:', width: 110 },
-                                { view: 'select', name: 'com.stop_bits', options: API.SERIAL.stop_bits_array, value: 1, default: 1 },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Межпакетный интервал:', width: 180 },
-                                {
-                                  view: 'text',
-                                  type: 'number',
-                                  name: 'com.period',
-                                  validate: function (v) {
-                                    return webix.rules.isNumber(v) && v >= 0 && v <= 255;
-                                  },
-                                  value: 0,
-                                  default: 0,
-                                },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Обмен с наличием эха:', width: 180 },
-                                { view: 'checkbox', name: 'com.echo', value: 0, default: 0, on: onHandler },
-                              ],
-                            },
-                          ],
-                        },
-                        {
-                          batch: 'eth',
-                          rows: [
-                            {
-                              cols: [
-                                { view: 'label', label: 'IP-адрес:', width: 110 },
-                                { view: 'text', name: 'eth.ip', validate: API.IPV4.validate, value: '1.1.1.1', default: '1.1.1.1' },
-                              ],
-                            },
-                            {
-                              cols: [
-                                { view: 'label', label: 'Порт:', width: 110 },
-                                {
-                                  view: 'text',
-                                  type: 'number',
-                                  name: 'eth.port',
-                                  validate: function (v) {
-                                    return webix.rules.isNumber(v) && v > 0 && v < 65536;
-                                  },
-                                  value: 503,
-                                  default: 503,
-                                },
-                              ],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                  {
-                    view: 'accordionitem',
-                    header: 'Файлы:',
-                    headerHeight: 22,
-                    headerAltHeight: 22,
-                    collapsed: false,
-                    body: {
-                      rows: [
-                        {
-                          cols: [
-                            { view: 'label', label: 'Путь к БФПО:', width: 110 },
-                            {
-                              view: 'path',
-                              name: 'path.bfpo',
-                              ext: 'sth',
-                              id: 'path.bfpo',
-                              validate: function (v) {
-                                return isNullOrEmpty(v) || getExtension(v.trim()).toLowerCase() === 'sth';
-                              },
-                            },
-                          ],
-                        },
-                        {
-                          cols: [
-                            { view: 'label', label: 'Путь к ПМК:', width: 110 },
-                            {
-                              view: 'path',
-                              name: 'path.pmk',
-                              ext: 'sth_a',
-                              id: 'path.pmk',
-                              validate: function (v) {
-                                let result = false;
-                                if (isNullOrEmpty(v)) {
-                                  let bfpo = $$('path.bfpo').getValue();
-                                  let readpmk = $$('read_pmk').getValue();
-                                  result = isNullOrEmpty(bfpo) || readpmk == '1';
-                                } else {
-                                  result = getExtension(v.trim()).toLowerCase() === 'sth_a';
-                                }
-                                return result;
-                              },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                  {
+                {
+                  cols: [
+                    { view: 'label', label: 'Аргумент:', width: 110 },
+                    { view: 'param', id: 'action.args', name: 'action.args', on: onHandler },
+                  ],
+                },
+                {
+                  cols: [
+                    { view: 'label', label: 'Триггер:', width: 110 },
+                    { view: 'link', id: 'action.trigger', name: 'action.trigger', on: onHandler },
+                  ],
+                },
+              ],
+            };
+      
+            switch (cellType) {
+              case 'switch':
+              case 'rollswitch':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(state);
+                  bindings.push(vclass);
+                  bindings.push({
                     cols: [
-                      { view: 'label', label: 'Подключиться к блоку:', width: 180 },
+                      { view: 'label', label: 'Положение:', width: 110 },
+                      { view: 'checkbox', name: 'position', value: 1, default: 1, on: onHandler, tooltip: 'Отображать положение выключателя' },
+                    ],
+                  });
+                  bindings.push(blinking);
+                  bindings.push(rotation);
+                  bindings.push(turning);
+                  bindings.push(shifting);
+                  bindings.push(moving);
+                  bindings.push(action);
+                  bindings.push(commands);
+      
+                  colors.rows.push(fillColor);
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'separator':
+              case 'disconnector':
+              case 'rolldisconnector':
+              case 'ground':
+              case 'contactor':
+              case 'rollelement':
+              case 'actuator':
+              case 'simpleswitch':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(state);
+                  bindings.push(vclass);
+                  bindings.push(blinking);
+                  bindings.push(rotation);
+                  bindings.push(turning);
+                  bindings.push(shifting);
+                  bindings.push(moving);
+                  bindings.push(action);
+                  bindings.push(commands);
+      
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'wstar':
+              case 'wtriangle':
+              case 'wtorn':
+              case 'fuse':
+              case 'current_transformer':
+              case 'current_transformer_ru':
+              case 'current_transformer_fsk':
+              case 'reactor':
+              case 'opn':
+              case 'opn_nl':
+              case 'rezistor':
+              case 'condensator':
+              case 'inductance':
+              case 'ground1':
+              case 'cable_cone':
+              case 'ac':
+              case 'load':
+              case 'compensator':
+                {
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(vclass);
+                  bindings.push(blinking);
+                  bindings.push(rotation);
+                  bindings.push(turning);
+                  bindings.push(shifting);
+                  bindings.push(moving);
+                  bindings.push(action);
+                  bindings.push(commands);
+      
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'bus':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(state);
+                  bindings.push(vclass);
+                  bindings.push(action);
+      
+                  colors.rows.push(fillColor);
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'link':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(state);
+                  bindings.push(vclass);
+      
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'sound':
+                {
+                  bindings.push(script);
+                  bindings.push(sound);
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Воспроизведение:', width: 145 },
+                      { view: 'link', name: 'play', on: onHandler },
+                    ],
+                  });
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Циклически:', width: 145 },
+                      { view: 'checkbox', name: 'play.cycle', link: 'play', value: 0, default: 0, on: onHandler, tooltip: 'Циклическое воспроизведение' },
+                    ],
+                  });
+                }
+                break;
+              case 'table':
+                {
+                  let table_items = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
                       {
-                        view: 'checkbox',
-                        name: 'options.connect',
-                        value: 0,
-                        default: 0,
-                        on: {
-                          onFocus: onHandler.onFocus,
-                          onChange: function () {
-                            let pmk = $$('pmk');
-                            if (this.getValue() == 1) pmk.show();
-                            else {
-                              $$('read_pmk').setValue(0);
-                              pmk.hide();
-                            }
+                        view: 'accordionitem',
+                        header: 'Список параметров:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: false,
+                        body: {
+                          view: 'forminput',
+                          name: 'items',
+                          bind: function (data) {
+                            if (data == null || data.length == 0) return;
+      
+                            let list = this.queryView('editlist');
+                            list.blockEvent();
+      
+                            data.forEach(function (x) {
+                              let item = GUID.isValid(x.id)
+                                ? context.eqTree.getItem(x.id)
+                                : context.paramsList.find(function (item) {
+                                    return item.n == x.id;
+                                  }, true);
+                              if (item != null) {
+                                item = mxUtils.clone(item);
+                                // restore user description
+                                item.d = x.d;
+                                list.config.bind.call(list, item);
+                              }
+                            });
+      
+                            list.refresh();
+                            list.unblockEvent();
                           },
-                          onReady: function () {
-                            this.callEvent('onChange');
+                          getValue: function () {
+                            let list = this.queryView('editlist');
+                            return list.config.getValue.call(list);
+                          },
+                          body: {
+                            view: 'editlist',
+                            select: true,
+                            navigation: true,
+                            drag: 'order',
+                            dragScroll: true,
+                            editable: true,
+                            editor: 'text',
+                            editValue: 'd',
+                            data: [],
+                            ready: function () {
+                              $(this.$view).attr('drop_target', true);
+                              webix.DragControl.addDrop(this.$view, context.dropLogic);
+      
+                              this.data.attachEvent(
+                                'onStoreUpdated',
+                                mxUtils.bind(this, function (id, obj, mode) {
+                                  context.properties.callEvent('onChange');
+                                })
+                              );
+                            },
+                            bind: function (item) {
+                              this.data.blockEvent();
+                              this.config.setValue.call(this, item);
+                              this.data.unblockEvent();
+                            },
+                            setValue: function (item) {
+                              if (item == null) return;
+      
+                              let index = this.getIndexById(this.getSelectedId());
+      
+                              // tag
+                              if (item.mid) {
+                                this.add({ id: item.n, val: item.n, d: item.d || item.n }, index);
+                                return;
+                              }
+                              // eq
+                              if (item.$count == 0 || item.eq) {
+                                let path = context.eqTree.buildPath(item.id);
+                                let value = { id: item.id, val: path, d: item.d || item.desc };
+                                if (!item.eq) {
+                                  let parent = context.eqTree.findParentEquipment(item.id);
+                                  if (parent) value.parent = parent.id;
+                                }
+                                this.add(value, index);
+                                return;
+                              }
+                            },
+                            getValue: function () {
+                              return this.data.serialize(true);
+                            },
+                            on: {
+                              onFocus: onHandler.onFocus,
+                              onBeforeAdd: function (id, obj, index) {
+                                return !this.exists(id);
+                              },
+                              onSelectChange: function (ids) {
+                                if (ids == null || ids.length != 1) return;
+                                let item = this.getSelectedItem();
+                                if (item == null) return;
+                                context.showItem(item.id);
+                              },
+                            },
+                            onClick: {
+                              'wxi-close': function (evt, id) {
+                                this.remove(id);
+                              },
+                            },
+                            template: function (obj, common) {
+                              return obj.d + "<span class='webix_icon wxi-close' style='float:right;margin-top:5px;margin-right:-10px' title='Удалить'></span>";
+                            },
                           },
                         },
                       },
                     ],
-                  },
-                  {
-                    id: 'pmk',
-                    hidden: true,
+                  };
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push({
                     cols: [
-                      { view: 'label', label: 'Вычитать ПМК:', width: 180 },
-                      { view: 'checkbox', name: 'options.read_pmk', id: 'read_pmk', value: 0, default: 0, on: onHandler },
+                      { view: 'label', label: 'Стиль:', width: 110 },
+                      {
+                        view: 'richselect',
+                        name: 'style',
+                        value: 'ptbl-default',
+                        default: 'ptbl-default',
+                        on: onHandler,
+                        tooltip: 'Стиль оформления таблицы',
+                        options: [
+                          { id: 'ptbl-default', value: 'Обычный' },
+                          { id: 'ptbl-borderless', value: 'Без сетки' },
+                        ],
+                      },
                     ],
+                  });
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Ед. измерения:', width: 180 },
+                      { view: 'checkbox', name: 'measure', value: 0, default: 0, on: onHandler, tooltip: 'Отображать единицы измерения' },
+                    ],
+                  });
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Ширина столбцов:', width: 180 },
+                      {
+                        view: 'text',
+                        name: 'w1',
+                        value: 0,
+                        default: 0,
+                        width: 80,
+                        type: 'number',
+                        attributes: { step: 5, min: 0 },
+                        validate: function (obj) {
+                          return webix.rules.isNumber(obj) && obj >= 0;
+                        },
+                      },
+                      {
+                        view: 'text',
+                        name: 'w2',
+                        value: 0,
+                        default: 0,
+                        width: 80,
+                        type: 'number',
+                        attributes: { step: 5, min: 0 },
+                        validate: function (obj) {
+                          return webix.rules.isNumber(obj) && obj >= 0;
+                        },
+                      },
+                      {},
+                    ],
+                  });
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Размер шрифта ячеек:', width: 180 },
+                      {
+                        view: 'text',
+                        name: 'fontSize',
+                        value: 10,
+                        default: 10,
+                        width: 80,
+                        type: 'number',
+                        attributes: { step: 1, min: 1 },
+                        validate: function (obj) {
+                          return webix.rules.isNumber(obj) && obj > 0;
+                        },
+                      },
+                    ],
+                  });
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Длина дробной части:', width: 180 },
+                      {
+                        view: 'text',
+                        name: 'fractionLength',
+                        value: 6,
+                        default: 6,
+                        width: 80,
+                        type: 'number',
+                        attributes: { step: 1, min: 0, max: 99 },
+                        validate: function (obj) {
+                          return webix.rules.isNumber(obj) && obj >= 0 && obj < 100;
+                        },
+                      },
+                    ],
+                  });
+                  bindings.push(table_items);
+      
+                  var names_font_colors = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Наименования:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: true,
+                        body: {
+                          view: 'forminput',
+                          body: {
+                            rows: [
+                              // font
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.name', editable: true, value: '#000000', default: '#000000', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.name.bad', editable: true, value: '#000000', default: '#000000', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.name.$1.val', link: 'color.font.name.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.font.name.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.name.$2.val', link: 'color.font.name.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.font.name.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.name.$3.val', link: 'color.font.name.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.font.name.$3' },
+                                ],
+                              },
+                              // fill
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.name', editable: true, value: '', default: '', on: onHandler, point: true },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.name.bad', editable: true, value: '', default: '', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.name.$1.val', link: 'color.fill.name.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.fill.name.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.name.$2.val', link: 'color.fill.name.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.fill.name.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.name.$3.val', link: 'color.fill.name.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.fill.name.$3' },
+                                ],
+                              },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                  };
+                  bindings.push(names_font_colors);
+      
+                  var values_font_colors = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Значения:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: true,
+                        body: {
+                          view: 'forminput',
+                          body: {
+                            rows: [
+                              // font
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.value', editable: true, value: '#90EE90', default: '#90EE90', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.value.bad', editable: true, value: VCLASS.UNRELIABLE_INFO, default: VCLASS.UNRELIABLE_INFO, on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.value.$1.val', link: 'color.font.value.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.font.value.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.value.$2.val', link: 'color.font.value.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.font.value.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.value.$3.val', link: 'color.font.value.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.font.value.$3' },
+                                ],
+                              },
+                              // fill
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.value', editable: true, value: '#000000', default: '#000000', on: onHandler, point: true },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.value.bad', editable: true, value: '#808080', default: '#808080', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.value.$1.val', link: 'color.fill.value.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.fill.value.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.value.$2.val', link: 'color.fill.value.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.fill.value.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.value.$3.val', link: 'color.fill.value.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.fill.value.$3' },
+                                ],
+                              },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                  };
+                  bindings.push(values_font_colors);
+      
+                  var measures_font_colors = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Ед. измерения:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: true,
+                        body: {
+                          view: 'forminput',
+                          body: {
+                            rows: [
+                              // font
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет шрифта (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.measure', editable: true, value: '#000000', default: '#000000', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.font.measure.bad', editable: true, value: '#000000', default: '#000000', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.measure.$1.val', link: 'color.font.measure.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.font.measure.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.measure.$2.val', link: 'color.font.measure.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.font.measure.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.font.measure.$3.val', link: 'color.font.measure.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.font.measure.$3' },
+                                ],
+                              },
+                              // fill
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Цвет заливки (по умолчанию):', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.measure', editable: true, value: '', default: '', on: onHandler, point: true },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'label', label: 'Плохое качество параметра:', width: 220 },
+                                  { view: 'colorpicker', name: 'color.fill.measure.bad', editable: true, value: '', default: '', on: onHandler },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.measure.$1.val', link: 'color.fill.measure.$1', width: 100, editable: true, value: '#FF0000', on: onHandler },
+                                  { view: 'link', name: 'color.fill.measure.$1' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.measure.$2.val', link: 'color.fill.measure.$2', width: 100, editable: true, value: '#00FF00', on: onHandler },
+                                  { view: 'link', name: 'color.fill.measure.$2' },
+                                ],
+                              },
+                              {
+                                cols: [
+                                  { view: 'colorpicker', name: 'color.fill.measure.$3.val', link: 'color.fill.measure.$3', width: 100, editable: true, value: '#0000FF', on: onHandler },
+                                  { view: 'link', name: 'color.fill.measure.$3' },
+                                ],
+                              },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                  };
+                  bindings.push(measures_font_colors);
+                }
+                break;
+              case 'group':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                }
+                break;
+              case 'button':
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(blinking);
+                  bindings.push(rotation);
+                  bindings.push(turning);
+                  bindings.push(shifting);
+                  bindings.push(moving);
+                  bindings.push(action);
+                  bindings.push(commands);
+      
+                  colors.rows.push(fillColor);
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'chart':
+                {
+                  let getRandomColor = function () {
+                    var letters = '0123456789ABCDEF'.split('');
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
+                    return color;
+                  };
+                  let color_suggest = webix.ui({
+                    view: 'suggest',
+                    body: {
+                      view: 'colorboard',
+                      width: 235,
+                      height: 200,
+                      cols: 12,
+                      rows: 10,
+                    },
+                  });
+                  let chart_items = {
+                    view: 'forminput',
+                    name: 'items',
+                    bind: function (data) {
+                      if (data == null || data.length == 0) return;
+      
+                      let table = this.queryView('datatable');
+                      table.blockEvent();
+      
+                      data.forEach(function (x) {
+                        let item = GUID.isValid(x.id)
+                          ? context.eqTree.getItem(x.id)
+                          : context.paramsList.find(function (item) {
+                              return item.n == x.id;
+                            }, true);
+                        if (item != null) {
+                          item = mxUtils.clone(item);
+                          // restore user description
+                          $.extend(item, x);
+                          //item.d = x.d;
+                          table.config.bind.call(table, item);
+                        }
+                      });
+      
+                      table.refresh();
+                      table.unblockEvent();
+                    },
+                    getValue: function () {
+                      let table = this.queryView('datatable');
+                      return table.config.getValue.call(table);
+                    },
+                    body: {
+                      rows: [
+                        { view: 'label', label: 'Список сигналов:' },
+                        {
+                          view: 'datatable',
+                          resizeColumn: { size: 8 },
+                          resizeRow: false,
+                          editable: true,
+                          headerRowHeight: 30,
+                          navigation: true,
+                          editaction: 'click',
+                          select: 'cell',
+                          rowHeight: 24,
+                          scrollX: true,
+                          drag: 'order',
+                          dragColumn: 'order',
+                          minHeight: 150,
+                          data: [],
+                          scheme: {
+                            $init: function (obj) {
+                              // default type
+                              if (obj.view == null) obj.view = 2;
+                              // random color
+                              if (obj.color == null) obj.color = getRandomColor();
+                            },
+                            $serialize: function (obj) {
+                              let result = {
+                                id: obj.id,
+                                d: obj.d,
+                                view: obj.view,
+                                color: obj.color,
+                              };
+                              if (obj.parent != null) result.parent = obj.parent;
+                              return result;
+                            },
+                          },
+                          columns: [
+                            {
+                              id: 'd',
+                              header: 'Сигнал',
+                              minWidth: 50,
+                              fillspace: true,
+                              editor: 'text',
+                              sort: 'string',
+                            },
+                            {
+                              id: 'view',
+                              header: 'Тип',
+                              minWidth: 60,
+                              fillspace: true,
+                              value: 2,
+                              editor: 'select',
+                              options: [
+                                { id: 1, value: 'Точка' },
+                                { id: 2, value: 'Линия' },
+                                { id: 3, value: 'Линия с памятью' },
+                                { id: 4, value: 'Столбцы' },
+                              ],
+                            },
+                            {
+                              id: 'color',
+                              header: 'Цвет',
+                              width: 95,
+                              editor: 'text',
+                              liveEdit: true,
+                              tooltip: false,
+                              suggest: color_suggest,
+                              template: "<span style='background-color:#color#;border-style:solid;border-width:0.5px;border-color:#808080;border-radius:4px; padding-right:10px;cursor:pointer;'>&nbsp</span> #color#",
+                            },
+                            {
+                              id: 'trash',
+                              header: "<span class='webix_icon wxi-trash remove_all' title='" + 'common.delete_all' + "'></span>",
+                              width: 35,
+                              template: function (obj, common) {
+                                let span = $(common.trashIcon(obj, common));
+                                span.attr('title', 'common.delete');
+                                return span[0].outerHTML;
+                              },
+                            },
+                          ],
+                          ready: function () {
+                            $(this.$view).attr('drop_target', true);
+                            webix.DragControl.addDrop(this.$view, context.dropLogic);
+      
+                            this.data.attachEvent(
+                              'onStoreUpdated',
+                              mxUtils.bind(this, function (id, obj, mode) {
+                                context.properties.callEvent('onChange');
+                              })
+                            );
+                          },
+                          bind: function (item) {
+                            this.data.blockEvent();
+                            this.config.setValue.call(this, item);
+                            this.data.unblockEvent();
+                          },
+                          setValue: function (item) {
+                            if (item == null) return;
+      
+                            let value = {};
+                            $.extend(value, item);
+      
+                            // tag
+                            if (item.mid) {
+                              value.id = item.n;
+                              value.val = item.n;
+                              value.d = item.d || item.desc || item.n;
+                            }
+                            // eq
+                            else if (item.$count == 0 || item.eq) {
+                              value.id = item.id;
+                              value.val = context.eqTree.buildPath(item.id);
+                              value.d = item.d || item.desc || item.n;
+      
+                              if (!item.eq) {
+                                let parent = context.eqTree.findParentEquipment(item.id);
+                                if (parent) value.parent = parent.id;
+                              }
+                            }
+      
+                            if (value != null && !$.isEmptyObject(value)) {
+                              let index = this.getIndexById(this.getSelectedId());
+                              this.add(value, index);
+                            }
+                          },
+                          getValue: function () {
+                            return this.serialize(true);
+                          },
+                          on: {
+                            onFocus: onHandler.onFocus,
+                            onAfterEditStart: function (cell) {
+                              let item = this.getItem(cell.row);
+                              if (!item) return false;
+      
+                              if (cell.column === 'color') {
+                                var editor = this.getEditor(cell);
+                                //show
+                                $$(editor.config.suggest).linkInput(editor.node);
+                                $$(editor.config.suggest).show(editor.node);
+                                $$(editor.config.suggest).getBody().setValue(item.color);
+                              }
+                              return true;
+                            },
+                            onLiveEdit: function (state, editor, ignoreUpdate) {
+                              let item = this.getItem(editor.row);
+                              if (!item) return;
+      
+                              if (editor.column === 'color') {
+                                item.color = state.value;
+                                // update editor
+                                editor.setValue(item.color);
+                                // update suggest
+                                var suggestView = $$(editor.config.suggest);
+                                suggestView.getBody().setValue(item.color);
+                              }
+                              return true;
+                            },
+                            onBeforeEditStop: function (state, editor, ignoreUpdate) {
+                              let item = this.getItem(editor.row);
+                              if (!item) return;
+      
+                              if (editor.column === 'color') {
+                                item.color = state.value;
+                                var suggestView = $$(editor.config.suggest);
+                                if (suggestView.isVisible()) {
+                                  var color = suggestView.getBody().getValue();
+                                  if (!isNullOrEmpty(color)) item.color = color;
+                                }
+                                state.value = item.color;
+                              }
+                            },
+                            onBeforeAdd: function (id, obj, index) {
+                              return !this.exists(id);
+                            },
+                            onSelectChange: function () {
+                              let item = this.getSelectedItem();
+                              if (item == null) return;
+                              context.showItem(item.id);
+                            },
+                          },
+                          onClick: {
+                            'wxi-trash': function (evt, id) {
+                              this.remove(id.row);
+                              return false;
+                            },
+                            remove_all: function (evt, id, trg) {
+                              let grid = this;
+                              grid.editStop();
+                              console.log('Удалить все сигналы', function (result) {
+                                if (result === true) grid.clearAll();
+                              })
+                              // messageConfirm('Удалить все сигналы', function (result) {
+                              //   if (result === true) grid.clearAll();
+                              // });
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  };
+                  let axisX = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Ось времени:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: true,
+                        body: {
+                          rows: [
+                            {
+                              cols: [
+                                { view: 'label', label: 'Ед. измерения:', width: 110 },
+                                {
+                                  view: 'richselect',
+                                  name: 'axisX.measure',
+                                  value: 's',
+                                  options: [
+                                    { id: 'ms', value: 'Миллисекунды' },
+                                    { id: 's', value: 'Секунды' },
+                                    { id: 'mn', value: 'Минуты' },
+                                    { id: 'h', value: 'Часы' },
+                                    { id: 'd', value: 'Сутки' },
+                                    { id: 'w', value: 'Неделя' },
+                                    { id: 'm', value: 'Месяц' },
+                                    { id: 'y', value: 'Год' },
+                                  ],
+                                },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Ширина:', width: 110 },
+                                { view: 'text', type: 'number', name: 'axisX.scale', value: 30 },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Шаг сетки:', width: 110 },
+                                { view: 'text', type: 'number', name: 'axisX.step', value: 5 },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Надпись:', width: 110 },
+                                { view: 'param', name: 'axisX.label' },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  };
+                  let axisY = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Ось значений:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: true,
+                        body: {
+                          rows: [
+                            {
+                              cols: [
+                                { view: 'label', label: 'Макс. значение:', width: 120 },
+                                {
+                                  view: 'checkbox',
+                                  width: 30,
+                                  name: 'axisY.max.show',
+                                  value: 0,
+                                  default: 0,
+                                  tooltip: 'Отображать максимальное значение',
+                                  on: {
+                                    onFocus: onHandler.onFocus,
+                                    onChange: function () {
+                                      this.callEvent('onReady', []);
+                                    },
+                                    onReady: function () {
+                                      $$('maxVal').define('disabled', this.getValue() != 1);
+                                      $$('maxVal').refresh();
+                                    },
+                                  },
+                                },
+                                { view: 'text', type: 'number', id: 'maxVal', name: 'axisY.max.value', value: 0, disabled: true },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Мин. значение:', width: 120 },
+                                {
+                                  view: 'checkbox',
+                                  width: 30,
+                                  name: 'axisY.min.show',
+                                  value: 0,
+                                  default: 0,
+                                  tooltip: 'Отображать минимальное значение',
+                                  on: {
+                                    onFocus: onHandler.onFocus,
+                                    onChange: function (newv) {
+                                      this.callEvent('onReady', []);
+                                    },
+                                    onReady: function () {
+                                      $$('minVal').define('disabled', this.getValue() != 1);
+                                      $$('minVal').refresh();
+                                    },
+                                  },
+                                },
+                                { view: 'text', type: 'number', id: 'minVal', name: 'axisY.min.value', value: 0, disabled: true },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Надпись:', width: 120 },
+                                { view: 'param', name: 'axisY.label' },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  };
+      
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(header);
+                  bindings.push({
+                    cols: [
+                      { view: 'label', label: 'Легенда:', width: 110 },
+                      { view: 'checkbox', name: 'legend', default: 1, value: 1, on: onHandler },
+                    ],
+                  });
+                  bindings.push(chart_items);
+                  bindings.push(axisX);
+                  bindings.push(axisY);
+                  //bindings.push(action);
+                  colors.rows.push(fillColor);
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+              case 'bmrz':
+                {
+                  var settings = {
+                    view: 'accordion',
+                    multi: true,
+                    type: 'clean',
+                    margin: 2,
+                    rows: [
+                      {
+                        view: 'accordionitem',
+                        header: 'Настройки подключения:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: false,
+                        body: {
+                          id: 'settings',
+                          visibleBatch: 'usb',
+                          rows: [
+                            {
+                              cols: [
+                                { view: 'label', label: 'Тип:', width: 110 },
+                                {
+                                  view: 'select',
+                                  name: 'connection.type',
+                                  options: [
+                                    { id: 'usb', value: 'USB' },
+                                    { id: 'com', value: 'RS485(MODBUS-MT)' },
+                                    { id: 'eth', value: 'Ethernet(MODBUS-MT/TCP)' },
+                                  ],
+                                  on: {
+                                    onReady: function () {
+                                      $$('settings').showBatch(this.getValue());
+                                    },
+                                    onChange: function (newv, oldv) {
+                                      $$('settings').showBatch(newv);
+                                    },
+                                  },
+                                },
+                              ],
+                            },
+                            {
+                              batch: 'usb',
+                              height: 1,
+                              template: '',
+                            },
+                            {
+                              batch: 'com',
+                              rows: [
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Порт:', width: 110 },
+                                    { view: 'text', name: 'com.port', validate: API.SERIAL.validate_port, value: 'COM1', default: 'COM1' },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Адрес:', width: 110 },
+                                    {
+                                      view: 'text',
+                                      name: 'com.address',
+                                      validate: function (v) {
+                                        return webix.rules.isNumber(v) && v > 0 && v < 248;
+                                      },
+                                      value: 55,
+                                      default: 55,
+                                    },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Скорость:', width: 110 },
+                                    { view: 'select', name: 'com.speed', options: API.SERIAL.baud_rates_array, value: 19200, default: 19200 },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Чётность:', width: 110 },
+                                    { view: 'select', name: 'com.parity', options: API.SERIAL.parities_array, value: 0, default: 0 },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Стоп. биты:', width: 110 },
+                                    { view: 'select', name: 'com.stop_bits', options: API.SERIAL.stop_bits_array, value: 1, default: 1 },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Межпакетный интервал:', width: 180 },
+                                    {
+                                      view: 'text',
+                                      type: 'number',
+                                      name: 'com.period',
+                                      validate: function (v) {
+                                        return webix.rules.isNumber(v) && v >= 0 && v <= 255;
+                                      },
+                                      value: 0,
+                                      default: 0,
+                                    },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Обмен с наличием эха:', width: 180 },
+                                    { view: 'checkbox', name: 'com.echo', value: 0, default: 0, on: onHandler },
+                                  ],
+                                },
+                              ],
+                            },
+                            {
+                              batch: 'eth',
+                              rows: [
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'IP-адрес:', width: 110 },
+                                    { view: 'text', name: 'eth.ip', validate: API.IPV4.validate, value: '1.1.1.1', default: '1.1.1.1' },
+                                  ],
+                                },
+                                {
+                                  cols: [
+                                    { view: 'label', label: 'Порт:', width: 110 },
+                                    {
+                                      view: 'text',
+                                      type: 'number',
+                                      name: 'eth.port',
+                                      validate: function (v) {
+                                        return webix.rules.isNumber(v) && v > 0 && v < 65536;
+                                      },
+                                      value: 503,
+                                      default: 503,
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        view: 'accordionitem',
+                        header: 'Файлы:',
+                        headerHeight: 22,
+                        headerAltHeight: 22,
+                        collapsed: false,
+                        body: {
+                          rows: [
+                            {
+                              cols: [
+                                { view: 'label', label: 'Путь к БФПО:', width: 110 },
+                                {
+                                  view: 'path',
+                                  name: 'path.bfpo',
+                                  ext: 'sth',
+                                  id: 'path.bfpo',
+                                  validate: function (v) {
+                                    return isNullOrEmpty(v) || getExtension(v.trim()).toLowerCase() === 'sth';
+                                  },
+                                },
+                              ],
+                            },
+                            {
+                              cols: [
+                                { view: 'label', label: 'Путь к ПМК:', width: 110 },
+                                {
+                                  view: 'path',
+                                  name: 'path.pmk',
+                                  ext: 'sth_a',
+                                  id: 'path.pmk',
+                                  validate: function (v) {
+                                    let result = false;
+                                    if (isNullOrEmpty(v)) {
+                                      let bfpo = $$('path.bfpo').getValue();
+                                      let readpmk = $$('read_pmk').getValue();
+                                      result = isNullOrEmpty(bfpo) || readpmk == '1';
+                                    } else {
+                                      result = getExtension(v.trim()).toLowerCase() === 'sth_a';
+                                    }
+                                    return result;
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        cols: [
+                          { view: 'label', label: 'Подключиться к блоку:', width: 180 },
+                          {
+                            view: 'checkbox',
+                            name: 'options.connect',
+                            value: 0,
+                            default: 0,
+                            on: {
+                              onFocus: onHandler.onFocus,
+                              onChange: function () {
+                                let pmk = $$('pmk');
+                                if (this.getValue() == 1) pmk.show();
+                                else {
+                                  $$('read_pmk').setValue(0);
+                                  pmk.hide();
+                                }
+                              },
+                              onReady: function () {
+                                this.callEvent('onChange');
+                              },
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        id: 'pmk',
+                        hidden: true,
+                        cols: [
+                          { view: 'label', label: 'Вычитать ПМК:', width: 180 },
+                          { view: 'checkbox', name: 'options.read_pmk', id: 'read_pmk', value: 0, default: 0, on: onHandler },
+                        ],
+                      },
+                    ],
+                  };
+                  bindings.push(settings);
+                }
+                break;
+              default:
+                {
+                  bindings.push(script);
+                  bindings.push(visibility);
+                  bindings.push(label);
+                  bindings.push(blinking);
+                  bindings.push(rotation);
+                  bindings.push(turning);
+                  bindings.push(shifting);
+                  bindings.push(moving);
+                  bindings.push(action);
+      
+                  colors.rows.push(fillColor);
+                  colors.rows.push(borderColor);
+                  colors.rows.push(fontColor);
+                }
+                break;
+            }
+      
+            // add colors section to binding
+            if (colors.rows.length > 0) bindings.push(colors);
+      
+            return bindings;
+          };
+          Bindings.prototype.destroy = function () {
+            if (this.eqTree) this.eqTree.destructor();
+            if (this.paramsList) this.paramsList.destructor();
+            if (this.properties) this.properties.destructor();
+            if (this.paramsTab) this.paramsTab.destructor();
+          };
+          editorUi.Bindings = Bindings;
+        })(window);
+      
+        this.initialize();
+      };
+      BindingsHandler.prototype.initialize = function () {
+        let context = this;
+      
+        // Ignores canvas in codecs
+        mxCell.prototype.mxTransient.push('chart', 'canvas', 'onBindingsUpdated');
+        mxCodecRegistry.getCodec(mxCell).exclude.push('chart', 'canvas', 'onBindingsUpdated');
+        mxCodecRegistry.getCodec(mxGraphModel).exclude.push('chart', 'canvas', 'onBindingsUpdated');
+      
+        // charts
+        Chart.defaults.global.tooltips.enabled = false;
+      
+        let chartColors = {
+          red: 'rgb(255, 99, 132)',
+          blue: 'rgb(54, 162, 235)',
+          max: 'rgb(255, 0, 255)',
+          min: 'rgb(0, 255, 000)',
+        };
+        let randomData = function (unit, add, min, max) {
+          if (min == null) min = -100;
+          if (max == null) max = +100;
+          if (unit == null) unit = 'second';
+      
+          let randomTime = function () {
+            switch (unit) {
+              case 'millisecond':
+                return new Date().addMilliseconds(add || 0);
+              case 'second':
+                return new Date().addSeconds(add || 0);
+              case 'minute':
+                return new Date().addMinutes(add || 0);
+              case 'hour':
+                return new Date().addHours(add || 0);
+              case 'day':
+                return new Date().addDays(add || 0);
+              case 'week':
+                return new Date().addWeeks(add || 0);
+              case 'month':
+                return new Date().addMonths(add || 0);
+              case 'year':
+                return new Date().addWeeks(add || 0);
+              default:
+                return new Date().addSeconds(add || 0);
+            }
+          };
+      
+          return {
+            x: randomTime(),
+            y: Math.random() * (max - min) + min,
+          };
+        };
+        var createMaxAnnotation = function (value) {
+          return {
+            id: 'y-max',
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-1',
+            value: value,
+            borderColor: 'rgba(255, 0, 0, 1)',
+            borderWidth: 1.5,
+            borderDash: [5, 5],
+            label: {
+              enabled: true,
+              backgroundColor: 'transparent',
+              fontColor: '#ff0000',
+              content: 'Макс.',
+              position: 'right',
+              fontSize: 10,
+              yAdjust: +8,
+              cornerRadius: 3,
+            },
+          };
+        };
+        var createMinAnnotation = function (value) {
+          return {
+            id: 'y-min',
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-1',
+            value: value,
+            borderColor: 'rgba(0, 0, 255, 1)',
+            borderWidth: 1.5,
+            borderDash: [5, 5],
+            label: {
+              enabled: true,
+              backgroundColor: 'transparent',
+              fontColor: '#0000ff',
+              content: 'Мин.',
+              position: 'right',
+              fontSize: 10,
+              yAdjust: -8,
+              cornerRadius: 3,
+            },
+          };
+        };
+        let getChartConfig = function () {
+          return {
+            type: 'scatter',
+            data: {
+              datasets: [
+                {
+                  label: 'Тренд 1',
+                  fill: false,
+                  showLine: true,
+                  lineTension: 0,
+                  backgroundColor: chartColors.red,
+                  borderColor: chartColors.red,
+                  data: [],
+                },
+                {
+                  label: 'Тренд 2',
+                  fill: false,
+                  showLine: true,
+                  lineTension: 0,
+                  backgroundColor: chartColors.blue,
+                  borderColor: chartColors.blue,
+                  data: [],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: {
+                duration: 300,
+              },
+              title: {
+                display: true,
+                text: 'График',
+              },
+              legend: {
+                display: true,
+                position: 'top',
+                onClick: function () {},
+                labels: {
+                  boxWidth: 15,
+                  fontFamily: 'Arial',
+                  fontSize: 8,
+                  padding: 5,
+                  usePointStyle: false,
+                },
+              },
+              scales: {
+                xAxes: [
+                  {
+                    display: true,
+                    type: 'time',
+                    autoSkip: false,
+                    position: 'bottom',
+                    distribution: 'linear',
+                    bounds: 'ticks',
+                    time: {
+                      isoWeekday: true,
+                      unit: 'second',
+                      //unitStepSize: 10,
+                      //stepSize: 1,
+                      //precision: 1,
+                      //round: true,
+                      //minUnit: 'hour',
+                      displayFormats: {
+                        millisecond: 'ss.SSS',
+                        second: 'mm:ss.SSS',
+                        minute: 'HH:mm:ss',
+                        hour: 'DD.MM HH:mm',
+                        day: 'DD.MM',
+                        week: 'WW.YYYY',
+                        month: 'DD.MM.YYYY',
+                        quarter: 'Q YYYY',
+                        year: 'YYYY',
+                      },
+                    },
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Время',
+                      lineHeight: 1,
+                      fontFamily: 'Arial',
+                      fontSize: 10,
+                      padding: { bootom: 5 },
+                    },
+                    //ticks:
+                    //{
+                    //    source: "auto",
+                    //    //maxTicksLimit: 10,
+                    //    //autoSkip: true,
+                    //    stepSize: 5,
+                    //    //precision: 1,
+      
+                    //    lineHeight: 1,
+                    //    fontFamily: 'Arial',
+                    //    fontSize: 10,
+                    //    padding: 0,
+                    //    maxRotation: 45,
+                    //    //callback: function (value, index, values)
+                    //    //{
+                    //    //    //return API.FORMAT.getDateTimeString(value);
+                    //    //    return moment(value).format('HH:mm:ss');
+                    //    //}
+                    //}
                   },
                 ],
-              };
-              bindings.push(settings);
-            }
-            break;
-          default:
-            {
-              bindings.push(script);
-              bindings.push(visibility);
-              bindings.push(label);
-              bindings.push(blinking);
-              bindings.push(rotation);
-              bindings.push(turning);
-              bindings.push(shifting);
-              bindings.push(moving);
-              bindings.push(action);
-  
-              colors.rows.push(fillColor);
-              colors.rows.push(borderColor);
-              colors.rows.push(fontColor);
-            }
-            break;
-        }
-  
-        // add colors section to binding
-        if (colors.rows.length > 0) bindings.push(colors);
-  
-        return bindings;
-      };
-      Bindings.prototype.destroy = function () {
-        if (this.eqTree) this.eqTree.destructor();
-        if (this.paramsList) this.paramsList.destructor();
-        if (this.properties) this.properties.destructor();
-        if (this.paramsTab) this.paramsTab.destructor();
-      };
-      editorUi.Bindings = Bindings;
-    })(window);
-  
-    this.initialize();
-  };
-  BindingsHandler.prototype.initialize = function () {
-    let context = this;
-  
-    // Ignores canvas in codecs
-    mxCell.prototype.mxTransient.push('chart', 'canvas', 'onBindingsUpdated');
-    mxCodecRegistry.getCodec(mxCell).exclude.push('chart', 'canvas', 'onBindingsUpdated');
-    mxCodecRegistry.getCodec(mxGraphModel).exclude.push('chart', 'canvas', 'onBindingsUpdated');
-  
-    // charts
-    Chart.defaults.global.tooltips.enabled = false;
-  
-    let chartColors = {
-      red: 'rgb(255, 99, 132)',
-      blue: 'rgb(54, 162, 235)',
-      max: 'rgb(255, 0, 255)',
-      min: 'rgb(0, 255, 000)',
-    };
-    let randomData = function (unit, add, min, max) {
-      if (min == null) min = -100;
-      if (max == null) max = +100;
-      if (unit == null) unit = 'second';
-  
-      let randomTime = function () {
-        switch (unit) {
-          case 'millisecond':
-            return new Date().addMilliseconds(add || 0);
-          case 'second':
-            return new Date().addSeconds(add || 0);
-          case 'minute':
-            return new Date().addMinutes(add || 0);
-          case 'hour':
-            return new Date().addHours(add || 0);
-          case 'day':
-            return new Date().addDays(add || 0);
-          case 'week':
-            return new Date().addWeeks(add || 0);
-          case 'month':
-            return new Date().addMonths(add || 0);
-          case 'year':
-            return new Date().addWeeks(add || 0);
-          default:
-            return new Date().addSeconds(add || 0);
-        }
-      };
-  
-      return {
-        x: randomTime(),
-        y: Math.random() * (max - min) + min,
-      };
-    };
-    var createMaxAnnotation = function (value) {
-      return {
-        id: 'y-max',
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-1',
-        value: value,
-        borderColor: 'rgba(255, 0, 0, 1)',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        label: {
-          enabled: true,
-          backgroundColor: 'transparent',
-          fontColor: '#ff0000',
-          content: 'Макс.',
-          position: 'right',
-          fontSize: 10,
-          yAdjust: +8,
-          cornerRadius: 3,
-        },
-      };
-    };
-    var createMinAnnotation = function (value) {
-      return {
-        id: 'y-min',
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-1',
-        value: value,
-        borderColor: 'rgba(0, 0, 255, 1)',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        label: {
-          enabled: true,
-          backgroundColor: 'transparent',
-          fontColor: '#0000ff',
-          content: 'Мин.',
-          position: 'right',
-          fontSize: 10,
-          yAdjust: -8,
-          cornerRadius: 3,
-        },
-      };
-    };
-    let getChartConfig = function () {
-      return {
-        type: 'scatter',
-        data: {
-          datasets: [
-            {
-              label: 'Тренд 1',
-              fill: false,
-              showLine: true,
-              lineTension: 0,
-              backgroundColor: chartColors.red,
-              borderColor: chartColors.red,
-              data: [],
-            },
-            {
-              label: 'Тренд 2',
-              fill: false,
-              showLine: true,
-              lineTension: 0,
-              backgroundColor: chartColors.blue,
-              borderColor: chartColors.blue,
-              data: [],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: {
-            duration: 300,
-          },
-          title: {
-            display: true,
-            text: 'График',
-          },
-          legend: {
-            display: true,
-            position: 'top',
-            onClick: function () {},
-            labels: {
-              boxWidth: 15,
-              fontFamily: 'Arial',
-              fontSize: 8,
-              padding: 5,
-              usePointStyle: false,
-            },
-          },
-          scales: {
-            xAxes: [
-              {
-                display: true,
-                type: 'time',
-                autoSkip: false,
-                position: 'bottom',
-                distribution: 'linear',
-                bounds: 'ticks',
-                time: {
-                  isoWeekday: true,
-                  unit: 'second',
-                  //unitStepSize: 10,
-                  //stepSize: 1,
-                  //precision: 1,
-                  //round: true,
-                  //minUnit: 'hour',
-                  displayFormats: {
-                    millisecond: 'ss.SSS',
-                    second: 'mm:ss.SSS',
-                    minute: 'HH:mm:ss',
-                    hour: 'DD.MM HH:mm',
-                    day: 'DD.MM',
-                    week: 'WW.YYYY',
-                    month: 'DD.MM.YYYY',
-                    quarter: 'Q YYYY',
-                    year: 'YYYY',
+                yAxes: [
+                  {
+                    display: true,
+                    scaleLabel: {
+                      display: true,
+                      labelString: 'Значение',
+                      lineHeight: 1,
+                      fontFamily: 'Arial',
+                      fontSize: 10,
+                      padding: { top: 5 },
+                    },
+                    ticks: {
+                      source: 'data',
+                      maxTicksLimit: 10,
+                      //stepSize: 1,
+                      precision: 3,
+                      lineHeight: 1,
+                      fontFamily: 'Arial',
+                      fontSize: 10,
+                    },
                   },
-                },
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Время',
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                  padding: { bootom: 5 },
-                },
-                //ticks:
-                //{
-                //    source: "auto",
-                //    //maxTicksLimit: 10,
-                //    //autoSkip: true,
-                //    stepSize: 5,
-                //    //precision: 1,
-  
-                //    lineHeight: 1,
-                //    fontFamily: 'Arial',
-                //    fontSize: 10,
-                //    padding: 0,
-                //    maxRotation: 45,
-                //    //callback: function (value, index, values)
-                //    //{
-                //    //    //return API.FORMAT.getDateTimeString(value);
-                //    //    return moment(value).format('HH:mm:ss');
-                //    //}
-                //}
+                ],
               },
-            ],
-            yAxes: [
-              {
-                display: true,
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Значение',
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                  padding: { top: 5 },
-                },
-                ticks: {
-                  source: 'data',
-                  maxTicksLimit: 10,
-                  //stepSize: 1,
-                  precision: 3,
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                },
+              layout: {
+                padding: 0,
               },
-            ],
-          },
-          layout: {
-            padding: 0,
-          },
-          annotation: {
-            drawTime: 'afterDraw',
-            annotations: [createMaxAnnotation(90), createMinAnnotation(-90)],
-          },
-        },
-      };
-    };
-  
-    let graphModelSetValue = this.graph.model.setValue;
-    this.graph.model.setValue = function (cell, value) {
-      cell.canvas = null;
-      cell.chart = null;
-      cell.table = null;
-      cell.onBindingsUpdated = null;
-      graphModelSetValue.apply(this, arguments);
-    };
-  
-    let graphFireMouseEvent = this.graph.fireMouseEvent;
-    this.graph.fireMouseEvent = function (evtName, me, sender) {
-      if (evtName == mxEvent.MOUSE_DOWN || evtName == mxEvent.MOUSE_UP) {
-        if (me.state?.cell.isTable) {
-          // get parent cell for inner table
-          const parent = context.graph.model.getParent(me.state.cell);
-          // change event target cell
-          me.state = this.view.getState(parent);
-        }
-        if (me.state?.cell.isPoster) {
-          // get parent cell for inner table
-          const parent = context.graph.model.getParent(me.state.cell);
-          // change event target cell
-          me.state = this.view.getState(parent);
-        }
-      }
-      if (evtName == mxEvent.MOUSE_MOVE) {
-        if (me.state?.cell.isPoster) {
-          // get parent cell for inner table
-          const parent = context.graph.model.getParent(me.state.cell);
-          // change event target cell
-          me.state = this.view.getState(parent);
-        }
-      }
-      graphFireMouseEvent.apply(this, arguments);
-    };
-  
-    let mxGraphViewValidatePosterState = mxGraphView.prototype.validateCellState;
-    mxGraphView.prototype.validatePosterState = function (cell, recurse) {
-      let context = this.graph;
-      let state = this.getState(cell);
-      if (state != null && context.model.isVertex(cell)) {
-        let geom = context.getCellGeometry(cell);
-        cell.onBindingsUpdated = mxUtils.bind(cell, function () {
-          // check content cell
-          let posterCell = this.getChildAt(0);
-          if (posterCell == null) {
-            // build cell
-            posterCell = new mxCell('', new mxGeometry(0, 0, geom.width, geom.height), 'text;html=1;overflow=fill;connectable=0;resizable=0;deletable=0;selectable=0;rotatable=0;editable=0;pointerEvents=0;'); //movable=0;
-            posterCell.vertex = true;
-            posterCell.isPoster = 1;
-            posterCell.isTable = true;
-            if (!this.children) {
-              posterCell = context.model.add(this, posterCell);
+              annotation: {
+                drawTime: 'afterDraw',
+                annotations: [createMaxAnnotation(90), createMinAnnotation(-90)],
+              },
+            },
+          };
+        };
+      
+        let graphModelSetValue = this.graph.model.setValue;
+        this.graph.model.setValue = function (cell, value) {
+          cell.canvas = null;
+          cell.chart = null;
+          cell.table = null;
+          cell.onBindingsUpdated = null;
+          graphModelSetValue.apply(this, arguments);
+        };
+      
+        let graphFireMouseEvent = this.graph.fireMouseEvent;
+        this.graph.fireMouseEvent = function (evtName, me, sender) {
+          if (evtName == mxEvent.MOUSE_DOWN || evtName == mxEvent.MOUSE_UP) {
+            if (me.state?.cell.isTable) {
+              // get parent cell for inner table
+              const parent = context.graph.model.getParent(me.state.cell);
+              // change event target cell
+              me.state = this.view.getState(parent);
+            }
+            if (me.state?.cell.isPoster) {
+              // get parent cell for inner table
+              const parent = context.graph.model.getParent(me.state.cell);
+              // change event target cell
+              me.state = this.view.getState(parent);
             }
           }
-          let styleBinding = this.getBinding('style');
-          let style = styleBinding != null ? JSON.parse($(styleBinding).attr('value')) : 'ptbl-default';
-  
-          // get bindings from default cell style
-          const parentStyles = (cell.style || '').split(';');
-          const getStyleByKey = (key) => {
-            const style = parentStyles.find((x) => x.startsWith(key));
-            return style?.includes('=') ? style.split('=')[1] : '';
-          };
-  
-          //get background image
-          let image = null;
-          API.POSTERS.metadata.forEach((el) => {
-            var pattern = /\b[a-zA-Z]+\b/;
-            if (cell._model) {
-              if (cell._model.data.type) {
-                const type = cell._model.data.type.match(pattern)[0];
-                if (el.key === type) {
-                  image = `url(${el.src})`;
+          if (evtName == mxEvent.MOUSE_MOVE) {
+            if (me.state?.cell.isPoster) {
+              // get parent cell for inner table
+              const parent = context.graph.model.getParent(me.state.cell);
+              // change event target cell
+              me.state = this.view.getState(parent);
+            }
+          }
+          graphFireMouseEvent.apply(this, arguments);
+        };
+      
+        let mxGraphViewValidatePosterState = mxGraphView.prototype.validateCellState;
+        mxGraphView.prototype.validatePosterState = function (cell, recurse) {
+        
+          let context = this.graph;
+          let state = this.getState(cell);
+          if (state != null && context.model.isVertex(cell)) {
+            let geom = context.getCellGeometry(cell);
+            cell.onBindingsUpdated = mxUtils.bind(cell, function () {
+              // check content cell
+              let posterCell = this.getChildAt(0);
+              if (posterCell == null) {
+                // build cell
+                posterCell = new mxCell('', new mxGeometry(0, 0, geom.width, geom.height), 'text;html=1;overflow=fill;connectable=0;resizable=0;deletable=0;selectable=0;rotatable=0;editable=0;pointerEvents=0;'); //movable=0;
+                posterCell.vertex = true;
+                posterCell.isPoster = 1;
+                posterCell.isTable = true;
+                if (!this.children) {
+                  posterCell = context.model.add(this, posterCell);
                 }
               }
-            }
-          });
-  
-          // get stroke width
-          let strokeWidth = (+getStyleByKey('strokeWidth') || 0) + 1; // min 1 px
-          if (strokeWidth % 2 !== 0) strokeWidth++; // should be even
-  
-          context.model.beginUpdate();
-  
-          // update content
-          let poster = '<div class="poster-block {S}" style="width:{TW};height:{TH}; background-image:{IMG}; background-size:{IMG_SZ}; background-position:{IMG_POS}; background-repeat:{IMG_RE}"></div>';
-  
-          poster = poster
-            .replace('{ID}', this.id)
-            .replace('{S}', style)
-            .replace('{TW}', `calc(100% - ${strokeWidth}px)`) // fix table position
-            .replace('{TH}', `calc(100% - ${strokeWidth}px)`) // fix table position
-            .replace('{IMG}', `${image}`)
-            .replace('{IMG_SZ}', 'cover')
-            .replace('{IMG_POS}', 'center')
-            .replace('{IMG_RE}', 'no-repeat');
-  
-          context.model.setValue(posterCell, poster);
-  
-          context.model.endUpdate();
-        });
-        cell.onBindingsUpdated();
-      }
-      return mxGraphViewValidatePosterState.apply(this, arguments);
-    };
-  
-    let mxGraphViewValidateCellState = mxGraphView.prototype.validateCellState;
-    mxGraphView.prototype.validateCellState = function (cell, recurse) {
-      let context = this.graph;
-      let state = this.getState(cell);
-  
-      if (state != null && context.model.isVertex(cell)) {
-        let shape = state.style[mxConstants.STYLE_SHAPE];
-        let geom = context.getCellGeometry(cell);
-  
-        switch (shape) {
-          case 'chart':
-            {
-              if (cell.canvas == null) {
-                // build chart
-                var node = document.createElement('canvas');
-                node.setAttribute('id', cell.mxObjectId);
-                node.setAttribute('class', 'chart');
-                node.setAttribute('width', geom.width);
-                node.setAttribute('height', geom.height);
-                // Document for empty output if not in DOM
-                //document.body.appendChild(node);
-                cell.canvas = node;
-                cell.chart = new Chart.Scatter(node.getContext('2d'), getChartConfig());
-  
-                if (cell.onBindingsUpdated == null) {
-                  cell.onBindingsUpdated = mxUtils.bind(cell, function () {
-                    if (this.chart != null) {
-                      // header
-                      this.chart.options.title.display = false;
-                      let hdrBinding = this.getBinding('header');
-                      if (hdrBinding != null) {
-                        let hdr = JSON.parse(hdrBinding.value);
-                        if (hdr != null && hdr.text != null) {
-                          this.chart.options.title.text = hdr.text;
-                          this.chart.options.title.display = true;
-                        }
-                      }
-                      // legend
-                      let legendBinding = this.getBinding('legend');
-                      this.chart.options.legend.display = legendBinding == null || JSON.parse(legendBinding.value) != '0';
-  
-                      // axisX.label
-                      this.chart.options.scales.xAxes[0].scaleLabel.display = false;
-                      let axisXLabelBinding = this.getBinding('axisX.label');
-                      if (axisXLabelBinding != null) {
-                        let axisXLabel = JSON.parse(axisXLabelBinding.value);
-                        if (axisXLabel != null && axisXLabel.text != null) {
-                          this.chart.options.scales.xAxes[0].scaleLabel.labelString = axisXLabel.text;
-                          this.chart.options.scales.xAxes[0].scaleLabel.display = true;
-                        }
-                      }
-  
-                      // axisX.measure
-                      let xUnit = 'second';
-                      let axisXMeasureBinding = this.getBinding('axisX.measure');
-                      if (axisXMeasureBinding != null) {
-                        let axisXMeasure = JSON.parse(axisXMeasureBinding.value);
-                        switch (axisXMeasure) {
-                          case 'ms':
-                            xUnit = 'millisecond';
-                            break;
-                          case 's':
-                            xUnit = 'second';
-                            break;
-                          case 'mn':
-                            xUnit = 'minute';
-                            break;
-                          case 'h':
-                            xUnit = 'hour';
-                            break;
-                          case 'd':
-                            xUnit = 'day';
-                            break;
-                          case 'w':
-                            xUnit = 'week';
-                            break;
-                          case 'm':
-                            xUnit = 'month';
-                            break;
-                          case 'y':
-                            xUnit = 'year';
-                            break;
-                          default:
-                            xUnit = 'second';
-                            break;
-                        }
-                      }
-                      this.chart.options.scales.xAxes[0].time.unit = xUnit;
-  
-                      // axisX.step
-                      let xStep = 1;
-                      this.chart.options.scales.xAxes[0].time.stepSize = xStep;
-                      let axisXStepBinding = this.getBinding('axisX.step');
-                      if (axisXStepBinding != null) {
-                        let axisXStep = JSON.parse(axisXStepBinding.value);
-                        xStep = parseNumber(axisXStep) || 1;
-                        this.chart.options.scales.xAxes[0].time.stepSize = xStep;
-                      }
-  
-                      // axisX.scale
-                      let xScale = 30;
-                      let axisXScaleBinding = this.getBinding('axisX.scale');
-                      if (axisXScaleBinding != null) {
-                        let axisXScale = JSON.parse(axisXScaleBinding.value);
-                        xScale = parseNumber(axisXScale) || 30;
-                      }
-  
-                      // axisY.label
-                      this.chart.options.scales.yAxes[0].scaleLabel.display = false;
-                      let axisYLabelBinding = this.getBinding('axisY.label');
-                      if (axisYLabelBinding != null) {
-                        let axisYLabel = JSON.parse(axisYLabelBinding.value);
-                        if (axisYLabel != null && axisYLabel.text != null) {
-                          this.chart.options.scales.yAxes[0].scaleLabel.labelString = axisYLabel.text;
-                          this.chart.options.scales.yAxes[0].scaleLabel.display = true;
-                        }
-                      }
-  
-                      // clear axisY annotations
-                      this.chart.options.annotation.annotations.length = 0;
-                      this.chart.annotation.elements = {};
-                      this.chart.annotation.options.annotations.length = 0;
-  
-                      // axisY.max
-                      let maxValue = null;
-                      let axisYMaxBinding = this.getBinding('axisY.max.show');
-                      if (axisYMaxBinding != null) {
-                        let axisYMaxShow = JSON.parse(axisYMaxBinding.value);
-                        if (axisYMaxShow != null && axisYMaxShow != '0') {
-                          let axisYMaxValueBinding = this.getBinding('axisY.max.value');
-                          if (axisYMaxValueBinding != null) {
-                            let axisYMaxValue = JSON.parse(axisYMaxValueBinding.value);
-                            if (axisYMaxValue != null) maxValue = parseNumber(axisYMaxValue, 0, 3);
-                          }
-                          let annotation = createMaxAnnotation(maxValue);
-                          this.chart.options.annotation.annotations.push(annotation); // show
-                        }
-                      }
-                      // axisY.min
-                      let minValue = null;
-                      let axisYMinBinding = this.getBinding('axisY.min.show');
-                      if (axisYMinBinding != null) {
-                        let axisYMinShow = JSON.parse(axisYMinBinding.value);
-                        if (axisYMinShow != null && axisYMinShow != '0') {
-                          let axisYMinValueBinding = this.getBinding('axisY.min.value');
-                          if (axisYMinValueBinding != null) {
-                            let axisYMinValue = JSON.parse(axisYMinValueBinding.value);
-                            if (axisYMinValue != null) minValue = parseNumber(axisYMinValue, 0, 3);
-                          }
-                          let annotation = createMinAnnotation(minValue);
-                          this.chart.options.annotation.annotations.push(annotation); // show
-                        }
-                      }
-  
-                      // items
-                      this.chart.data.datasets = [];
-                      let itemsBinding = this.getBinding('items');
-                      if (itemsBinding != null) {
-                        let getType = function (item) {
-                          switch (item.view) {
-                            case '4': // bars
-                              return 'bar';
-                            default:
-                              return 'scatter';
-                          }
-                        };
-                        let getShowLine = function (item) {
-                          switch (item.view) {
-                            case '1': // points
-                              return false;
-                            default:
-                              return true;
-                          }
-                        };
-  
-                        let items = JSON.parse(itemsBinding.value);
-                        if (items != null && items.length > 0) {
-                          for (let i = 0; i < items.length; i++) {
-                            let item = items[i];
-                            if (item != null) {
-                              this.chart.data.datasets.push({
-                                label: item.d,
-                                fill: false,
-                                showLine: getShowLine(item),
-                                lineTension: 0,
-                                backgroundColor: item.color,
-                                borderColor: item.color,
-                                type: getType(item),
-                                steppedLine: item.view == '3' ? 'before' : false, // stepped line
-                                data: [randomData(xUnit, +0, minValue, maxValue), randomData(xUnit, +10, minValue, maxValue), randomData(xUnit, +20, minValue, maxValue)],
-                              });
+              let styleBinding = this.getBinding('style');
+              let style = styleBinding != null ? JSON.parse($(styleBinding).attr('value')) : 'ptbl-default';
+      
+              // get bindings from default cell style
+              const parentStyles = (cell.style || '').split(';');
+              const getStyleByKey = (key) => {
+                const style = parentStyles.find((x) => x.startsWith(key));
+                return style?.includes('=') ? style.split('=')[1] : '';
+              };
+      
+              //get background image
+              let image = null;
+              API.POSTERS.metadata.forEach((el) => {
+                var pattern = /\b[a-zA-Z]+\b/;
+                if (cell._model) {
+                  if (cell._model.data.type) {
+                    const type = cell._model.data.type.match(pattern)[0];
+                    if (el.key === type) {
+                      image = `url(${el.src})`;
+                    }
+                  }
+                }
+              });
+      
+              // get stroke width
+              let strokeWidth = (+getStyleByKey('strokeWidth') || 0) + 1; // min 1 px
+              if (strokeWidth % 2 !== 0) strokeWidth++; // should be even
+      
+              context.model.beginUpdate();
+      
+              // update content
+              let poster = '<div class="poster-block {S}" style="width:{TW};height:{TH}; background-image:{IMG}; background-size:{IMG_SZ}; background-position:{IMG_POS}; background-repeat:{IMG_RE}"></div>';
+      
+              poster = poster
+                .replace('{ID}', this.id)
+                .replace('{S}', style)
+                .replace('{TW}', `calc(100% - ${strokeWidth}px)`) // fix table position
+                .replace('{TH}', `calc(100% - ${strokeWidth}px)`) // fix table position
+                .replace('{IMG}', `${image}`)
+                .replace('{IMG_SZ}', 'cover')
+                .replace('{IMG_POS}', 'center')
+                .replace('{IMG_RE}', 'no-repeat');
+      
+              context.model.setValue(posterCell, poster);
+      
+              context.model.endUpdate();
+            });
+            cell.onBindingsUpdated();
+          }
+          return mxGraphViewValidatePosterState.apply(this, arguments);
+        };
+      
+        let mxGraphViewValidateCellState = mxGraphView.prototype.validateCellState;
+        mxGraphView.prototype.validateCellState = function (cell, recurse) {
+          let context = this.graph;
+          let state = this.getState(cell);
+      
+          if (state != null && context.model.isVertex(cell)) {
+            let shape = state.style[mxConstants.STYLE_SHAPE];
+            let geom = context.getCellGeometry(cell);
+      
+            switch (shape) {
+              case 'chart':
+                {
+                  if (cell.canvas == null) {
+                    // build chart
+                    var node = document.createElement('canvas');
+                    node.setAttribute('id', cell.mxObjectId);
+                    node.setAttribute('class', 'chart');
+                    node.setAttribute('width', geom.width);
+                    node.setAttribute('height', geom.height);
+                    // Document for empty output if not in DOM
+                    //document.body.appendChild(node);
+                    cell.canvas = node;
+                    cell.chart = new Chart.Scatter(node.getContext('2d'), getChartConfig());
+      
+                    if (cell.onBindingsUpdated == null) {
+                      cell.onBindingsUpdated = mxUtils.bind(cell, function () {
+                        if (this.chart != null) {
+                          // header
+                          this.chart.options.title.display = false;
+                          let hdrBinding = this.getBinding('header');
+                          if (hdrBinding != null) {
+                            let hdr = JSON.parse(hdrBinding.value);
+                            if (hdr != null && hdr.text != null) {
+                              this.chart.options.title.text = hdr.text;
+                              this.chart.options.title.display = true;
                             }
                           }
+                          // legend
+                          let legendBinding = this.getBinding('legend');
+                          this.chart.options.legend.display = legendBinding == null || JSON.parse(legendBinding.value) != '0';
+      
+                          // axisX.label
+                          this.chart.options.scales.xAxes[0].scaleLabel.display = false;
+                          let axisXLabelBinding = this.getBinding('axisX.label');
+                          if (axisXLabelBinding != null) {
+                            let axisXLabel = JSON.parse(axisXLabelBinding.value);
+                            if (axisXLabel != null && axisXLabel.text != null) {
+                              this.chart.options.scales.xAxes[0].scaleLabel.labelString = axisXLabel.text;
+                              this.chart.options.scales.xAxes[0].scaleLabel.display = true;
+                            }
+                          }
+      
+                          // axisX.measure
+                          let xUnit = 'second';
+                          let axisXMeasureBinding = this.getBinding('axisX.measure');
+                          if (axisXMeasureBinding != null) {
+                            let axisXMeasure = JSON.parse(axisXMeasureBinding.value);
+                            switch (axisXMeasure) {
+                              case 'ms':
+                                xUnit = 'millisecond';
+                                break;
+                              case 's':
+                                xUnit = 'second';
+                                break;
+                              case 'mn':
+                                xUnit = 'minute';
+                                break;
+                              case 'h':
+                                xUnit = 'hour';
+                                break;
+                              case 'd':
+                                xUnit = 'day';
+                                break;
+                              case 'w':
+                                xUnit = 'week';
+                                break;
+                              case 'm':
+                                xUnit = 'month';
+                                break;
+                              case 'y':
+                                xUnit = 'year';
+                                break;
+                              default:
+                                xUnit = 'second';
+                                break;
+                            }
+                          }
+                          this.chart.options.scales.xAxes[0].time.unit = xUnit;
+      
+                          // axisX.step
+                          let xStep = 1;
+                          this.chart.options.scales.xAxes[0].time.stepSize = xStep;
+                          let axisXStepBinding = this.getBinding('axisX.step');
+                          if (axisXStepBinding != null) {
+                            let axisXStep = JSON.parse(axisXStepBinding.value);
+                            xStep = parseNumber(axisXStep) || 1;
+                            this.chart.options.scales.xAxes[0].time.stepSize = xStep;
+                          }
+      
+                          // axisX.scale
+                          let xScale = 30;
+                          let axisXScaleBinding = this.getBinding('axisX.scale');
+                          if (axisXScaleBinding != null) {
+                            let axisXScale = JSON.parse(axisXScaleBinding.value);
+                            xScale = parseNumber(axisXScale) || 30;
+                          }
+      
+                          // axisY.label
+                          this.chart.options.scales.yAxes[0].scaleLabel.display = false;
+                          let axisYLabelBinding = this.getBinding('axisY.label');
+                          if (axisYLabelBinding != null) {
+                            let axisYLabel = JSON.parse(axisYLabelBinding.value);
+                            if (axisYLabel != null && axisYLabel.text != null) {
+                              this.chart.options.scales.yAxes[0].scaleLabel.labelString = axisYLabel.text;
+                              this.chart.options.scales.yAxes[0].scaleLabel.display = true;
+                            }
+                          }
+      
+                          // clear axisY annotations
+                          this.chart.options.annotation.annotations.length = 0;
+                          this.chart.annotation.elements = {};
+                          this.chart.annotation.options.annotations.length = 0;
+      
+                          // axisY.max
+                          let maxValue = null;
+                          let axisYMaxBinding = this.getBinding('axisY.max.show');
+                          if (axisYMaxBinding != null) {
+                            let axisYMaxShow = JSON.parse(axisYMaxBinding.value);
+                            if (axisYMaxShow != null && axisYMaxShow != '0') {
+                              let axisYMaxValueBinding = this.getBinding('axisY.max.value');
+                              if (axisYMaxValueBinding != null) {
+                                let axisYMaxValue = JSON.parse(axisYMaxValueBinding.value);
+                                if (axisYMaxValue != null) maxValue = parseNumber(axisYMaxValue, 0, 3);
+                              }
+                              let annotation = createMaxAnnotation(maxValue);
+                              this.chart.options.annotation.annotations.push(annotation); // show
+                            }
+                          }
+                          // axisY.min
+                          let minValue = null;
+                          let axisYMinBinding = this.getBinding('axisY.min.show');
+                          if (axisYMinBinding != null) {
+                            let axisYMinShow = JSON.parse(axisYMinBinding.value);
+                            if (axisYMinShow != null && axisYMinShow != '0') {
+                              let axisYMinValueBinding = this.getBinding('axisY.min.value');
+                              if (axisYMinValueBinding != null) {
+                                let axisYMinValue = JSON.parse(axisYMinValueBinding.value);
+                                if (axisYMinValue != null) minValue = parseNumber(axisYMinValue, 0, 3);
+                              }
+                              let annotation = createMinAnnotation(minValue);
+                              this.chart.options.annotation.annotations.push(annotation); // show
+                            }
+                          }
+      
+                          // items
+                          this.chart.data.datasets = [];
+                          let itemsBinding = this.getBinding('items');
+                          if (itemsBinding != null) {
+                            let getType = function (item) {
+                              switch (item.view) {
+                                case '4': // bars
+                                  return 'bar';
+                                default:
+                                  return 'scatter';
+                              }
+                            };
+                            let getShowLine = function (item) {
+                              switch (item.view) {
+                                case '1': // points
+                                  return false;
+                                default:
+                                  return true;
+                              }
+                            };
+      
+                            let items = JSON.parse(itemsBinding.value);
+                            if (items != null && items.length > 0) {
+                              for (let i = 0; i < items.length; i++) {
+                                let item = items[i];
+                                if (item != null) {
+                                  this.chart.data.datasets.push({
+                                    label: item.d,
+                                    fill: false,
+                                    showLine: getShowLine(item),
+                                    lineTension: 0,
+                                    backgroundColor: item.color,
+                                    borderColor: item.color,
+                                    type: getType(item),
+                                    steppedLine: item.view == '3' ? 'before' : false, // stepped line
+                                    data: [randomData(xUnit, +0, minValue, maxValue), randomData(xUnit, +10, minValue, maxValue), randomData(xUnit, +20, minValue, maxValue)],
+                                  });
+                                }
+                              }
+                            }
+                          }
+      
+                          // update x-axis width
+                          if (xScale > 0 && xStep > 0) {
+                            let xAxis = this.chart.scales['x-axis-1'];
+                            let minDate = moment(xAxis.min).toDate();
+                            let maxDate = moment(xAxis.max).toDate();
+      
+                            switch (xUnit) {
+                              case 'millisecond':
+                                minDate = maxDate.addMilliseconds(-xScale || 0);
+                                break;
+                              case 'second':
+                                minDate = maxDate.addSeconds(-xScale || 0);
+                                break;
+                              case 'minute':
+                                minDate = maxDate.addMinutes(-xScale || 0);
+                                break;
+                              case 'hour':
+                                minDate = maxDate.addHours(-xScale || 0);
+                                break;
+                              case 'day':
+                                minDate = maxDate.addDays(-xScale || 0);
+                                break;
+                              case 'week':
+                                minDate = maxDate.addWeeks(-xScale || 0);
+                                break;
+                              case 'month':
+                                minDate = maxDate.addMonths(-xScale || 0);
+                                break;
+                              case 'year':
+                                minDate = maxDate.addWeeks(-xScale || 0);
+                                break;
+                              default:
+                                break;
+                            }
+      
+                            if (minDate != null) this.chart.options.scales.xAxes[0].ticks.min = moment(minDate);
+                          }
+      
+                          this.chart.update();
                         }
-                      }
-  
-                      // update x-axis width
-                      if (xScale > 0 && xStep > 0) {
-                        let xAxis = this.chart.scales['x-axis-1'];
-                        let minDate = moment(xAxis.min).toDate();
-                        let maxDate = moment(xAxis.max).toDate();
-  
-                        switch (xUnit) {
-                          case 'millisecond':
-                            minDate = maxDate.addMilliseconds(-xScale || 0);
-                            break;
-                          case 'second':
-                            minDate = maxDate.addSeconds(-xScale || 0);
-                            break;
-                          case 'minute':
-                            minDate = maxDate.addMinutes(-xScale || 0);
-                            break;
-                          case 'hour':
-                            minDate = maxDate.addHours(-xScale || 0);
-                            break;
-                          case 'day':
-                            minDate = maxDate.addDays(-xScale || 0);
-                            break;
-                          case 'week':
-                            minDate = maxDate.addWeeks(-xScale || 0);
-                            break;
-                          case 'month':
-                            minDate = maxDate.addMonths(-xScale || 0);
-                            break;
-                          case 'year':
-                            minDate = maxDate.addWeeks(-xScale || 0);
-                            break;
-                          default:
-                            break;
-                        }
-  
-                        if (minDate != null) this.chart.options.scales.xAxes[0].ticks.min = moment(minDate);
-                      }
-  
-                      this.chart.update();
+                      });
+                      cell.onBindingsUpdated();
                     }
-                  });
-                  cell.onBindingsUpdated();
+                  }
+                }
+                break;
+              case 'table':
+                {
+                  if (cell.onBindingsUpdated == null) {
+                    cell.onBindingsUpdated = mxUtils.bind(cell, function () {
+                      // check content cell
+                      let tableCell = this.getChildAt(0);
+                      if (tableCell == null) {
+                        // build cell
+                        tableCell = new mxCell('Параметры', new mxGeometry(0, 0, geom.width, geom.height), 'text;html=1;overflow=fill;connectable=0;resizable=0;deletable=0;selectable=0;rotatable=0;editable=0;pointerEvents=0;'); //movable=0;
+                        tableCell.vertex = true;
+                        tableCell.connectable = false;
+                        tableCell.isTable = true;
+                        tableCell = context.model.add(this, tableCell);
+                      }
+      
+                      let itemsBinding = this.getBinding('items');
+                      let items = itemsBinding != null ? JSON.parse($(itemsBinding).attr('value')) : [];
+      
+                      let styleBinding = this.getBinding('style');
+                      let style = styleBinding != null ? JSON.parse($(styleBinding).attr('value')) : 'ptbl-default';
+      
+                      let measureBinding = this.getBinding('measure');
+                      let showMeasure = measureBinding != null ? JSON.parse($(measureBinding).attr('value')) == 1 : false;
+      
+                      let w1Binding = this.getBinding('w1');
+                      let w1 = w1Binding != null ? JSON.parse($(w1Binding).attr('value')) + 'px' : '40%';
+                      let w2Binding = this.getBinding('w2');
+                      let w2 = w2Binding != null ? JSON.parse($(w2Binding).attr('value')) + 'px' : '40%';
+      
+                      const fontSizeBinding = this.getBinding('fontSize');
+                      const fontSize = fontSizeBinding != null ? JSON.parse($(fontSizeBinding).attr('value')) + 'px' : '10px';
+      
+                      // get bindings from default cell style
+                      const parentStyles = (cell.style || '').split(';');
+                      const getStyleByKey = (key) => {
+                        const style = parentStyles.find((x) => x.startsWith(key));
+                        return style?.includes('=') ? style.split('=')[1] : '';
+                      };
+      
+                      // get stroke color
+                      const strokeColor = getStyleByKey('strokeColor') || 'grey';
+      
+                      // get stroke width
+                      let strokeWidth = (+getStyleByKey('strokeWidth') || 0) + 1; // min 1 px
+                      if (strokeWidth % 2 !== 0) strokeWidth++; // should be even
+      
+                      context.model.beginUpdate();
+      
+                      // update content
+                      let table = '<table class="tbl{ID} {S}" style="width:{TW};height:{TH};margin-top:{TM};font-size:{FS}"><tbody>{B}</tbody></table>';
+      
+                      let rows = [];
+                      for (let i = 0; i < items.length; i++) {
+                        let item = items[i];
+                        let ncell = '<td class="c-name"  style="width:{w1}; border-color:{BC}">{N}</td>'.replace('{N}', item.d || '&nbsp;').replace('{BC}', strokeColor);
+                        let vcell = '<td class="c-value" style="width:{w2}; border-color:{BC}">{V}</td>'.replace('{V}', item.v || '&nbsp;').replace('{BC}', strokeColor);
+                        // build row
+                        let row = '<tr id="{ID}">'.replace('{ID}', item.id);
+                        row += ncell;
+                        row += vcell;
+                        if (showMeasure) {
+                          let mcell = '<td class="c-measure" style="border-color:{BC}">{M}</td>'.replace('{M}', item.m || '&nbsp;').replace('{BC}', strokeColor);
+                          row += mcell;
+                        }
+                        row += '</tr>';
+                        // column width
+                        row = row.replace('{w1}', w1);
+                        row = row.replace('{w2}', w2);
+                        rows.push(row);
+                      }
+      
+                      table = table
+                        .replace('{ID}', this.id)
+                        .replace('{S}', style)
+                        .replace('{FS}', fontSize)
+                        .replace('{TW}', `calc(100% - ${strokeWidth}px)`) // fix table position
+                        .replace('{TH}', `calc(100% - ${strokeWidth}px)`) // fix table position
+                        .replace('{TM}', `${Math.ceil(strokeWidth / 2)}px`) // fix table position
+                        .replace('{B}', rows.join(''));
+                      context.model.setValue(tableCell, table);
+      
+                      context.model.endUpdate();
+                    });
+                    cell.onBindingsUpdated();
+                  }
+                }
+                break;
+            }
+          }
+          return mxGraphViewValidateCellState.apply(this, arguments);
+        };
+      
+        let graphConvertValueToString = this.graph.convertValueToString;
+        this.graph.convertValueToString = function (cell) {
+          if (this.model.isVertex(cell)) {
+            let state = this.view.getState(cell);
+            if (state != null) {
+              switch (state.style[mxConstants.STYLE_SHAPE]) {
+                case 'chart': {
+                  // remove image
+                  if (state.shape.image != null) {
+                    delete state.shape.image;
+                    this.cellRenderer.doRedrawShape(state);
+                  }
+                  return cell.canvas;
                 }
               }
             }
-            break;
-          case 'table':
-            {
-              if (cell.onBindingsUpdated == null) {
-                cell.onBindingsUpdated = mxUtils.bind(cell, function () {
-                  // check content cell
-                  let tableCell = this.getChildAt(0);
-                  if (tableCell == null) {
-                    // build cell
-                    tableCell = new mxCell('Параметры', new mxGeometry(0, 0, geom.width, geom.height), 'text;html=1;overflow=fill;connectable=0;resizable=0;deletable=0;selectable=0;rotatable=0;editable=0;pointerEvents=0;'); //movable=0;
-                    tableCell.vertex = true;
-                    tableCell.connectable = false;
-                    tableCell.isTable = true;
-                    tableCell = context.model.add(this, tableCell);
-                  }
-  
-                  let itemsBinding = this.getBinding('items');
-                  let items = itemsBinding != null ? JSON.parse($(itemsBinding).attr('value')) : [];
-  
-                  let styleBinding = this.getBinding('style');
-                  let style = styleBinding != null ? JSON.parse($(styleBinding).attr('value')) : 'ptbl-default';
-  
-                  let measureBinding = this.getBinding('measure');
-                  let showMeasure = measureBinding != null ? JSON.parse($(measureBinding).attr('value')) == 1 : false;
-  
-                  let w1Binding = this.getBinding('w1');
-                  let w1 = w1Binding != null ? JSON.parse($(w1Binding).attr('value')) + 'px' : '40%';
-                  let w2Binding = this.getBinding('w2');
-                  let w2 = w2Binding != null ? JSON.parse($(w2Binding).attr('value')) + 'px' : '40%';
-  
-                  const fontSizeBinding = this.getBinding('fontSize');
-                  const fontSize = fontSizeBinding != null ? JSON.parse($(fontSizeBinding).attr('value')) + 'px' : '10px';
-  
-                  // get bindings from default cell style
-                  const parentStyles = (cell.style || '').split(';');
-                  const getStyleByKey = (key) => {
-                    const style = parentStyles.find((x) => x.startsWith(key));
-                    return style?.includes('=') ? style.split('=')[1] : '';
-                  };
-  
-                  // get stroke color
-                  const strokeColor = getStyleByKey('strokeColor') || 'grey';
-  
-                  // get stroke width
-                  let strokeWidth = (+getStyleByKey('strokeWidth') || 0) + 1; // min 1 px
-                  if (strokeWidth % 2 !== 0) strokeWidth++; // should be even
-  
-                  context.model.beginUpdate();
-  
-                  // update content
-                  let table = '<table class="tbl{ID} {S}" style="width:{TW};height:{TH};margin-top:{TM};font-size:{FS}"><tbody>{B}</tbody></table>';
-  
-                  let rows = [];
-                  for (let i = 0; i < items.length; i++) {
-                    let item = items[i];
-                    let ncell = '<td class="c-name"  style="width:{w1}; border-color:{BC}">{N}</td>'.replace('{N}', item.d || '&nbsp;').replace('{BC}', strokeColor);
-                    let vcell = '<td class="c-value" style="width:{w2}; border-color:{BC}">{V}</td>'.replace('{V}', item.v || '&nbsp;').replace('{BC}', strokeColor);
-                    // build row
-                    let row = '<tr id="{ID}">'.replace('{ID}', item.id);
-                    row += ncell;
-                    row += vcell;
-                    if (showMeasure) {
-                      let mcell = '<td class="c-measure" style="border-color:{BC}">{M}</td>'.replace('{M}', item.m || '&nbsp;').replace('{BC}', strokeColor);
-                      row += mcell;
-                    }
-                    row += '</tr>';
-                    // column width
-                    row = row.replace('{w1}', w1);
-                    row = row.replace('{w2}', w2);
-                    rows.push(row);
-                  }
-  
-                  table = table
-                    .replace('{ID}', this.id)
-                    .replace('{S}', style)
-                    .replace('{FS}', fontSize)
-                    .replace('{TW}', `calc(100% - ${strokeWidth}px)`) // fix table position
-                    .replace('{TH}', `calc(100% - ${strokeWidth}px)`) // fix table position
-                    .replace('{TM}', `${Math.ceil(strokeWidth / 2)}px`) // fix table position
-                    .replace('{B}', rows.join(''));
-                  context.model.setValue(tableCell, table);
-  
-                  context.model.endUpdate();
-                });
-                cell.onBindingsUpdated();
-              }
-            }
-            break;
-        }
-      }
-      return mxGraphViewValidateCellState.apply(this, arguments);
-    };
-  
-    let graphConvertValueToString = this.graph.convertValueToString;
-    this.graph.convertValueToString = function (cell) {
-      if (this.model.isVertex(cell)) {
-        let state = this.view.getState(cell);
-        if (state != null) {
-          switch (state.style[mxConstants.STYLE_SHAPE]) {
-            case 'chart': {
-              // remove image
-              if (state.shape.image != null) {
-                delete state.shape.image;
-                this.cellRenderer.doRedrawShape(state);
-              }
-              return cell.canvas;
-            }
           }
-        }
-      }
-      return graphConvertValueToString.apply(this, arguments);
-    };
-  };
-  BindingsHandler.prototype.ready = function () {
-    // rebuild(update) all cells view
-    var filter = mxUtils.bind(this.graph, function (cell) {
-      return !this.model.isLayer(cell) && !this.model.isRoot(cell) && cell.bindings != null;
-    });
-    this.graph.model.filterDescendants(filter).forEach(function (cell) {
-      if (cell.onBindingsUpdated != null) cell.onBindingsUpdated();
-    });
-  };
+          return graphConvertValueToString.apply(this, arguments);
+        };
+      };
+      BindingsHandler.prototype.ready = function () {
+        // rebuild(update) all cells view
+        var filter = mxUtils.bind(this.graph, function (cell) {
+          return !this.model.isLayer(cell) && !this.model.isRoot(cell) && cell.bindings != null;
+        });
+        this.graph.model.filterDescendants(filter).forEach(function (cell) {
+          if (cell.onBindingsUpdated != null) cell.onBindingsUpdated();
+        });
+      };
   
   //Bindings.js end
 
 
 //Graph.js start
-
 
 mxGraph.prototype.pageScale = 1;
 mxGraph.prototype.pageBreakColor             = '#c0c0c0';
@@ -7750,7 +7760,8 @@ mxVmlCanvas2D.prototype.createTransparentFill = function ()
 /**
  * Defines graph class.
  */
- function Graph (container, model, renderHint, stylesheet, themes)
+  //export default function Graph (container, model, renderHint, stylesheet, themes)
+function Graph (container, model, renderHint, stylesheet, themes)
 {
     mxGraph.call(this, container, model, renderHint, stylesheet);
     
@@ -9403,21 +9414,24 @@ Graph.prototype.getPageLayout = function()
  */
 Graph.prototype.sanitizeHtml = function(value, editing)
 {
-    // // Uses https://code.google.com/p/google-caja/wiki/JsHtmlSanitizer
-    // // NOTE: Original minimized sanitizer was modified to support
-    // // data URIs for images, mailto and special data:-links.
-    // // LATER: Add MathML to whitelisted tags
-    // function urlX(link)
-    // {
-    //     if (link != null && link.toString().toLowerCase().substring(0, 11) !== 'javascript:')
-    //     {
-    //         return link;
-    //     }
+    // Uses https://code.google.com/p/google-caja/wiki/JsHtmlSanitizer
+    // NOTE: Original minimized sanitizer was modified to support
+    // data URIs for images, mailto and special data:-links.
+    // LATER: Add MathML to whitelisted tags
+    function urlX(link)
+    {
+        if (link != null && link.toString().toLowerCase().substring(0, 11) !== 'javascript:')
+        {
+            return link;
+        }
         
-    //     return null;
-    // };
-    // function idX(id) { return id };
-  
+        return null;
+    };
+    function idX(id) { return id };
+   //---fix---//
+    //  return sanitizer.sanitize(value, urlX, idX);
+    return null  
+    //---fix---//
     // return html_sanitize(value, urlX, idX);
 };
 
@@ -11452,7 +11466,7 @@ HoverIcons.prototype.setCurrentState = function(state)
     /**
      * Updates jumps for valid edges and repaints if needed.
      */
-    var mxGraphViewValidateCellState = mxGraphView.prototype.validateCellState;
+    let mxGraphViewValidateCellState = mxGraphView.prototype.validateCellState;
     mxGraphView.prototype.validateCellState = function(cell, recurse)
     {
         recurse = (recurse != null) ? recurse : true;
@@ -14695,7 +14709,7 @@ if (typeof mxVertexHandler != 'undefined')
             }
         };
         
-        mxCellEditorGetInitialValue = mxCellEditor.prototype.getInitialValue;
+        let mxCellEditorGetInitialValue = mxCellEditor.prototype.getInitialValue;
         mxCellEditor.prototype.getInitialValue = function(state, trigger)
         {
             if (mxUtils.getValue(state.style, 'html', '0') == '0')
@@ -14717,7 +14731,7 @@ if (typeof mxVertexHandler != 'undefined')
             }
         };
         
-        mxCellEditorGetCurrentValue = mxCellEditor.prototype.getCurrentValue;
+        let mxCellEditorGetCurrentValue = mxCellEditor.prototype.getCurrentValue;
         mxCellEditor.prototype.getCurrentValue = function(state)
         {
             if (mxUtils.getValue(state.style, 'html', '0') == '0')
@@ -21358,4489 +21372,3156 @@ DiagramFormatPanel.prototype.destroy = function()
 
 //Shapes.js start
 
-/**
- * Copyright (c) 2006-2015, JGraph Ltd
- */
+// Hook for custom constraints
+mxShape.prototype.getConstraints = function (style, w, h)
+{
+    return null; // this.constraints;
+};
+mxShape.prototype.setTransparentBackgroundImage = function (node)
+{
+    node.style.backgroundImage = 'url(\'' + mxUtils.transparentImage + '\')';
+};
 
 /**
  * Registers shapes.
  */
-(function()
+(function ()
 {
-	// Cube Shape, supports size style
-	function CubeShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(CubeShape, mxCylinder);
-	CubeShape.prototype.size = 20;
-	CubeShape.prototype.darkOpacity = 0;
-	CubeShape.prototype.darkOpacity2 = 0;
-	
-	CubeShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		var op = Math.max(-1, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'darkOpacity', this.darkOpacity))));
-		var op2 = Math.max(-1, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'darkOpacity2', this.darkOpacity2))));
-		c.translate(x, y);
-		
-		c.begin();
-		c.moveTo(0, 0);
-		c.lineTo(w - s, 0);
-		c.lineTo(w, s);
-		c.lineTo(w, h);
-		c.lineTo(s, h);
-		c.lineTo(0, h - s);
-		c.lineTo(0, 0);
-		c.close();
-		c.end();
-		c.fillAndStroke();
-		
-		if (!this.outline)
-		{
-			c.setShadow(false);
-	
-			if (op != 0)
-			{
-				c.setFillAlpha(Math.abs(op));
-				c.setFillColor((op < 0) ? '#FFFFFF' : '#000000');
-				c.begin();
-				c.moveTo(0, 0);
-				c.lineTo(w - s, 0);
-				c.lineTo(w, s);
-				c.lineTo(s, s);
-				c.close();
-				c.fill();
-			}
-
-			if (op2 != 0)
-			{
-				c.setFillAlpha(Math.abs(op2));
-				c.setFillColor((op2 < 0) ? '#FFFFFF' : '#000000');
-				c.begin();
-				c.moveTo(0, 0);
-				c.lineTo(s, s);
-				c.lineTo(s, h);
-				c.lineTo(0, h - s);
-				c.close();
-				c.fill();
-			}
-			
-			c.begin();
-			c.moveTo(s, h);
-			c.lineTo(s, s);
-			c.lineTo(0, 0);
-			c.moveTo(s, s);
-			c.lineTo(w, s);
-			c.end();
-			c.stroke();
-		}
-	};
-	CubeShape.prototype.getLabelMargins = function(rect)
-	{
-		if (mxUtils.getValue(this.style, 'boundedLbl', false))
-		{
-			var s = parseFloat(mxUtils.getValue(this.style, 'size', this.size)) * this.scale;
-			
-			return new mxRectangle(s, s, 0, 0);
-		}
-		
-		return null;
-	};
-	
-	mxCellRenderer.registerShape('cube', CubeShape);
-	
-	var tan30 = Math.tan(mxUtils.toRadians(30));
-	var tan30Dx = (0.5 - tan30) / 2;
-	
-	// Cube Shape, supports size style
-	function IsoRectangleShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(IsoRectangleShape, mxActor);
-	IsoRectangleShape.prototype.size = 20;
-	IsoRectangleShape.prototype.redrawPath = function(path, x, y, w, h)
-	{
-		var m = Math.min(w, h / tan30);
-
-		path.translate((w - m) / 2, (h - m) / 2 + m / 4);
-		path.moveTo(0, 0.25 * m);
-		path.lineTo(0.5 * m, m * tan30Dx);
-		path.lineTo(m, 0.25 * m);
-		path.lineTo(0.5 * m, (0.5 - tan30Dx) * m);
-		path.lineTo(0, 0.25 * m);
-		path.close();
-		path.end();
-	};
-
-	mxCellRenderer.registerShape('isoRectangle', IsoRectangleShape);
-
-	// Cube Shape, supports size style
-	function IsoCubeShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(IsoCubeShape, mxCylinder);
-	IsoCubeShape.prototype.size = 20;
-	IsoCubeShape.prototype.redrawPath = function(path, x, y, w, h, isForeground)
-	{
-		var m = Math.min(w, h / (0.5 + tan30));
-
-		if (isForeground)
-		{
-			path.moveTo(0, 0.25 * m);
-			path.lineTo(0.5 * m, (0.5 - tan30Dx) * m);
-			path.lineTo(m, 0.25 * m);
-			path.moveTo(0.5 * m, (0.5 - tan30Dx) * m);
-			path.lineTo(0.5 * m, (1 - tan30Dx) * m);
-			path.end();
-		}
-		else
-		{
-			path.translate((w - m) / 2, (h - m) / 2);
-			path.moveTo(0, 0.25 * m);
-			path.lineTo(0.5 * m, m * tan30Dx);
-			path.lineTo(m, 0.25 * m);
-			path.lineTo(m, 0.75 * m);
-			path.lineTo(0.5 * m, (1 - tan30Dx) * m);
-			path.lineTo(0, 0.75 * m);
-			path.close();
-			path.end();
-		}
-	};
-
-	mxCellRenderer.registerShape('isoCube', IsoCubeShape);
-	
-	// DataStore Shape, supports size style
-	function DataStoreShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(DataStoreShape, mxCylinder);
-
-	DataStoreShape.prototype.redrawPath = function(c, x, y, w, h, isForeground)
-	{
-		var dy = Math.min(h / 2, Math.round(h / 8) + this.strokewidth - 1);
-		
-		if ((isForeground && this.fill != null) || (!isForeground && this.fill == null))
-		{
-			c.moveTo(0, dy);
-			c.curveTo(0, 2 * dy, w, 2 * dy, w, dy);
-			
-			// Needs separate shapes for correct hit-detection
-			if (!isForeground)
-			{
-				c.stroke();
-				c.begin();
-			}
-			
-			c.translate(0, dy / 2);
-			c.moveTo(0, dy);
-			c.curveTo(0, 2 * dy, w, 2 * dy, w, dy);
-			
-			// Needs separate shapes for correct hit-detection
-			if (!isForeground)
-			{
-				c.stroke();
-				c.begin();
-			}
-			
-			c.translate(0, dy / 2);
-			c.moveTo(0, dy);
-			c.curveTo(0, 2 * dy, w, 2 * dy, w, dy);
-			
-			// Needs separate shapes for correct hit-detection
-			if (!isForeground)
-			{
-				c.stroke();
-				c.begin();
-			}
-			
-			c.translate(0, -dy);
-		}
-		
-		if (!isForeground)
-		{
-			c.moveTo(0, dy);
-			c.curveTo(0, -dy / 3, w, -dy / 3, w, dy);
-			c.lineTo(w, h - dy);
-			c.curveTo(w, h + dy / 3, 0, h + dy / 3, 0, h - dy);
-			c.close();
-		}
-	};
-	DataStoreShape.prototype.getLabelMargins = function(rect)
-	{
-		return new mxRectangle(0, 2.5 * Math.min(rect.height / 2,
-			Math.round(rect.height / 8) + this.strokewidth - 1), 0, 0);
-	}
-
-	mxCellRenderer.registerShape('datastore', DataStoreShape);
-
-	// Note Shape, supports size style
-	function NoteShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(NoteShape, mxCylinder);
-	NoteShape.prototype.size = 30;
-	NoteShape.prototype.darkOpacity = 0;
-	
-	NoteShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		var op = Math.max(-1, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'darkOpacity', this.darkOpacity))));
-		c.translate(x, y);
-		
-		c.begin();
-		c.moveTo(0, 0);
-		c.lineTo(w - s, 0);
-		c.lineTo(w, s);
-		c.lineTo(w, h);
-		c.lineTo(0, h);
-		c.lineTo(0, 0);
-		c.close();
-		c.end();
-		c.fillAndStroke();
-		
-		if (!this.outline)
-		{
-			c.setShadow(false);
-	
-			if (op != 0)
-			{
-				c.setFillAlpha(Math.abs(op));
-				c.setFillColor((op < 0) ? '#FFFFFF' : '#000000');
-				c.begin();
-				c.moveTo(w - s, 0);
-				c.lineTo(w - s, s);
-				c.lineTo(w, s);
-				c.close();
-				c.fill();
-			}
-			
-			c.begin();
-			c.moveTo(w - s, 0);
-			c.lineTo(w - s, s);
-			c.lineTo(w, s);
-			c.end();
-			c.stroke();
-		}
-	};
-
-	mxCellRenderer.registerShape('note', NoteShape);
-
-	// Note Shape, supports size style
-	function SwitchShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(SwitchShape, mxActor);
-	SwitchShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var curve = 0.5;
-		c.moveTo(0, 0);
-		c.quadTo(w / 2, h * curve,  w, 0);
-		c.quadTo(w * (1 - curve), h / 2, w, h);
-		c.quadTo(w / 2, h * (1 - curve), 0, h);
-		c.quadTo(w * curve, h / 2, 0, 0);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('switch', SwitchShape);
-
-	// Folder Shape, supports tabWidth, tabHeight styles
-	function FolderShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(FolderShape, mxCylinder);
-	FolderShape.prototype.tabWidth = 60;
-	FolderShape.prototype.tabHeight = 20;
-	FolderShape.prototype.tabPosition = 'right';
-	FolderShape.prototype.redrawPath = function(path, x, y, w, h, isForeground)
-	{
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'tabWidth', this.tabWidth))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'tabHeight', this.tabHeight))));
-		var tp = mxUtils.getValue(this.style, 'tabPosition', this.tabPosition);
-
-		if (isForeground)
-		{
-			if (tp == 'left')
-			{
-				path.moveTo(0, dy);
-				path.lineTo(dx, dy);
-			}
-			// Right is default
-			else
-			{
-				path.moveTo(w - dx, dy);
-				path.lineTo(w, dy);
-			}
-			
-			path.end();
-		}
-		else
-		{
-			if (tp == 'left')
-			{
-				path.moveTo(0, 0);
-				path.lineTo(dx, 0);
-				path.lineTo(dx, dy);
-				path.lineTo(w, dy);
-			}
-			// Right is default
-			else
-			{
-				path.moveTo(0, dy);
-				path.lineTo(w - dx, dy);
-				path.lineTo(w - dx, 0);
-				path.lineTo(w, 0);
-			}
-			
-			path.lineTo(w, h);
-			path.lineTo(0, h);
-			path.lineTo(0, dy);
-			path.close();
-			path.end();
-		}
-	};
-
-	mxCellRenderer.registerShape('folder', FolderShape);
-
-	// Card shape
-	function CardShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CardShape, mxActor);
-	CardShape.prototype.size = 30;
-	CardShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	CardShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(s, 0), new mxPoint(w, 0), new mxPoint(w, h), new mxPoint(0, h), new mxPoint(0, s)],
-				this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('card', CardShape);
-
-	// Tape shape
-	function TapeShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(TapeShape, mxActor);
-	TapeShape.prototype.size = 0.4;
-	TapeShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dy = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var fy = 1.4;
-		
-		c.moveTo(0, dy / 2);
-		c.quadTo(w / 4, dy * fy, w / 2, dy / 2);
-		c.quadTo(w * 3 / 4, dy * (1 - fy), w, dy / 2);
-		c.lineTo(w, h - dy / 2);
-		c.quadTo(w * 3 / 4, h - dy * fy, w / 2, h - dy / 2);
-		c.quadTo(w / 4, h - dy * (1 - fy), 0, h - dy / 2);
-		c.lineTo(0, dy / 2);
-		c.close();
-		c.end();
-	};
-	
-	TapeShape.prototype.getLabelBounds = function(rect)
-	{
-		if (mxUtils.getValue(this.style, 'boundedLbl', false))
-		{
-			var size = mxUtils.getValue(this.style, 'size', this.size);			
-			var w = rect.width;
-			var h = rect.height;
-			
-			if (this.direction == null ||
-					this.direction == mxConstants.DIRECTION_EAST ||
-					this.direction == mxConstants.DIRECTION_WEST)
-			{
-				var dy = h * size;
-				
-				return new mxRectangle(rect.x, rect.y + dy, w, h - 2 * dy);
-			}
-			else
-			{
-				var dx = w * size;
-				
-				return new mxRectangle(rect.x + dx, rect.y, w - 2 * dx, h);
-			}
-		}
-		
-		return rect;
-	};
-	
-	mxCellRenderer.registerShape('tape', TapeShape);
-
-	// Document shape
-	function DocumentShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(DocumentShape, mxActor);
-	DocumentShape.prototype.size = 0.3;
-	DocumentShape.prototype.getLabelMargins = function(rect)
-	{
-		if (mxUtils.getValue(this.style, 'boundedLbl', false))
-		{
-			return new mxRectangle(0, 0, 0, parseFloat(mxUtils.getValue(
-				this.style, 'size', this.size)) * rect.height);
-		}
-		
-		return null;
-	};
-	DocumentShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dy = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var fy = 1.4;
-		
-		c.moveTo(0, 0);
-		c.lineTo(w, 0);
-		c.lineTo(w, h - dy / 2);
-		c.quadTo(w * 3 / 4, h - dy * fy, w / 2, h - dy / 2);
-		c.quadTo(w / 4, h - dy * (1 - fy), 0, h - dy / 2);
-		c.lineTo(0, dy / 2);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('document', DocumentShape);
-
-	var cylinderGetCylinderSize = mxCylinder.prototype.getCylinderSize;
-	
-	mxCylinder.prototype.getCylinderSize = function(x, y, w, h)
-	{
-		var size = mxUtils.getValue(this.style, 'size');
-		
-		if (size != null)
-		{
-			return h * Math.max(0, Math.min(1, size));
-		}
-		else
-		{
-			return cylinderGetCylinderSize.apply(this, arguments);
-		}
-	};
-	
-	mxCylinder.prototype.getLabelMargins = function(rect)
-	{
-		if (mxUtils.getValue(this.style, 'boundedLbl', false))
-		{
-			var size = mxUtils.getValue(this.style, 'size', 0.15) * 2;
-			
-			return new mxRectangle(0, Math.min(this.maxHeight * this.scale, rect.height * size), 0, 0);
-		}
-		
-		return null;
-	};
-
-	// Parallelogram shape
-	function ParallelogramShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(ParallelogramShape, mxActor);
-	ParallelogramShape.prototype.size = 0.2;
-	ParallelogramShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	ParallelogramShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, h), new mxPoint(dx, 0), new mxPoint(w, 0), new mxPoint(w - dx, h)],
-				this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('parallelogram', ParallelogramShape);
-
-	// Trapezoid shape
-	function TrapezoidShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(TrapezoidShape, mxActor);
-	TrapezoidShape.prototype.size = 0.2;
-	TrapezoidShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	TrapezoidShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = w * Math.max(0, Math.min(0.5, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, h), new mxPoint(dx, 0), new mxPoint(w - dx, 0), new mxPoint(w, h)],
-				this.isRounded, arcSize, true);
-	};
-
-	mxCellRenderer.registerShape('trapezoid', TrapezoidShape);
-
-	// Curly Bracket shape
-	function CurlyBracketShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CurlyBracketShape, mxActor);
-	CurlyBracketShape.prototype.size = 0.5;
-	CurlyBracketShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		c.setFillColor(null);
-		var s = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(w, 0), new mxPoint(s, 0), new mxPoint(s, h / 2),
-		                   new mxPoint(0, h / 2), new mxPoint(s, h / 2), new mxPoint(s, h),
-		                   new mxPoint(w, h)], this.isRounded, arcSize, false);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('curlyBracket', CurlyBracketShape);
-
-	// Parallel marker shape
-	function ParallelMarkerShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(ParallelMarkerShape, mxActor);
-	ParallelMarkerShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		c.setStrokeWidth(1);
-		c.setFillColor(this.stroke);
-		var w2 = w / 5;
-		c.rect(0, 0, w2, h);
-		c.fillAndStroke();
-		c.rect(2 * w2, 0, w2, h);
-		c.fillAndStroke();
-		c.rect(4 * w2, 0, w2, h);
-		c.fillAndStroke();
-	};
-
-	mxCellRenderer.registerShape('parallelMarker', ParallelMarkerShape);
-
-	/**
-	 * Adds handJiggle style (jiggle=n sets jiggle)
-	 */
-	function HandJiggle(canvas, defaultVariation)
-	{
-		this.canvas = canvas;
-		
-		// Avoids "spikes" in the output
-		this.canvas.setLineJoin('round');
-		this.canvas.setLineCap('round');
-		
-		this.defaultVariation = defaultVariation;
-		
-		this.originalLineTo = this.canvas.lineTo;
-		this.canvas.lineTo = mxUtils.bind(this, HandJiggle.prototype.lineTo);
-		
-		this.originalMoveTo = this.canvas.moveTo;
-		this.canvas.moveTo = mxUtils.bind(this, HandJiggle.prototype.moveTo);
-		
-		this.originalClose = this.canvas.close;
-		this.canvas.close = mxUtils.bind(this, HandJiggle.prototype.close);
-		
-		this.originalQuadTo = this.canvas.quadTo;
-		this.canvas.quadTo = mxUtils.bind(this, HandJiggle.prototype.quadTo);
-		
-		this.originalCurveTo = this.canvas.curveTo;
-		this.canvas.curveTo = mxUtils.bind(this, HandJiggle.prototype.curveTo);
-		
-		this.originalArcTo = this.canvas.arcTo;
-		this.canvas.arcTo = mxUtils.bind(this, HandJiggle.prototype.arcTo);
-	};
-	
-	HandJiggle.prototype.moveTo = function(endX, endY)
-	{
-		this.originalMoveTo.apply(this.canvas, arguments);
-		this.lastX = endX;
-		this.lastY = endY;
-		this.firstX = endX;
-		this.firstY = endY;
-	};
-	
-	HandJiggle.prototype.close = function()
-	{
-		if (this.firstX != null && this.firstY != null)
-		{
-			this.lineTo(this.firstX, this.firstY);
-			this.originalClose.apply(this.canvas, arguments);
-		}
-		
-		this.originalClose.apply(this.canvas, arguments);
-	};
-	
-	HandJiggle.prototype.quadTo = function(x1, y1, x2, y2)
-	{
-		this.originalQuadTo.apply(this.canvas, arguments);
-		this.lastX = x2;
-		this.lastY = y2;
-	};
-	
-	HandJiggle.prototype.curveTo = function(x1, y1, x2, y2, x3, y3)
-	{
-		this.originalCurveTo.apply(this.canvas, arguments);
-		this.lastX = x3;
-		this.lastY = y3;
-	};
-	
-	HandJiggle.prototype.arcTo = function(rx, ry, angle, largeArcFlag, sweepFlag, x, y)
-	{
-		this.originalArcTo.apply(this.canvas, arguments);
-		this.lastX = x;
-		this.lastY = y;
-	};
-
-	HandJiggle.prototype.lineTo = function(endX, endY)
-	{
-		// LATER: Check why this.canvas.lastX cannot be used
-		if (this.lastX != null && this.lastY != null)
-		{
-			var dx = Math.abs(endX - this.lastX);
-			var dy = Math.abs(endY - this.lastY);
-			var dist = Math.sqrt(dx * dx + dy * dy);
-			
-			if (dist < 2)
-			{
-				this.originalLineTo.apply(this.canvas, arguments);
-				this.lastX = endX;
-				this.lastY = endY;
-				
-				return;
-			}
-	
-			var segs = Math.round(dist / 10);
-			var variation = this.defaultVariation;
-			
-			if (segs < 5)
-			{
-				segs = 5;
-				variation /= 3;
-			}
-			
-			function sign(x)
-			{
-			    return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
-			}
-	
-			var stepX = sign(endX - this.lastX) * dx / segs;
-			var stepY = sign(endY - this.lastY) * dy / segs;
-	
-			var fx = dx / dist;
-			var fy = dy / dist;
-	
-			for (var s = 0; s < segs; s++)
-			{
-				var x = stepX * s + this.lastX;
-				var y = stepY * s + this.lastY;
-	
-				var offset = (Math.random() - 0.5) * variation;
-				this.originalLineTo.call(this.canvas, x - offset * fy, y - offset * fx);
-			}
-			
-			this.originalLineTo.call(this.canvas, endX, endY);
-			this.lastX = endX;
-			this.lastY = endY;
-		}
-		else
-		{
-			this.originalLineTo.apply(this.canvas, arguments);
-			this.lastX = endX;
-			this.lastY = endY;
-		}
-	};
-	
-	HandJiggle.prototype.destroy = function()
-	{
-		 this.canvas.lineTo = this.originalLineTo;
-		 this.canvas.moveTo = this.originalMoveTo;
-		 this.canvas.close = this.originalClose;
-		 this.canvas.quadTo = this.originalQuadTo;
-		 this.canvas.curveTo = this.originalCurveTo;
-		 this.canvas.arcTo = this.originalArcTo;
-	};
-	
-	// Installs hand jiggle in all shapes
-	var mxShapePaint0 = mxShape.prototype.paint;
-	mxShape.prototype.defaultJiggle = 1.5;
-	mxShape.prototype.paint = function(c)
-	{
-		// NOTE: getValue does not return a boolean value so !('0') would return true here and below
-		if (this.style != null && mxUtils.getValue(this.style, 'comic', '0') != '0' && c.handHiggle == null)
-		{
-			c.handJiggle = new HandJiggle(c, mxUtils.getValue(this.style, 'jiggle', this.defaultJiggle));
-		}
-		
-		mxShapePaint0.apply(this, arguments);
-		
-		if (c.handJiggle != null)
-		{
-			c.handJiggle.destroy();
-			delete c.handJiggle;
-		}
-	};
-	
-	// Sets default jiggle for diamond
-	mxRhombus.prototype.defaultJiggle = 2;
-
-	/**
-	 * Overrides to avoid call to rect
-	 */
-	var mxRectangleShapeIsHtmlAllowed0 = mxRectangleShape.prototype.isHtmlAllowed;
-	mxRectangleShape.prototype.isHtmlAllowed = function()
-	{
-		return (this.style == null || mxUtils.getValue(this.style, 'comic', '0') == '0') &&
-			mxRectangleShapeIsHtmlAllowed0.apply(this, arguments);
-	};
-	
-	var mxRectangleShapePaintBackground0 = mxRectangleShape.prototype.paintBackground;
-	mxRectangleShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		if (c.handJiggle == null)
-		{
-			mxRectangleShapePaintBackground0.apply(this, arguments);
-		}
-		else
-		{
-			var events = true;
-			
-			if (this.style != null)
-			{
-				events = mxUtils.getValue(this.style, mxConstants.STYLE_POINTER_EVENTS, '1') == '1';		
-			}
-			
-			if (events || (this.fill != null && this.fill != mxConstants.NONE) ||
-				(this.stroke != null && this.stroke != mxConstants.NONE))
-			{
-				if (!events && (this.fill == null || this.fill == mxConstants.NONE))
-				{
-					c.pointerEvents = false;
-				}
-				
-				c.begin();
-				
-				if (this.isRounded)
-				{
-					var r = 0;
-					
-					if (mxUtils.getValue(this.style, mxConstants.STYLE_ABSOLUTE_ARCSIZE, 0) == '1')
-					{
-						r = Math.min(w / 2, Math.min(h / 2, mxUtils.getValue(this.style,
-							mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2));
-					}
-					else
-					{
-						var f = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE,
-							mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-						r = Math.min(w * f, h * f);
-					}
-					
-					c.moveTo(x + r, y);
-					c.lineTo(x + w - r, y);
-					c.quadTo(x + w, y, x + w, y + r);
-					c.lineTo(x + w, y + h - r);
-					c.quadTo(x + w, y + h, x + w - r, y + h);
-					c.lineTo(x + r, y + h);
-					c.quadTo(x, y + h, x, y + h - r);
-					c.lineTo(x, y + r);
-					c.quadTo(x, y, x + r, y);
-				}
-				else
-				{
-					
-					c.moveTo(x, y);
-					c.lineTo(x + w, y);
-					c.lineTo(x + w, y + h);
-					c.lineTo(x, y + h);
-					c.lineTo(x, y);
-				}
-				
-				// LATER: Check if close is needed here
-				c.close();
-				c.end();
-				
-				c.fillAndStroke();
-			}			
-		}
-	};
-
-	/**
-	 * Disables glass effect with hand jiggle.
-	 */
-	var mxRectangleShapePaintForeground0 = mxRectangleShape.prototype.paintForeground;
-	mxRectangleShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		if (c.handJiggle == null)
-		{
-			mxRectangleShapePaintForeground0.apply(this, arguments);
-		}
-	};
-
-	// End of hand jiggle integration
-	
-	// Process Shape
-	function ProcessShape()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(ProcessShape, mxRectangleShape);
-	ProcessShape.prototype.size = 0.1;
-	ProcessShape.prototype.isHtmlAllowed = function()
-	{
-		return false;
-	};
-	ProcessShape.prototype.getLabelBounds = function(rect)
-	{
-		if (mxUtils.getValue(this.state.style, mxConstants.STYLE_HORIZONTAL, true) ==
-			(this.direction == null ||
-			this.direction == mxConstants.DIRECTION_EAST ||
-			this.direction == mxConstants.DIRECTION_WEST))
-		{
-			var w = rect.width;
-			var h = rect.height;
-			var r = new mxRectangle(rect.x, rect.y, w, h);
-	
-			var inset = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-	
-			if (this.isRounded)
-			{
-				var f = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE,
-					mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-				inset = Math.max(inset, Math.min(w * f, h * f));
-			}
-			
-			r.x += Math.round(inset);
-			r.width -= Math.round(2 * inset);
-			
-			return r;
-		}
-		
-		return rect;
-	};
-	ProcessShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		var inset = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-
-		if (this.isRounded)
-		{
-			var f = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE,
-				mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-			inset = Math.max(inset, Math.min(w * f, h * f));
-		}
-		
-		// Crisp rendering of inner lines
-		inset = Math.round(inset);
-		
-		c.begin();
-		c.moveTo(x + inset, y);
-		c.lineTo(x + inset, y + h);
-		c.moveTo(x + w - inset, y);
-		c.lineTo(x + w - inset, y + h);
-		c.end();
-		c.stroke();
-		mxRectangleShape.prototype.paintForeground.apply(this, arguments);
-	};
-
-	mxCellRenderer.registerShape('process', ProcessShape);
-	
-	// Transparent Shape
-	function TransparentShape()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(TransparentShape, mxRectangleShape);
-	TransparentShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		c.setFillColor(mxConstants.NONE);
-		c.rect(x, y, w, h);
-		c.fill();
-	};
-	TransparentShape.prototype.paintForeground = function(c, x, y, w, h) 	{ };
-
-	mxCellRenderer.registerShape('transparent', TransparentShape);
-
-	// Callout shape
-	function CalloutShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CalloutShape, mxHexagon);
-	CalloutShape.prototype.size = 30;
-	CalloutShape.prototype.position = 0.5;
-	CalloutShape.prototype.position2 = 0.5;
-	CalloutShape.prototype.base = 20;
-	CalloutShape.prototype.getLabelMargins = function()
-	{
-		return new mxRectangle(0, 0, 0, parseFloat(mxUtils.getValue(
-			this.style, 'size', this.size)) * this.scale);
-	};
-	CalloutShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	CalloutShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		var s = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var dx = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'position', this.position))));
-		var dx2 = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'position2', this.position2))));
-		var base = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'base', this.base))));
-		
-		this.addPoints(c, [new mxPoint(0, 0), new mxPoint(w, 0), new mxPoint(w, h - s),
-			new mxPoint(Math.min(w, dx + base), h - s), new mxPoint(dx2, h),
-			new mxPoint(Math.max(0, dx), h - s), new mxPoint(0, h - s)],
-			this.isRounded, arcSize, true, [4]);
-	};
-
-	mxCellRenderer.registerShape('callout', CalloutShape);
-
-	// Step shape
-	function StepShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(StepShape, mxActor);
-	StepShape.prototype.size = 0.2;
-	StepShape.prototype.fixedSize = 20;
-	StepShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	StepShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var fixed = mxUtils.getValue(this.style, 'fixedSize', '0') != '0';
-		var s = (fixed) ? Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'size', this.fixedSize)))) :
-			w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, 0), new mxPoint(w - s, 0), new mxPoint(w, h / 2), new mxPoint(w - s, h),
-		                   new mxPoint(0, h), new mxPoint(s, h / 2)], this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('step', StepShape);
-
-	// Hexagon shape
-	function HexagonShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(HexagonShape, mxHexagon);
-	HexagonShape.prototype.size = 0.25;
-	HexagonShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	HexagonShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s =  w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(s, 0), new mxPoint(w - s, 0), new mxPoint(w, 0.5 * h), new mxPoint(w - s, h),
-		                   new mxPoint(s, h), new mxPoint(0, 0.5 * h)], this.isRounded, arcSize, true);
-	};
-
-	mxCellRenderer.registerShape('hexagon', HexagonShape);
-
-	// Plus Shape
-	function PlusShape()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(PlusShape, mxRectangleShape);
-	PlusShape.prototype.isHtmlAllowed = function()
-	{
-		return false;
-	};
-	PlusShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		var border = Math.min(w / 5, h / 5) + 1;
-		
-		c.begin();
-		c.moveTo(x + w / 2, y + border);
-		c.lineTo(x + w / 2, y + h - border);
-		c.moveTo(x + border, y + h / 2);
-		c.lineTo(x + w - border, y + h / 2);
-		c.end();
-		c.stroke();
-		mxRectangleShape.prototype.paintForeground.apply(this, arguments);
-	};
-
-	mxCellRenderer.registerShape('plus', PlusShape);
-	
-	// Overrides painting of rhombus shape to allow for double style
-	var mxRhombusPaintVertexShape = mxRhombus.prototype.paintVertexShape;
-	mxRhombus.prototype.getLabelBounds = function(rect)
-	{
-		if (this.style['double'] == 1)
-		{
-			var margin = (Math.max(2, this.strokewidth + 1) * 2 + parseFloat(
-				this.style[mxConstants.STYLE_MARGIN] || 0)) * this.scale;
-		
-			return new mxRectangle(rect.x + margin, rect.y + margin,
-				rect.width - 2 * margin, rect.height - 2 * margin);
-		}
-		
-		return rect;
-	};
-	mxRhombus.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxRhombusPaintVertexShape.apply(this, arguments);
-
-		if (!this.outline && this.style['double'] == 1)
-		{
-			var margin = Math.max(2, this.strokewidth + 1) * 2 +
-				parseFloat(this.style[mxConstants.STYLE_MARGIN] || 0);
-			x += margin;
-			y += margin;
-			w -= 2 * margin;
-			h -= 2 * margin;
-			
-			if (w > 0 && h > 0)
-			{
-				c.setShadow(false);
-				
-				// Workaround for closure compiler bug where the lines with x and y above
-				// are removed if arguments is used as second argument in call below.
-				mxRhombusPaintVertexShape.apply(this, [c, x, y, w, h]);
-			}
-		}
-	};
-
-	// CompositeShape
-	function ExtendedShape()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(ExtendedShape, mxRectangleShape);
-	ExtendedShape.prototype.isHtmlAllowed = function()
-	{
-		return false;
-	};
-	ExtendedShape.prototype.getLabelBounds = function(rect)
-	{
-		if (this.style['double'] == 1)
-		{
-			var margin = (Math.max(2, this.strokewidth + 1) + parseFloat(
-				this.style[mxConstants.STYLE_MARGIN] || 0)) * this.scale;
-		
-			return new mxRectangle(rect.x + margin, rect.y + margin,
-				rect.width - 2 * margin, rect.height - 2 * margin);
-		}
-		
-		return rect;
-	};
-	
-	ExtendedShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		if (this.style != null)
-		{
-			if (!this.outline && this.style['double'] == 1)
-			{
-				var margin = Math.max(2, this.strokewidth + 1) + parseFloat(this.style[mxConstants.STYLE_MARGIN] || 0);
-				x += margin;
-				y += margin;
-				w -= 2 * margin;
-				h -= 2 * margin;
-				
-				if (w > 0 && h > 0)
-				{
-					mxRectangleShape.prototype.paintBackground.apply(this, arguments);
-				}
-			}
-			
-			c.setDashed(false);
-			
-			// Draws the symbols defined in the style. The symbols are
-			// numbered from 1...n. Possible postfixes are align,
-			// verticalAlign, spacing, arcSpacing, width, height
-			var counter = 0;
-			var shape = null;
-			
-			do
-			{
-				shape = mxCellRenderer.defaultShapes[this.style['symbol' + counter]];
-				
-				if (shape != null)
-				{
-					var align = this.style['symbol' + counter + 'Align'];
-					var valign = this.style['symbol' + counter + 'VerticalAlign'];
-					var width = this.style['symbol' + counter + 'Width'];
-					var height = this.style['symbol' + counter + 'Height'];
-					var spacing = this.style['symbol' + counter + 'Spacing'] || 0;
-					var vspacing = this.style['symbol' + counter + 'VSpacing'] || spacing;
-					var arcspacing = this.style['symbol' + counter + 'ArcSpacing'];
-					
-					if (arcspacing != null)
-					{
-						var arcSize = this.getArcSize(w + this.strokewidth, h + this.strokewidth) * arcspacing;
-						spacing += arcSize;
-						vspacing += arcSize;
-					}
-					
-					var x2 = x;
-					var y2 = y;
-					
-					if (align == mxConstants.ALIGN_CENTER)
-					{
-						x2 += (w - width) / 2;
-					}
-					else if (align == mxConstants.ALIGN_RIGHT)
-					{
-						x2 += w - width - spacing;
-					}
-					else
-					{
-						x2 += spacing;
-					}
-					
-					if (valign == mxConstants.ALIGN_MIDDLE)
-					{
-						y2 += (h - height) / 2;
-					}
-					else if (valign == mxConstants.ALIGN_BOTTOM)
-					{
-						y2 += h - height - vspacing;
-					}
-					else
-					{
-						y2 += vspacing;
-					}
-					
-					c.save();
-					
-					// Small hack to pass style along into subshape
-					var tmp = new shape();
-					// TODO: Clone style and override settings (eg. strokewidth)
-					tmp.style = this.style;
-					shape.prototype.paintVertexShape.call(tmp, c, x2, y2, width, height);
-					c.restore();
-				}
-				
-				counter++;
-			}
-			while (shape != null);
-		}
-		
-		// Paints glass effect
-		mxRectangleShape.prototype.paintForeground.apply(this, arguments);
-	};
-
-	mxCellRenderer.registerShape('ext', ExtendedShape);
-	
-	// Tape Shape, supports size style
-	function MessageShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(MessageShape, mxCylinder);
-	MessageShape.prototype.redrawPath = function(path, x, y, w, h, isForeground)
-	{
-		if (isForeground)
-		{
-			path.moveTo(0, 0);
-			path.lineTo(w / 2, h / 2);
-			path.lineTo(w, 0);
-			path.end();
-		}
-		else
-		{
-			path.moveTo(0, 0);
-			path.lineTo(w, 0);
-			path.lineTo(w, h);
-			path.lineTo(0, h);
-			path.close();
-		}
-	};
-
-	mxCellRenderer.registerShape('message', MessageShape);
-	
-	// UML Actor Shape
-	function UmlActorShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(UmlActorShape, mxShape);
-	UmlActorShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		c.translate(x, y);
-
-		// Head
-		c.ellipse(w / 4, 0, w / 2, h / 4);
-		c.fillAndStroke();
-
-		c.begin();
-		c.moveTo(w / 2, h / 4);
-		c.lineTo(w / 2, 2 * h / 3);
-		
-		// Arms
-		c.moveTo(w / 2, h / 3);
-		c.lineTo(0, h / 3);
-		c.moveTo(w / 2, h / 3);
-		c.lineTo(w, h / 3);
-		
-		// Legs
-		c.moveTo(w / 2, 2 * h / 3);
-		c.lineTo(0, h);
-		c.moveTo(w / 2, 2 * h / 3);
-		c.lineTo(w, h);
-		c.end();
-		
-		c.stroke();
-	};
-
-	// Replaces existing actor shape
-	mxCellRenderer.registerShape('umlActor', UmlActorShape);
-	
-	// UML Boundary Shape
-	function UmlBoundaryShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(UmlBoundaryShape, mxShape);
-	UmlBoundaryShape.prototype.getLabelMargins = function(rect)
-	{
-		return new mxRectangle(rect.width / 6, 0, 0, 0);
-	};
-	UmlBoundaryShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		c.translate(x, y);
-		
-		// Base line
-		c.begin();
-		c.moveTo(0, h / 4);
-		c.lineTo(0, h * 3 / 4);
-		c.end();
-		c.stroke();
-		
-		// Horizontal line
-		c.begin();
-		c.moveTo(0, h / 2);
-		c.lineTo(w / 6, h / 2);
-		c.end();
-		c.stroke();
-		
-		// Circle
-		c.ellipse(w / 6, 0, w * 5 / 6, h);
-		c.fillAndStroke();
-	};
-
-	// Replaces existing actor shape
-	mxCellRenderer.registerShape('umlBoundary', UmlBoundaryShape);
-
-	// UML Entity Shape
-	function UmlEntityShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(UmlEntityShape, mxEllipse);
-	UmlEntityShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxEllipse.prototype.paintVertexShape.apply(this, arguments);
-		
-		c.begin();
-		c.moveTo(x + w / 8, y + h);
-		c.lineTo(x + w * 7 / 8, y + h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('umlEntity', UmlEntityShape);
-
-	// UML Destroy Shape
-	function UmlDestroyShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(UmlDestroyShape, mxShape);
-	UmlDestroyShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		c.translate(x, y);
-
-		c.begin();
-		c.moveTo(w, 0);
-		c.lineTo(0, h);
-		c.moveTo(0, 0);
-		c.lineTo(w, h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('umlDestroy', UmlDestroyShape);
-	
-	// UML Control Shape
-	function UmlControlShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(UmlControlShape, mxShape);
-	UmlControlShape.prototype.getLabelBounds = function(rect)
-	{
-		return new mxRectangle(rect.x, rect.y + rect.height / 8, rect.width, rect.height * 7 / 8);
-	};
-	UmlControlShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		c.translate(x, y);
-
-		// Upper line
-		c.begin();
-		c.moveTo(w * 3 / 8, h / 8 * 1.1);
-		c.lineTo(w * 5 / 8, 0);
-		c.end();
-		c.stroke();
-		
-		// Circle
-		c.ellipse(0, h / 8, w, h * 7 / 8);
-		c.fillAndStroke();
-	};
-	UmlControlShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		// Lower line
-		c.begin();
-		c.moveTo(w * 3 / 8, h / 8 * 1.1);
-		c.lineTo(w * 5 / 8, h / 4);
-		c.end();
-		c.stroke();
-	};
-
-	// Replaces existing actor shape
-	mxCellRenderer.registerShape('umlControl', UmlControlShape);
-
-	// UML Lifeline Shape
-	function UmlLifeline()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(UmlLifeline, mxRectangleShape);
-	UmlLifeline.prototype.size = 40;
-	UmlLifeline.prototype.isHtmlAllowed = function()
-	{
-		return false;
-	};
-	UmlLifeline.prototype.getLabelBounds = function(rect)
-	{
-		var size = Math.max(0, Math.min(rect.height, parseFloat(
-			mxUtils.getValue(this.style, 'size', this.size)) * this.scale));
-		
-		return new mxRectangle(rect.x, rect.y, rect.width, size);
-	};
-	UmlLifeline.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		var size = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var participant = mxUtils.getValue(this.style, 'participant');
-		
-		if (participant == null || this.state == null)
-		{
-			mxRectangleShape.prototype.paintBackground.call(this, c, x, y, w, size);
-		}
-		else
-		{
-			var ctor = this.state.view.graph.cellRenderer.getShape(participant);
-			
-			if (ctor != null && ctor != UmlLifeline)
-			{
-				var shape = new ctor();
-				shape.apply(this.state);
-				c.save();
-				shape.paintVertexShape(c, x, y, w, size);
-				c.restore();
-			}
-		}
-		
-		if (size < h)
-		{
-			c.setDashed(true);
-			c.begin();
-			c.moveTo(x + w / 2, y + size);
-			c.lineTo(x + w / 2, y + h);
-			c.end();
-			c.stroke();
-		}
-	};
-	UmlLifeline.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		var size = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		mxRectangleShape.prototype.paintForeground.call(this, c, x, y, w, Math.min(h, size));
-	};
-
-	mxCellRenderer.registerShape('umlLifeline', UmlLifeline);
-	
-	// UML Frame Shape
-	function UmlFrame()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(UmlFrame, mxShape);
-	UmlFrame.prototype.width = 60;
-	UmlFrame.prototype.height = 30;
-	UmlFrame.prototype.corner = 10;
-	UmlFrame.prototype.getLabelMargins = function(rect)
-	{
-		return new mxRectangle(0, 0,
-			rect.width - (parseFloat(mxUtils.getValue(this.style, 'width', this.width) * this.scale)),
-			rect.height - (parseFloat(mxUtils.getValue(this.style, 'height', this.height) * this.scale)));
-	};
-	UmlFrame.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		var co = this.corner;
-		var w0 = Math.min(w, Math.max(co, parseFloat(mxUtils.getValue(this.style, 'width', this.width))));
-		var h0 = Math.min(h, Math.max(co * 1.5, parseFloat(mxUtils.getValue(this.style, 'height', this.height))));
-		var bg = mxUtils.getValue(this.style, mxConstants.STYLE_SWIMLANE_FILLCOLOR, mxConstants.NONE);
-		
-		if (bg != mxConstants.NONE)
-		{
-			c.setFillColor(bg);
-			c.rect(x, y, w, h);
-			c.fill();
-		}
-		
-		if (this.fill != null && this.fill != mxConstants.NONE && this.gradient && this.gradient != mxConstants.NONE)
-		{
-			var b = this.getGradientBounds(c, x, y, w, h);
-			c.setGradient(this.fill, this.gradient, x, y, w, h, this.gradientDirection);
-		}
-		else
-		{
-			c.setFillColor(this.fill);
-		}
-
-		c.begin();
-		c.moveTo(x, y);
-		c.lineTo(x + w0, y);
-		c.lineTo(x + w0, y + Math.max(0, h0 - co * 1.5));
-		c.lineTo(x + Math.max(0, w0 - co), y + h0);
-		c.lineTo(x, y + h0);
-		c.close();
-		c.fillAndStroke();
-		
-		c.begin();
-		c.moveTo(x + w0, y);
-		c.lineTo(x + w, y);
-		c.lineTo(x + w, y + h);
-		c.lineTo(x, y + h);
-		c.lineTo(x, y + h0);
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('umlFrame', UmlFrame);
-	
-	mxPerimeter.LifelinePerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		var size = UmlLifeline.prototype.size;
-		
-		if (vertex != null)
-		{
-			size = mxUtils.getValue(vertex.style, 'size', size) * vertex.view.scale;
-		}
-		
-		var sw = (parseFloat(vertex.style[mxConstants.STYLE_STROKEWIDTH] || 1) * vertex.view.scale / 2) - 1;
-
-		if (next.x < bounds.getCenterX())
-		{
-			sw += 1;
-			sw *= -1;
-		}
-		
-		return new mxPoint(bounds.getCenterX() + sw, Math.min(bounds.y + bounds.height,
-				Math.max(bounds.y + size, next.y)));
-	};
-	
-	mxStyleRegistry.putValue('lifelinePerimeter', mxPerimeter.LifelinePerimeter);
-	
-	mxPerimeter.OrthogonalPerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		orthogonal = true;
-		
-		return mxPerimeter.RectanglePerimeter.apply(this, arguments);
-	};
-	
-	mxStyleRegistry.putValue('orthogonalPerimeter', mxPerimeter.OrthogonalPerimeter);
-
-	mxPerimeter.BackbonePerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		var sw = (parseFloat(vertex.style[mxConstants.STYLE_STROKEWIDTH] || 1) * vertex.view.scale / 2) - 1;
-		
-		if (vertex.style['backboneSize'] != null)
-		{
-			sw += (parseFloat(vertex.style['backboneSize']) * vertex.view.scale / 2) - 1;
-		}
-		
-		if (vertex.style[mxConstants.STYLE_DIRECTION] == 'south' ||
-			vertex.style[mxConstants.STYLE_DIRECTION] == 'north')
-		{
-			if (next.x < bounds.getCenterX())
-			{
-				sw += 1;
-				sw *= -1;
-			}
-			
-			return new mxPoint(bounds.getCenterX() + sw, Math.min(bounds.y + bounds.height,
-					Math.max(bounds.y, next.y)));
-		}
-		else
-		{
-			if (next.y < bounds.getCenterY())
-			{
-				sw += 1;
-				sw *= -1;
-			}
-			
-			return new mxPoint(Math.min(bounds.x + bounds.width, Math.max(bounds.x, next.x)),
-				bounds.getCenterY() + sw);
-		}
-	};
-	
-	mxStyleRegistry.putValue('backbonePerimeter', mxPerimeter.BackbonePerimeter);
-
-	// Callout Perimeter
-	mxPerimeter.CalloutPerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		return mxPerimeter.RectanglePerimeter(mxUtils.getDirectedBounds(bounds, new mxRectangle(0, 0, 0,
-			Math.max(0, Math.min(bounds.height, parseFloat(mxUtils.getValue(vertex.style, 'size',
-			CalloutShape.prototype.size)) * vertex.view.scale))),
-			vertex.style), vertex, next, orthogonal);
-	};
-	
-	mxStyleRegistry.putValue('calloutPerimeter', mxPerimeter.CalloutPerimeter);
-	
-	// Parallelogram Perimeter
-	mxPerimeter.ParallelogramPerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		var size = ParallelogramShape.prototype.size;
-		
-		if (vertex != null)
-		{
-			size = mxUtils.getValue(vertex.style, 'size', size);
-		}
-		
-		var x = bounds.x;
-		var y = bounds.y;
-		var w = bounds.width;
-		var h = bounds.height;
-
-		var direction = (vertex != null) ? mxUtils.getValue(
-			vertex.style, mxConstants.STYLE_DIRECTION,
-			mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-		var vertical = direction == mxConstants.DIRECTION_NORTH ||
-			direction == mxConstants.DIRECTION_SOUTH;
-		var points;
-		
-		if (vertical)
-		{
-			var dy = h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y), new mxPoint(x + w, y + dy),
-						new mxPoint(x + w, y + h), new mxPoint(x, y + h - dy), new mxPoint(x, y)];
-		}
-		else
-		{
-			var dx = w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x + dx, y), new mxPoint(x + w, y),
-							new mxPoint(x + w - dx, y + h), new mxPoint(x, y + h), new mxPoint(x + dx, y)];
-		}	
-		
-		var cx = bounds.getCenterX();
-		var cy = bounds.getCenterY();
-		
-		var p1 = new mxPoint(cx, cy);
-		
-		if (orthogonal)
-		{
-			if (next.x < x || next.x > x + w)
-			{
-				p1.y = next.y;
-			}
-			else
-			{
-				p1.x = next.x;
-			}
-		}
-		
-		return mxUtils.getPerimeterPoint(points, p1, next);
-	};
-	
-	mxStyleRegistry.putValue('parallelogramPerimeter', mxPerimeter.ParallelogramPerimeter);
-	
-	// Trapezoid Perimeter
-	mxPerimeter.TrapezoidPerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		var size = TrapezoidShape.prototype.size;
-		
-		if (vertex != null)
-		{
-			size = mxUtils.getValue(vertex.style, 'size', size);
-		}
-		
-		var x = bounds.x;
-		var y = bounds.y;
-		var w = bounds.width;
-		var h = bounds.height;
-
-		var direction = (vertex != null) ? mxUtils.getValue(
-				vertex.style, mxConstants.STYLE_DIRECTION,
-				mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-		var points;
-		
-		if (direction == mxConstants.DIRECTION_EAST)
-		{
-			var dx = w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x + dx, y), new mxPoint(x + w - dx, y),
-						new mxPoint(x + w, y + h), new mxPoint(x, y + h), new mxPoint(x + dx, y)];
-		}
-		else if (direction == mxConstants.DIRECTION_WEST)
-		{
-			var dx = w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y), new mxPoint(x + w, y),
-						new mxPoint(x + w - dx, y + h), new mxPoint(x + dx, y + h), new mxPoint(x, y)];
-		}
-		else if (direction == mxConstants.DIRECTION_NORTH)
-		{
-			var dy = h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y + dy), new mxPoint(x + w, y),
-						new mxPoint(x + w, y + h), new mxPoint(x, y + h - dy), new mxPoint(x, y + dy)];
-		}
-		else
-		{
-			var dy = h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y), new mxPoint(x + w, y + dy),
-						new mxPoint(x + w, y + h - dy), new mxPoint(x, y + h), new mxPoint(x, y)];
-		}		
-
-		var cx = bounds.getCenterX();
-		var cy = bounds.getCenterY();
-		
-		var p1 = new mxPoint(cx, cy);
-		
-		if (orthogonal)
-		{
-			if (next.x < x || next.x > x + w)
-			{
-				p1.y = next.y;
-			}
-			else
-			{
-				p1.x = next.x;
-			}
-		}
-
-		return mxUtils.getPerimeterPoint(points, p1, next);
-	};
-	
-	mxStyleRegistry.putValue('trapezoidPerimeter', mxPerimeter.TrapezoidPerimeter);
-	
-	// Step Perimeter
-	mxPerimeter.StepPerimeter = function (bounds, vertex, next, orthogonal)
-	{
-		var fixed = mxUtils.getValue(vertex.style, 'fixedSize', '0') != '0';
-		var size = (fixed) ? StepShape.prototype.fixedSize : StepShape.prototype.size;
-		
-		if (vertex != null)
-		{
-			size = mxUtils.getValue(vertex.style, 'size', size);
-		}
-		
-		var x = bounds.x;
-		var y = bounds.y;
-		var w = bounds.width;
-		var h = bounds.height;
-
-		var cx = bounds.getCenterX();
-		var cy = bounds.getCenterY();
-		
-		var direction = (vertex != null) ? mxUtils.getValue(
-				vertex.style, mxConstants.STYLE_DIRECTION,
-				mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-		var points;
-		
-		if (direction == mxConstants.DIRECTION_EAST)
-		{
-			var dx = (fixed) ? Math.max(0, Math.min(w, size)) : w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y), new mxPoint(x + w - dx, y), new mxPoint(x + w, cy),
-							new mxPoint(x + w - dx, y + h), new mxPoint(x, y + h),
-							new mxPoint(x + dx, cy), new mxPoint(x, y)];
-		}
-		else if (direction == mxConstants.DIRECTION_WEST)
-		{
-			var dx = (fixed) ? Math.max(0, Math.min(w, size)) : w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x + dx, y), new mxPoint(x + w, y), new mxPoint(x + w - dx, cy),
-							new mxPoint(x + w, y + h), new mxPoint(x + dx, y + h),
-							new mxPoint(x, cy), new mxPoint(x + dx, y)];
-		}
-		else if (direction == mxConstants.DIRECTION_NORTH)
-		{
-			var dy = (fixed) ? Math.max(0, Math.min(h, size)) : h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y + dy), new mxPoint(cx, y), new mxPoint(x + w, y + dy),
-							new mxPoint(x + w, y + h), new mxPoint(cx, y + h - dy),
-							new mxPoint(x, y + h), new mxPoint(x, y + dy)];
-		}
-		else
-		{
-			var dy = (fixed) ? Math.max(0, Math.min(h, size)) : h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x, y), new mxPoint(cx, y + dy), new mxPoint(x + w, y),
-							new mxPoint(x + w, y + h - dy), new mxPoint(cx, y + h),
-							new mxPoint(x, y + h - dy), new mxPoint(x, y)];
-		}		
-		
-		var p1 = new mxPoint(cx, cy);
-		
-		if (orthogonal)
-		{
-			if (next.x < x || next.x > x + w)
-			{
-				p1.y = next.y;
-			}
-			else
-			{
-				p1.x = next.x;
-			}
-		}
-		
-		return mxUtils.getPerimeterPoint(points, p1, next);
-	};
-	
-	mxStyleRegistry.putValue('stepPerimeter', mxPerimeter.StepPerimeter);
-	
-	// Hexagon Perimeter 2 (keep existing one)
-	mxPerimeter.HexagonPerimeter2 = function (bounds, vertex, next, orthogonal)
-	{
-		var size = HexagonShape.prototype.size;
-		
-		if (vertex != null)
-		{
-			size = mxUtils.getValue(vertex.style, 'size', size);
-		}
-		
-		var x = bounds.x;
-		var y = bounds.y;
-		var w = bounds.width;
-		var h = bounds.height;
-
-		var cx = bounds.getCenterX();
-		var cy = bounds.getCenterY();
-		
-		var direction = (vertex != null) ? mxUtils.getValue(
-			vertex.style, mxConstants.STYLE_DIRECTION,
-			mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
-		var vertical = direction == mxConstants.DIRECTION_NORTH ||
-			direction == mxConstants.DIRECTION_SOUTH;
-		var points;
-		
-		if (vertical)
-		{
-			var dy = h * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(cx, y), new mxPoint(x + w, y + dy), new mxPoint(x + w, y + h - dy),
-							new mxPoint(cx, y + h), new mxPoint(x, y + h - dy),
-							new mxPoint(x, y + dy), new mxPoint(cx, y)];
-		}
-		else
-		{
-			var dx = w * Math.max(0, Math.min(1, size));
-			points = [new mxPoint(x + dx, y), new mxPoint(x + w - dx, y), new mxPoint(x + w, cy),
-						new mxPoint(x + w - dx, y + h), new mxPoint(x + dx, y + h),
-						new mxPoint(x, cy), new mxPoint(x + dx, y)];
-		}		
-
-		var p1 = new mxPoint(cx, cy);
-		
-		if (orthogonal)
-		{
-			if (next.x < x || next.x > x + w)
-			{
-				p1.y = next.y;
-			}
-			else
-			{
-				p1.x = next.x;
-			}
-		}
-		
-		return mxUtils.getPerimeterPoint(points, p1, next);
-	};
-	
-	mxStyleRegistry.putValue('hexagonPerimeter2', mxPerimeter.HexagonPerimeter2);
-	
-	// Provided Interface Shape (aka Lollipop)
-	function LollipopShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(LollipopShape, mxShape);
-	LollipopShape.prototype.size = 10;
-	LollipopShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		var sz = parseFloat(mxUtils.getValue(this.style, 'size', this.size));
-		c.translate(x, y);
-		
-		c.ellipse((w - sz) / 2, 0, sz, sz);
-		c.fillAndStroke();
-
-		c.begin();
-		c.moveTo(w / 2, sz);
-		c.lineTo(w / 2, h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('lollipop', LollipopShape);
-
-	// Required Interface Shape
-	function RequiresShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(RequiresShape, mxShape);
-	RequiresShape.prototype.size = 10;
-	RequiresShape.prototype.inset = 2;
-	RequiresShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		var sz = parseFloat(mxUtils.getValue(this.style, 'size', this.size));
-		var inset = parseFloat(mxUtils.getValue(this.style, 'inset', this.inset)) + this.strokewidth;
-		c.translate(x, y);
-
-		c.begin();
-		c.moveTo(w / 2, sz + inset);
-		c.lineTo(w / 2, h);
-		c.end();
-		c.stroke();
-		
-		c.begin();
-		c.moveTo((w - sz) / 2 - inset, sz / 2);
-		c.quadTo((w - sz) / 2 - inset, sz + inset, w / 2, sz + inset);
-		c.quadTo((w + sz) / 2 + inset, sz + inset, (w + sz) / 2 + inset, sz / 2);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('requires', RequiresShape);
-
-	// Required Interface Shape
-	function RequiredInterfaceShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(RequiredInterfaceShape, mxShape);
-	
-	RequiredInterfaceShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		c.translate(x, y);
-
-		c.begin();
-		c.moveTo(0, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, 0, h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('requiredInterface', RequiredInterfaceShape);
-
-	// Provided and Required Interface Shape
-	function ProvidedRequiredInterfaceShape()
-	{
-		mxShape.call(this);
-	};
-	mxUtils.extend(ProvidedRequiredInterfaceShape, mxShape);
-	ProvidedRequiredInterfaceShape.prototype.inset = 2;
-	ProvidedRequiredInterfaceShape.prototype.paintBackground = function(c, x, y, w, h)
-	{
-		var inset = parseFloat(mxUtils.getValue(this.style, 'inset', this.inset)) + this.strokewidth;
-		c.translate(x, y);
-
-		c.ellipse(0, inset, w - 2 * inset, h - 2 * inset);
-		c.fillAndStroke();
-		
-		c.begin();
-		c.moveTo(w / 2, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, w / 2, h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('providedRequiredInterface', ProvidedRequiredInterfaceShape);
-		
-	// Module shape
-	function ModuleShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(ModuleShape, mxCylinder);
-	ModuleShape.prototype.jettyWidth = 20;
-	ModuleShape.prototype.jettyHeight = 10;
-	ModuleShape.prototype.redrawPath = function(path, x, y, w, h, isForeground)
-	{
-		var dx = parseFloat(mxUtils.getValue(this.style, 'jettyWidth', this.jettyWidth));
-		var dy = parseFloat(mxUtils.getValue(this.style, 'jettyHeight', this.jettyHeight));
-		var x0 = dx / 2;
-		var x1 = x0 + dx / 2;
-		var y0 = Math.min(dy, h - dy);
-		var y1 = Math.min(y0 + 2 * dy, h - dy);
-
-		if (isForeground)
-		{
-			path.moveTo(x0, y0);
-			path.lineTo(x1, y0);
-			path.lineTo(x1, y0 + dy);
-			path.lineTo(x0, y0 + dy);
-			path.moveTo(x0, y1);
-			path.lineTo(x1, y1);
-			path.lineTo(x1, y1 + dy);
-			path.lineTo(x0, y1 + dy);
-			path.end();
-		}
-		else
-		{
-			path.moveTo(x0, 0);
-			path.lineTo(w, 0);
-			path.lineTo(w, h);
-			path.lineTo(x0, h);
-			path.lineTo(x0, y1 + dy);
-			path.lineTo(0, y1 + dy);
-			path.lineTo(0, y1);
-			path.lineTo(x0, y1);
-			path.lineTo(x0, y0 + dy);
-			path.lineTo(0, y0 + dy);
-			path.lineTo(0, y0);
-			path.lineTo(x0, y0);
-			path.close();
-			path.end();
-		}
-	};
-
-	mxCellRenderer.registerShape('module', ModuleShape);
-	
-	// Component shape
-	function ComponentShape()
-	{
-		mxCylinder.call(this);
-	};
-	mxUtils.extend(ComponentShape, mxCylinder);
-	ComponentShape.prototype.jettyWidth = 32;
-	ComponentShape.prototype.jettyHeight = 12;
-	ComponentShape.prototype.redrawPath = function(path, x, y, w, h, isForeground)
-	{
-		var dx = parseFloat(mxUtils.getValue(this.style, 'jettyWidth', this.jettyWidth));
-		var dy = parseFloat(mxUtils.getValue(this.style, 'jettyHeight', this.jettyHeight));
-		var x0 = dx / 2;
-		var x1 = x0 + dx / 2;
-		var y0 = 0.3 * h - dy / 2;
-		var y1 = 0.7 * h - dy / 2;
-
-		if (isForeground)
-		{
-			path.moveTo(x0, y0);
-			path.lineTo(x1, y0);
-			path.lineTo(x1, y0 + dy);
-			path.lineTo(x0, y0 + dy);
-			path.moveTo(x0, y1);
-			path.lineTo(x1, y1);
-			path.lineTo(x1, y1 + dy);
-			path.lineTo(x0, y1 + dy);
-			path.end();
-		}
-		else
-		{
-			path.moveTo(x0, 0);
-			path.lineTo(w, 0);
-			path.lineTo(w, h);
-			path.lineTo(x0, h);
-			path.lineTo(x0, y1 + dy);
-			path.lineTo(0, y1 + dy);
-			path.lineTo(0, y1);
-			path.lineTo(x0, y1);
-			path.lineTo(x0, y0 + dy);
-			path.lineTo(0, y0 + dy);
-			path.lineTo(0, y0);
-			path.lineTo(x0, y0);
-			path.close();
-			path.end();
-		}
-	};
-
-	mxCellRenderer.registerShape('component', ComponentShape);
-	
-	// Associative entity derived from rectangle shape
-	function AssociativeEntity()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(AssociativeEntity, mxRectangleShape);
-	AssociativeEntity.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		var hw = w / 2;
-		var hh = h / 2;
-		
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		c.begin();
-		this.addPoints(c, [new mxPoint(x + hw, y), new mxPoint(x + w, y + hh), new mxPoint(x + hw, y + h),
-		     new mxPoint(x, y + hh)], this.isRounded, arcSize, true);
-		c.stroke();
-
-		mxRectangleShape.prototype.paintForeground.apply(this, arguments);
-	};
-
-	mxCellRenderer.registerShape('associativeEntity', AssociativeEntity);
-
-	// State Shapes derives from double ellipse
-	function StateShape()
-	{
-		mxDoubleEllipse.call(this);
-	};
-	mxUtils.extend(StateShape, mxDoubleEllipse);
-	StateShape.prototype.outerStroke = true;
-	StateShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		var inset = Math.min(4, Math.min(w / 5, h / 5));
-		
-		if (w > 0 && h > 0)
-		{
-			c.ellipse(x + inset, y + inset, w - 2 * inset, h - 2 * inset);
-			c.fillAndStroke();
-		}
-		
-		c.setShadow(false);
-
-		if (this.outerStroke)
-		{
-			c.ellipse(x, y, w, h);
-			c.stroke();			
-		}
-	};
-
-	mxCellRenderer.registerShape('endState', StateShape);
-
-	function StartStateShape()
-	{
-		StateShape.call(this);
-	};
-	mxUtils.extend(StartStateShape, StateShape);
-	StartStateShape.prototype.outerStroke = false;
-	
-	mxCellRenderer.registerShape('startState', StartStateShape);
-
-	// Link shape
-	function LinkShape()
-	{
-		mxArrowConnector.call(this);
-		this.spacing = 0;
-	};
-	mxUtils.extend(LinkShape, mxArrowConnector);
-	LinkShape.prototype.defaultWidth = 4;
-	
-	LinkShape.prototype.isOpenEnded = function()
-	{
-		return true;
-	};
-
-	LinkShape.prototype.getEdgeWidth = function()
-	{
-		return mxUtils.getNumber(this.style, 'width', this.defaultWidth) + Math.max(0, this.strokewidth - 1);
-	};
-	
-	LinkShape.prototype.isArrowRounded = function()
-	{
-		return this.isRounded;
-	};
-
-	// Registers the link shape
-	mxCellRenderer.registerShape('link', LinkShape);
-
-	// Generic arrow
-	function FlexArrowShape()
-	{
-		mxArrowConnector.call(this);
-		this.spacing = 0;
-	};
-	mxUtils.extend(FlexArrowShape, mxArrowConnector);
-	FlexArrowShape.prototype.defaultWidth = 10;
-	FlexArrowShape.prototype.defaultArrowWidth = 20;
-
-	FlexArrowShape.prototype.getStartArrowWidth = function()
-	{
-		return this.getEdgeWidth() + mxUtils.getNumber(this.style, 'startWidth', this.defaultArrowWidth);
-	};
-
-	FlexArrowShape.prototype.getEndArrowWidth = function()
-	{
-		return this.getEdgeWidth() + mxUtils.getNumber(this.style, 'endWidth', this.defaultArrowWidth);;
-	};
-
-	FlexArrowShape.prototype.getEdgeWidth = function()
-	{
-		return mxUtils.getNumber(this.style, 'width', this.defaultWidth) + Math.max(0, this.strokewidth - 1);
-	};
-	
-	// Registers the link shape
-	mxCellRenderer.registerShape('flexArrow', FlexArrowShape);
-	
-	// Manual Input shape
-	function ManualInputShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(ManualInputShape, mxActor);
-	ManualInputShape.prototype.size = 30;
-	ManualInputShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	ManualInputShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s = Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, h), new mxPoint(0, s), new mxPoint(w, 0), new mxPoint(w, h)],
-				this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('manualInput', ManualInputShape);
-
-	// Internal storage
-	function InternalStorageShape()
-	{
-		mxRectangleShape.call(this);
-	};
-	mxUtils.extend(InternalStorageShape, mxRectangleShape);
-	InternalStorageShape.prototype.dx = 20;
-	InternalStorageShape.prototype.dy = 20;
-	InternalStorageShape.prototype.isHtmlAllowed = function()
-	{
-		return false;
-	};
-	InternalStorageShape.prototype.paintForeground = function(c, x, y, w, h)
-	{
-		mxRectangleShape.prototype.paintForeground.apply(this, arguments);
-		var inset = 0;
-		
-		if (this.isRounded)
-		{
-			var f = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE,
-				mxConstants.RECTANGLE_ROUNDING_FACTOR * 100) / 100;
-			inset = Math.max(inset, Math.min(w * f, h * f));
-		}
-		
-		var dx = Math.max(inset, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'dx', this.dx))));
-		var dy = Math.max(inset, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'dy', this.dy))));
-		
-		c.begin();
-		c.moveTo(x, y + dy);
-		c.lineTo(x + w, y + dy);
-		c.end();
-		c.stroke();
-		
-		c.begin();
-		c.moveTo(x + dx, y);
-		c.lineTo(x + dx, y + h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('internalStorage', InternalStorageShape);
-
-	// Internal storage
-	function CornerShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CornerShape, mxActor);
-	CornerShape.prototype.dx = 20;
-	CornerShape.prototype.dy = 20;
-	
-	// Corner
-	CornerShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'dx', this.dx))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'dy', this.dy))));
-		
-		var s = Math.min(w / 2, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, 0), new mxPoint(w, 0), new mxPoint(w, dy), new mxPoint(dx, dy),
-		                   new mxPoint(dx, h), new mxPoint(0, h)], this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('corner', CornerShape);
-
-	// Crossbar shape
-	function CrossbarShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CrossbarShape, mxActor);
-	
-	CrossbarShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		c.moveTo(0, 0);
-		c.lineTo(0, h);
-		c.end();
-		
-		c.moveTo(w, 0);
-		c.lineTo(w, h);
-		c.end();
-		
-		c.moveTo(0, h / 2);
-		c.lineTo(w, h / 2);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('crossbar', CrossbarShape);
-
-	// Internal storage
-	function TeeShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(TeeShape, mxActor);
-	TeeShape.prototype.dx = 20;
-	TeeShape.prototype.dy = 20;
-	
-	// Corner
-	TeeShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'dx', this.dx))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'dy', this.dy))));
-		var w2 = Math.abs(w - dx) / 2;
-		
-		var s = Math.min(w / 2, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, 0), new mxPoint(w, 0), new mxPoint(w, dy), new mxPoint((w + dx) / 2, dy),
-		                   new mxPoint((w + dx) / 2, h), new mxPoint((w - dx) / 2, h), new mxPoint((w - dx) / 2, dy),
-		                   new mxPoint(0, dy)], this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('tee', TeeShape);
-
-	// Arrow
-	function SingleArrowShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(SingleArrowShape, mxActor);
-	SingleArrowShape.prototype.arrowWidth = 0.3;
-	SingleArrowShape.prototype.arrowSize = 0.2;
-	SingleArrowShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', this.arrowWidth))));
-		var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', this.arrowSize))));
-		var at = (h - aw) / 2;
-		var ab = at + aw;
-		
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, at), new mxPoint(w - as, at), new mxPoint(w - as, 0), new mxPoint(w, h / 2),
-		                   new mxPoint(w - as, h), new mxPoint(w - as, ab), new mxPoint(0, ab)],
-		                   this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('singleArrow', SingleArrowShape);
-
-	// Arrow
-	function DoubleArrowShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(DoubleArrowShape, mxActor);
-	DoubleArrowShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth))));
-		var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', SingleArrowShape.prototype.arrowSize))));
-		var at = (h - aw) / 2;
-		var ab = at + aw;
-		
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, h / 2), new mxPoint(as, 0), new mxPoint(as, at), new mxPoint(w - as, at),
-		                   new mxPoint(w - as, 0), new mxPoint(w, h / 2), new mxPoint(w - as, h),
-		                   new mxPoint(w - as, ab), new mxPoint(as, ab), new mxPoint(as, h)],
-		                   this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('doubleArrow', DoubleArrowShape);
-
-	// Data storage
-	function DataStorageShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(DataStorageShape, mxActor);
-	DataStorageShape.prototype.size = 0.1;
-	DataStorageShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-
-		c.moveTo(s, 0);
-		c.lineTo(w, 0);
-		c.quadTo(w - s * 2, h / 2, w, h);
-		c.lineTo(s, h);
-		c.quadTo(s - s * 2, h / 2, s, 0);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('dataStorage', DataStorageShape);
-
-	// Or
-	function OrShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(OrShape, mxActor);
-	OrShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		c.moveTo(0, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, 0, h);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('or', OrShape);
-
-	// Xor
-	function XorShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(XorShape, mxActor);
-	XorShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		c.moveTo(0, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, 0, h);
-		c.quadTo(w / 2, h / 2, 0, 0);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('xor', XorShape);
-
-	// Loop limit
-	function LoopLimitShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(LoopLimitShape, mxActor);
-	LoopLimitShape.prototype.size = 20;
-	LoopLimitShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	LoopLimitShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s = Math.min(w / 2, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(s, 0), new mxPoint(w - s, 0), new mxPoint(w, s * 0.8), new mxPoint(w, h),
-		                   new mxPoint(0, h), new mxPoint(0, s * 0.8)], this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('loopLimit', LoopLimitShape);
-
-	// Off page connector
-	function OffPageConnectorShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(OffPageConnectorShape, mxActor);
-	OffPageConnectorShape.prototype.size = 3 / 8;
-	OffPageConnectorShape.prototype.isRoundable = function()
-	{
-		return true;
-	};
-	OffPageConnectorShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var s = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		this.addPoints(c, [new mxPoint(0, 0), new mxPoint(w, 0), new mxPoint(w, h - s), new mxPoint(w / 2, h),
-		                   new mxPoint(0, h - s)], this.isRounded, arcSize, true);
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('offPageConnector', OffPageConnectorShape);
-
-	// Internal storage
-	function TapeDataShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(TapeDataShape, mxEllipse);
-	TapeDataShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxEllipse.prototype.paintVertexShape.apply(this, arguments);
-		
-		c.begin();
-		c.moveTo(x + w / 2, y + h);
-		c.lineTo(x + w, y + h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('tapeData', TapeDataShape);
-
-	// OrEllipseShape
-	function OrEllipseShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(OrEllipseShape, mxEllipse);
-	OrEllipseShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxEllipse.prototype.paintVertexShape.apply(this, arguments);
-		
-		c.setShadow(false);
-		c.begin();
-		c.moveTo(x, y + h / 2);
-		c.lineTo(x + w, y + h / 2);
-		c.end();
-		c.stroke();
-		
-		c.begin();
-		c.moveTo(x + w / 2, y);
-		c.lineTo(x + w / 2, y + h);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('orEllipse', OrEllipseShape);
-
-	// SumEllipseShape
-	function SumEllipseShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(SumEllipseShape, mxEllipse);
-	SumEllipseShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxEllipse.prototype.paintVertexShape.apply(this, arguments);
-		var s2 = 0.145;
-		
-		c.setShadow(false);
-		c.begin();
-		c.moveTo(x + w * s2, y + h * s2);
-		c.lineTo(x + w * (1 - s2), y + h * (1 - s2));
-		c.end();
-		c.stroke();
-		
-		c.begin();
-		c.moveTo(x + w * (1 - s2), y + h * s2);
-		c.lineTo(x + w * s2, y + h * (1 - s2));
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('sumEllipse', SumEllipseShape);
-
-	// SortShape
-	function SortShape()
-	{
-		mxRhombus.call(this);
-	};
-	mxUtils.extend(SortShape, mxRhombus);
-	SortShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxRhombus.prototype.paintVertexShape.apply(this, arguments);
-		
-		c.setShadow(false);
-		c.begin();
-		c.moveTo(x, y + h / 2);
-		c.lineTo(x + w, y + h / 2);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('sortShape', SortShape);
-
-	// CollateShape
-	function CollateShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(CollateShape, mxEllipse);
-	CollateShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		c.begin();
-		c.moveTo(x, y);
-		c.lineTo(x + w, y);
-		c.lineTo(x + w / 2, y + h / 2);
-		c.close();
-		c.fillAndStroke();
-		
-		c.begin();
-		c.moveTo(x, y + h);
-		c.lineTo(x + w, y + h);
-		c.lineTo(x + w / 2, y + h / 2);
-		c.close();
-		c.fillAndStroke();
-	};
-
-	mxCellRenderer.registerShape('collate', CollateShape);
-
-	// DimensionShape
-	function DimensionShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(DimensionShape, mxEllipse);
-	DimensionShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		// Arrow size
-		var al = 10;
-		var cy = y + h - al / 2;
-		
-		c.begin();
-		c.moveTo(x, y);
-		c.lineTo(x, y + h);
-		c.moveTo(x, cy);
-		c.lineTo(x + al, cy - al / 2);
-		c.moveTo(x, cy);
-		c.lineTo(x + al, cy + al / 2);
-		c.moveTo(x, cy);
-		c.lineTo(x + w, cy);
-
-		// Opposite side
-		c.moveTo(x + w, y);
-		c.lineTo(x + w, y + h);
-		c.moveTo(x + w, cy);
-		c.lineTo(x + w - al, cy - al / 2);
-		c.moveTo(x + w, cy);
-		c.lineTo(x + w - al, cy + al / 2);
-		c.end();
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('dimension', DimensionShape);
-
-	// PartialRectangleShape
-	function PartialRectangleShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(PartialRectangleShape, mxEllipse);
-	PartialRectangleShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		if (!this.outline)
-		{
-			c.setStrokeColor(null);
-		}
-
-		mxRectangleShape.prototype.paintBackground.apply(this, arguments);
-		
-		if (this.style != null)
-		{
-			c.setStrokeColor(this.stroke);
-			c.rect(x, y, w, h);
-			c.fill();
-
-			c.begin();
-			c.moveTo(x, y);
-			
-			if (mxUtils.getValue(this.style, 'top', '1') == '1')
-			{
-				c.lineTo(x + w, y);
-			}
-			else
-			{
-				c.moveTo(x + w, y);
-			}
-			
-			if (mxUtils.getValue(this.style, 'right', '1') == '1')
-			{
-				c.lineTo(x + w, y + h);
-			}
-			else
-			{
-				c.moveTo(x + w, y + h);
-			}
-			
-			if (mxUtils.getValue(this.style, 'bottom', '1') == '1')
-			{
-				c.lineTo(x, y + h);
-			}
-			else
-			{
-				c.moveTo(x, y + h);
-			}
-			
-			if (mxUtils.getValue(this.style, 'left', '1') == '1')
-			{
-				c.lineTo(x, y);
-			}
-						
-			c.end();
-			c.stroke();
-		}
-	};
-
-	mxCellRenderer.registerShape('partialRectangle', PartialRectangleShape);
-
-	// LineEllipseShape
-	function LineEllipseShape()
-	{
-		mxEllipse.call(this);
-	};
-	mxUtils.extend(LineEllipseShape, mxEllipse);
-	LineEllipseShape.prototype.paintVertexShape = function(c, x, y, w, h)
-	{
-		mxEllipse.prototype.paintVertexShape.apply(this, arguments);
-		
-		c.setShadow(false);
-		c.begin();
-		
-		if (mxUtils.getValue(this.style, 'line') == 'vertical')
-		{
-			c.moveTo(x + w / 2, y);
-			c.lineTo(x + w / 2, y + h);
-		}
-		else
-		{
-			c.moveTo(x, y + h / 2);
-			c.lineTo(x + w, y + h / 2);
-		}
-
-		c.end();			
-		c.stroke();
-	};
-
-	mxCellRenderer.registerShape('lineEllipse', LineEllipseShape);
-
-	// Delay
-	function DelayShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(DelayShape, mxActor);
-	DelayShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = Math.min(w, h / 2);
-		c.moveTo(0, 0);
-		c.lineTo(w - dx, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, w - dx, h);
-		c.lineTo(0, h);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('delay', DelayShape);
-
-	// Cross Shape
-	function CrossShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(CrossShape, mxActor);
-	CrossShape.prototype.size = 0.2;
-	CrossShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var m = Math.min(h, w);
-		var size = Math.max(0, Math.min(m, m * parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var t = (h - size) / 2;
-		var b = t + size;
-		var l = (w - size) / 2;
-		var r = l + size;
-		
-		c.moveTo(0, t);
-		c.lineTo(l, t);
-		c.lineTo(l, 0);
-		c.lineTo(r, 0);
-		c.lineTo(r, t);
-		c.lineTo(w, t);
-		c.lineTo(w, b);
-		c.lineTo(r, b);
-		c.lineTo(r, h);
-		c.lineTo(l, h);
-		c.lineTo(l, b);
-		c.lineTo(0, b);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('cross', CrossShape);
-
-	// Display
-	function DisplayShape()
-	{
-		mxActor.call(this);
-	};
-	mxUtils.extend(DisplayShape, mxActor);
-	DisplayShape.prototype.size = 0.25;
-	DisplayShape.prototype.redrawPath = function(c, x, y, w, h)
-	{
-		var dx = Math.min(w, h / 2);
-		var s = Math.min(w - dx, Math.max(0, parseFloat(mxUtils.getValue(this.style, 'size', this.size))) * w);
-		
-		c.moveTo(0, h / 2);
-		c.lineTo(s, 0);
-		c.lineTo(w - dx, 0);
-		c.quadTo(w, 0, w, h / 2);
-		c.quadTo(w, h, w - dx, h);
-		c.lineTo(s, h);
-		c.close();
-		c.end();
-	};
-
-	mxCellRenderer.registerShape('display', DisplayShape);
-	
-	// FilledEdge shape
-	function FilledEdge()
-	{
-		mxConnector.call(this);
-	};
-	mxUtils.extend(FilledEdge, mxConnector);
-	
-	FilledEdge.prototype.origPaintEdgeShape = FilledEdge.prototype.paintEdgeShape;
-	FilledEdge.prototype.paintEdgeShape = function(c, pts, rounded)
-	{
-		// Markers modify incoming points array
-		var temp = [];
-		
-		for (var i = 0; i < pts.length; i++)
-		{
-			temp.push(mxUtils.clone(pts[i]));
-		}
-		
-		// paintEdgeShape resets dashed to false
-		var dashed = c.state.dashed;
-		var fixDash = c.state.fixDash;
-		FilledEdge.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
-
-		if (c.state.strokeWidth >= 3)
-		{
-			var fillClr = mxUtils.getValue(this.style, 'fillColor', null);
-			
-			if (fillClr != null)
-			{
-				c.setStrokeColor(fillClr);
-				c.setStrokeWidth(c.state.strokeWidth - 2);
-				c.setDashed(dashed, fixDash);
-				
-				FilledEdge.prototype.origPaintEdgeShape.apply(this, [c, pts, rounded]);
-			}
-		}
-	};
-
-	// Registers the link shape
-	mxCellRenderer.registerShape('filledEdge', FilledEdge);
-
-	// Implements custom colors for shapes
-	if (typeof StyleFormatPanel !== 'undefined')
-	{
-		(function()
-		{
-			var styleFormatPanelGetCustomColors = StyleFormatPanel.prototype.getCustomColors;
-			
-			StyleFormatPanel.prototype.getCustomColors = function()
-			{
-				var ss = this.format.getSelectionState();
-				var result = styleFormatPanelGetCustomColors.apply(this, arguments);
-				
-				if (ss.style.shape == 'umlFrame')
-				{
-					result.push({title: mxResources.get('laneColor'), key: 'swimlaneFillColor', defaultValue: '#ffffff'});
-				}
-				
-				return result;
-			};
-		})();
-	}
-	
-	// Registers and defines the custom marker
-	mxMarker.addMarker('dash', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var nx = unitX * (size + sw + 1);
-		var ny = unitY * (size + sw + 1);
-
-		return function()
-		{
-			c.begin();
-			c.moveTo(pe.x - nx / 2 - ny / 2, pe.y - ny / 2 + nx / 2);
-			c.lineTo(pe.x + ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 - nx / 2);
-			c.stroke();
-		};
-	});
-
-	// Registers and defines the custom marker
-	mxMarker.addMarker('box', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var nx = unitX * (size + sw + 1);
-		var ny = unitY * (size + sw + 1);
-		var px = pe.x + nx / 2;
-		var py = pe.y + ny / 2;
-		
-		pe.x -= nx;
-		pe.y -= ny;
-
-		return function()
-		{
-			c.begin();
-			c.moveTo(px - nx / 2 - ny / 2, py - ny / 2 + nx / 2);
-			c.lineTo(px - nx / 2 + ny / 2, py - ny / 2 - nx / 2);
-			c.lineTo(px + ny / 2 - 3 * nx / 2, py - 3 * ny / 2 - nx / 2);
-			c.lineTo(px - ny / 2 - 3 * nx / 2, py - 3 * ny / 2 + nx / 2);
-			c.close();
-			
-			if (filled)
-			{
-				c.fillAndStroke();
-			}
-			else
-			{
-				c.stroke();
-			}
-		};
-	});
-	
-	// Registers and defines the custom marker
-	mxMarker.addMarker('cross', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var nx = unitX * (size + sw + 1);
-		var ny = unitY * (size + sw + 1);
-
-		return function()
-		{
-			c.begin();
-			c.moveTo(pe.x - nx / 2 - ny / 2, pe.y - ny / 2 + nx / 2);
-			c.lineTo(pe.x + ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 - nx / 2);
-			c.moveTo(pe.x - nx / 2 + ny / 2, pe.y - ny / 2 - nx / 2);
-			c.lineTo(pe.x - ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 + nx / 2);
-			c.stroke();
-		};
-	});
-	
-	function circleMarker(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var a = size / 2;
-		var size = size + sw;
-
-		var pt = pe.clone();
-		
-		pe.x -= unitX * (2 * size + sw);
-		pe.y -= unitY * (2 * size + sw);
-		
-		unitX = unitX * (size + sw);
-		unitY = unitY * (size + sw);
-
-		return function()
-		{
-			c.ellipse(pt.x - unitX - size, pt.y - unitY - size, 2 * size, 2 * size);
-			
-			if (filled)
-			{
-				c.fillAndStroke();
-			}
-			else
-			{
-				c.stroke();
-			}
-		};
-	};
-	
-	mxMarker.addMarker('circle', circleMarker);
-	mxMarker.addMarker('circlePlus', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var pt = pe.clone();
-		var fn = circleMarker.apply(this, arguments);
-		var nx = unitX * (size + 2 * sw); // (size + sw + 1);
-		var ny = unitY * (size + 2 * sw); //(size + sw + 1);
-
-		return function()
-		{
-			fn.apply(this, arguments);
-
-			c.begin();
-			c.moveTo(pt.x - unitX * (sw), pt.y - unitY * (sw));
-			c.lineTo(pt.x - 2 * nx + unitX * (sw), pt.y - 2 * ny + unitY * (sw));
-			c.moveTo(pt.x - nx - ny + unitY * sw, pt.y - ny + nx - unitX * sw);
-			c.lineTo(pt.x + ny - nx - unitY * sw, pt.y - ny - nx + unitX * sw);
-			c.stroke();
-		};
-	});
-	
-	// Registers and defines the custom marker
-	mxMarker.addMarker('halfCircle', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		var nx = unitX * (size + sw + 1);
-		var ny = unitY * (size + sw + 1);
-		var pt = pe.clone();
-		
-		pe.x -= nx;
-		pe.y -= ny;
-
-		return function()
-		{
-			c.begin();
-			c.moveTo(pt.x - ny, pt.y + nx);
-			c.quadTo(pe.x - ny, pe.y + nx, pe.x, pe.y);
-			c.quadTo(pe.x + ny, pe.y - nx, pt.x + ny, pt.y - nx);
-			c.stroke();
-		};
-	});
-
-	mxMarker.addMarker('async', function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		// The angle of the forward facing arrow sides against the x axis is
-		// 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
-		// only half the strokewidth is processed ).
-		var endOffsetX = unitX * sw * 1.118;
-		var endOffsetY = unitY * sw * 1.118;
-		
-		unitX = unitX * (size + sw);
-		unitY = unitY * (size + sw);
-
-		var pt = pe.clone();
-		pt.x -= endOffsetX;
-		pt.y -= endOffsetY;
-		
-		var f = 1;
-		pe.x += -unitX * f - endOffsetX;
-		pe.y += -unitY * f - endOffsetY;
-		
-		return function()
-		{
-			c.begin();
-			c.moveTo(pt.x, pt.y);
-			
-			if (source)
-			{
-				c.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
-			}
-			else
-			{
-				c.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-			}
-			
-			c.lineTo(pt.x - unitX, pt.y - unitY);
-			c.close();
-
-			if (filled)
-			{
-				c.fillAndStroke();
-			}
-			else
-			{
-				c.stroke();
-			}
-		};
-	});
-	
-	function createOpenAsyncArrow(widthFactor = 2)
-	{
-		widthFactor = (widthFactor != null) ? widthFactor : 2;
-		
-		return function(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
-		{
-			unitX = unitX * (size + sw);
-			unitY = unitY * (size + sw);
-			
-			var pt = pe.clone();
-
-			return function()
-			{
-				c.begin();
-				c.moveTo(pt.x, pt.y);
-				
-				if (source)
-				{
-					c.lineTo(pt.x - unitX - unitY / widthFactor, pt.y - unitY + unitX / widthFactor);
-				}
-				else
-				{
-					c.lineTo(pt.x + unitY / widthFactor - unitX, pt.y - unitY - unitX / widthFactor);
-				}
-				
-				c.stroke();
-			};
-		}
-	};
-	
-	mxMarker.addMarker('openAsync', createOpenAsyncArrow(2));
-	
-	function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled)
-	{
-		// The angle of the forward facing arrow sides against the x axis is
-		// 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
-		// only half the strokewidth is processed ).
-		var endOffsetX = unitX * sw * 1.118;
-		var endOffsetY = unitY * sw * 1.118;
-		
-		unitX = unitX * (size + sw);
-		unitY = unitY * (size + sw);
-
-		var pt = pe.clone();
-		pt.x -= endOffsetX;
-		pt.y -= endOffsetY;
-		
-		var f = (type != mxConstants.ARROW_CLASSIC && type != mxConstants.ARROW_CLASSIC_THIN) ? 1 : 3 / 4;
-		pe.x += -unitX * f - endOffsetX;
-		pe.y += -unitY * f - endOffsetY;
-		
-		return function()
-		{
-			canvas.begin();
-			canvas.moveTo(pt.x, pt.y);
-			canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
-		
-			if (type == mxConstants.ARROW_CLASSIC || type == mxConstants.ARROW_CLASSIC_THIN)
-			{
-				canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
-			}
-		
-			canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
-			canvas.close();
-
-			if (filled)
-			{
-				canvas.fillAndStroke();
-			}
-			else
-			{
-				canvas.stroke();
-			}
-		};
-	}
-	
-	// Handlers are only added if mxVertexHandler is defined (ie. not in embedded graph)
-	if (typeof mxVertexHandler !== 'undefined')
-	{
-		function createHandle(state, keys, getPositionFn, setPositionFn, ignoreGrid, redrawEdges)
-		{
-			var handle = new mxHandle(state, null, mxVertexHandler.prototype.secondaryHandleImage);
-			
-			handle.execute = function()
-			{
-				for (var i = 0; i < keys.length; i++)
-				{	
-					this.copyStyle(keys[i]);
-				}
-			};
-			
-			handle.getPosition = getPositionFn;
-			handle.setPosition = setPositionFn;
-			handle.ignoreGrid = (ignoreGrid != null) ? ignoreGrid : true;
-			
-			// Overridden to update connected edges
-			if (redrawEdges)
-			{
-				var positionChanged = handle.positionChanged;
-				
-				handle.positionChanged = function()
-				{
-					positionChanged.apply(this, arguments);
-					
-					// Redraws connected edges TODO: Include child edges
-					state.view.invalidate(this.state.cell);
-					state.view.validate();
-				};
-			}
-			
-			return handle;
-		};
-		
-		function createArcHandle(state, yOffset)
-		{
-			return createHandle(state, [mxConstants.STYLE_ARCSIZE], function(bounds)
-			{
-				var tmp = (yOffset != null) ? yOffset : bounds.height / 8;
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ABSOLUTE_ARCSIZE, 0) == '1')
-				{
-					var arcSize = mxUtils.getValue(state.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-					
-					return new mxPoint(bounds.x + bounds.width - Math.min(bounds.width / 2, arcSize), bounds.y + tmp);
-				}
-				else
-				{
-					var arcSize = Math.max(0, parseFloat(mxUtils.getValue(state.style,
-						mxConstants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100))) / 100;
-					
-					return new mxPoint(bounds.x + bounds.width - Math.min(Math.max(bounds.width / 2, bounds.height / 2),
-						Math.min(bounds.width, bounds.height) * arcSize), bounds.y + tmp);
-				}
-			}, function(bounds, pt, me)
-			{
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ABSOLUTE_ARCSIZE, 0) == '1')
-				{
-					this.state.style[mxConstants.STYLE_ARCSIZE] = Math.round(Math.max(0, Math.min(bounds.width,
-						(bounds.x + bounds.width - pt.x) * 2)));
-				}
-				else
-				{
-					var f = Math.min(50, Math.max(0, (bounds.width - pt.x + bounds.x) * 100 /
-						Math.min(bounds.width, bounds.height)));
-					this.state.style[mxConstants.STYLE_ARCSIZE] = Math.round(f);
-				}
-			});
-		}
-
-		function createArcHandleFunction()
-		{
-			return function(state)
-			{
-				var handles = [];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			};
-		};
-		
-		function createTrapezoidHandleFunction(max)
-		{
-			return function(state)
-			{
-				var handles = [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(max, parseFloat(mxUtils.getValue(this.state.style, 'size', TrapezoidShape.prototype.size))));
-				
-					return new mxPoint(bounds.x + size * bounds.width * 0.75, bounds.y + bounds.height / 4);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(max, (pt.x - bounds.x) / (bounds.width * 0.75)));
-				}, null, true)];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			};
-		};
-		
-		function createDisplayHandleFunction(defaultValue, allowArcHandle, max, redrawEdges, fixedDefaultValue)
-		{
-			max = (max != null) ? max : 1;
-			
-			return function(state)
-			{
-				var handles = [createHandle(state, ['size'], function(bounds)
-				{
-					var fixed = (fixedDefaultValue != null) ? mxUtils.getValue(this.state.style, 'fixedSize', '0') != '0' : null;
-					var size = parseFloat(mxUtils.getValue(this.state.style, 'size', (fixed) ? fixedDefaultValue : defaultValue));
-	
-					return new mxPoint(bounds.x + Math.max(0, Math.min(bounds.width, size * ((fixed) ? 1 : bounds.width))), bounds.getCenterY());
-				}, function(bounds, pt, me)
-				{
-					var fixed = (fixedDefaultValue != null) ? mxUtils.getValue(this.state.style, 'fixedSize', '0') != '0' : null;
-					var size = (fixed) ? (pt.x - bounds.x) : Math.max(0, Math.min(max, (pt.x - bounds.x) / bounds.width));
-					
-					if (fixed && !mxEvent.isAltDown(me.getEvent()))
-					{
-						size = state.view.graph.snap(size);
-					}
-					
-					this.state.style['size'] = size;
-				}, null, redrawEdges)];
-				
-				if (allowArcHandle && mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			};
-		};
-		
-		function createCubeHandleFunction(factor, defaultValue, allowArcHandle)
-		{
-			return function(state)
-			{
-				var handles = [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.width, Math.min(bounds.height, parseFloat(
-						mxUtils.getValue(this.state.style, 'size', defaultValue))))) * factor;
-					
-					return new mxPoint(bounds.x + size, bounds.y + size);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.round(Math.max(0, Math.min(Math.min(bounds.width, pt.x - bounds.x),
-							Math.min(bounds.height, pt.y - bounds.y))) / factor);
-				})];
-				
-				if (allowArcHandle && mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			};
-		};
-		
-		function createArrowHandleFunction(maxSize)
-		{
-			return function(state)
-			{
-				return [createHandle(state, ['arrowWidth', 'arrowSize'], function(bounds)
-				{
-					var aw = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth)));
-					var as = Math.max(0, Math.min(maxSize, mxUtils.getValue(this.state.style, 'arrowSize', SingleArrowShape.prototype.arrowSize)));
-					
-					return new mxPoint(bounds.x + (1 - as) * bounds.width, bounds.y + (1 - aw) * bounds.height / 2);
-				}, function(bounds, pt)
-				{
-					this.state.style['arrowWidth'] = Math.max(0, Math.min(1, Math.abs(bounds.y + bounds.height / 2 - pt.y) / bounds.height * 2));
-					this.state.style['arrowSize'] = Math.max(0, Math.min(maxSize, (bounds.x + bounds.width - pt.x) / (bounds.width)));
-				})];
-			};
-		};
-		
-		function createEdgeHandle(state, keys, start, getPosition, setPosition)
-		{
-			return createHandle(state, keys, function(bounds)
-			{
-				var pts = state.absolutePoints;
-				var n = pts.length - 1;
-				
-				var tr = state.view.translate;
-				var s = state.view.scale;
-				
-				var p0 = (start) ? pts[0] : pts[n];
-				var p1 = (start) ? pts[1] : pts[n - 1];
-				var dx = (start) ? p1.x - p0.x : p1.x - p0.x;
-				var dy = (start) ? p1.y - p0.y : p1.y - p0.y;
-
-				var dist = Math.sqrt(dx * dx + dy * dy);
-				
-				var pt = getPosition.call(this, dist, dx / dist, dy / dist, p0, p1);
-				
-				return new mxPoint(pt.x / s - tr.x, pt.y / s - tr.y);
-			}, function(bounds, pt, me)
-			{
-				var pts = state.absolutePoints;
-				var n = pts.length - 1;
-				
-				var tr = state.view.translate;
-				var s = state.view.scale;
-				
-				var p0 = (start) ? pts[0] : pts[n];
-				var p1 = (start) ? pts[1] : pts[n - 1];
-				var dx = (start) ? p1.x - p0.x : p1.x - p0.x;
-				var dy = (start) ? p1.y - p0.y : p1.y - p0.y;
-
-				var dist = Math.sqrt(dx * dx + dy * dy);
-				pt.x = (pt.x + tr.x) * s;
-				pt.y = (pt.y + tr.y) * s;
-
-				setPosition.call(this, dist, dx / dist, dy / dist, p0, p1, pt, me);
-			});
-		};
-		
-		function createEdgeWidthHandle(state, start, spacing)
-		{
-			return createEdgeHandle(state, ['width'], start, function(dist, nx, ny, p0, p1)
-			{
-				var w = state.shape.getEdgeWidth() * state.view.scale + spacing;
-
-				return new mxPoint(p0.x + nx * dist / 4 + ny * w / 2, p0.y + ny * dist / 4 - nx * w / 2);
-			}, function(dist, nx, ny, p0, p1, pt)
-			{
-				var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));					
-				state.style['width'] = Math.round(w * 2) / state.view.scale - spacing;
-			});
-		};
-		
-		function ptLineDistance(x1, y1, x2, y2, x0, y0)
-		{
-			return Math.abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
-		}
-
-		var handleFactory = {
-			'link': function(state)
-			{
-				var spacing = 10;
-
-				return [createEdgeWidthHandle(state, true, spacing), createEdgeWidthHandle(state, false, spacing)];
-			},
-			'flexArrow': function(state)
-			{
-				// Do not use state.shape.startSize/endSize since it is cached
-				var tol = state.view.graph.gridSize / state.view.scale;
-				var handles = [];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_STARTARROW, mxConstants.NONE) != mxConstants.NONE)
-				{
-					handles.push(createEdgeHandle(state, ['width', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], true, function(dist, nx, ny, p0, p1)
-					{
-						var w = (state.shape.getEdgeWidth() - state.shape.strokewidth) * state.view.scale;
-						var l = mxUtils.getNumber(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
-						
-						return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) + ny * w / 2,
-							p0.y + ny * (l + state.shape.strokewidth * state.view.scale) - nx * w / 2);
-					}, function(dist, nx, ny, p0, p1, pt, me)
-					{
-						var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
-						var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
-						
-						state.style[mxConstants.STYLE_STARTSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
-						state.style['width'] = Math.round(w * 2) / state.view.scale;
-						
-						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
-						{
-							state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
-						}
-
-						// Snaps to end geometry
-						if (!mxEvent.isAltDown(me.getEvent()))
-						{
-							if (Math.abs(parseFloat(state.style[mxConstants.STYLE_STARTSIZE]) - parseFloat(state.style[mxConstants.STYLE_ENDSIZE])) < tol / 6)
-							{
-								state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
-							}
-						}
-					}));
-					
-					handles.push(createEdgeHandle(state, ['startWidth', 'endWidth', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], true, function(dist, nx, ny, p0, p1)
-					{
-						var w = (state.shape.getStartArrowWidth() - state.shape.strokewidth) * state.view.scale;
-						var l = mxUtils.getNumber(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
-						
-						return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) + ny * w / 2,
-							p0.y + ny * (l + state.shape.strokewidth * state.view.scale) - nx * w / 2);
-					}, function(dist, nx, ny, p0, p1, pt, me)
-					{
-						var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
-						var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
-						
-						state.style[mxConstants.STYLE_STARTSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
-						state.style['startWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
-						
-						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
-						{
-							state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
-							state.style['endWidth'] = state.style['startWidth'];
-						}
-						
-						// Snaps to endWidth
-						if (!mxEvent.isAltDown(me.getEvent()))
-						{
-							if (Math.abs(parseFloat(state.style[mxConstants.STYLE_STARTSIZE]) - parseFloat(state.style[mxConstants.STYLE_ENDSIZE])) < tol / 6)
-							{
-								state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
-							}
-							
-							if (Math.abs(parseFloat(state.style['startWidth']) - parseFloat(state.style['endWidth'])) < tol)
-							{
-								state.style['startWidth'] = state.style['endWidth'];
-							}
-						}
-					}));
-				}
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ENDARROW, mxConstants.NONE) != mxConstants.NONE)
-				{
-					handles.push(createEdgeHandle(state, ['width', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], false, function(dist, nx, ny, p0, p1)
-					{
-						var w = (state.shape.getEdgeWidth() - state.shape.strokewidth) * state.view.scale;
-						var l = mxUtils.getNumber(state.style, mxConstants.STYLE_ENDSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
-						
-						return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) - ny * w / 2,
-							p0.y + ny * (l + state.shape.strokewidth * state.view.scale) + nx * w / 2);
-					}, function(dist, nx, ny, p0, p1, pt, me)
-					{
-						var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
-						var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
-						
-						state.style[mxConstants.STYLE_ENDSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
-						state.style['width'] = Math.round(w * 2) / state.view.scale;
-						
-						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
-						{
-							state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
-						}
-					
-						// Snaps to start geometry
-						if (!mxEvent.isAltDown(me.getEvent()))
-						{
-							if (Math.abs(parseFloat(state.style[mxConstants.STYLE_ENDSIZE]) - parseFloat(state.style[mxConstants.STYLE_STARTSIZE])) < tol / 6)
-							{
-								state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
-							}
-						}
-					}));
-					
-					handles.push(createEdgeHandle(state, ['startWidth', 'endWidth', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], false, function(dist, nx, ny, p0, p1)
-					{
-						var w = (state.shape.getEndArrowWidth() - state.shape.strokewidth) * state.view.scale;
-						var l = mxUtils.getNumber(state.style, mxConstants.STYLE_ENDSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
-						
-						return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) - ny * w / 2,
-							p0.y + ny * (l + state.shape.strokewidth * state.view.scale) + nx * w / 2);
-					}, function(dist, nx, ny, p0, p1, pt, me)
-					{
-						var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
-						var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
-						
-						state.style[mxConstants.STYLE_ENDSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
-						state.style['endWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
-						
-						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
-						{
-							state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
-							state.style['startWidth'] = state.style['endWidth'];
-						}
-					
-						// Snaps to start geometry
-						if (!mxEvent.isAltDown(me.getEvent()))
-						{
-							if (Math.abs(parseFloat(state.style[mxConstants.STYLE_ENDSIZE]) - parseFloat(state.style[mxConstants.STYLE_STARTSIZE])) < tol / 6)
-							{
-								state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
-							}
-							
-							if (Math.abs(parseFloat(state.style['endWidth']) - parseFloat(state.style['startWidth'])) < tol)
-							{
-								state.style['endWidth'] = state.style['startWidth'];
-							}
-						}
-					}));
-				}
-				
-				return handles;
-			},
-			'swimlane': function(state)
-			{
-				var handles = [createHandle(state, [mxConstants.STYLE_STARTSIZE], function(bounds)
-				{
-					var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
-					
-					if (mxUtils.getValue(state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1)
-					{
-						return new mxPoint(bounds.getCenterX(), bounds.y + Math.max(0, Math.min(bounds.height, size)));
-					}
-					else
-					{
-						return new mxPoint(bounds.x + Math.max(0, Math.min(bounds.width, size)), bounds.getCenterY());
-					}
-				}, function(bounds, pt)
-				{	
-					state.style[mxConstants.STYLE_STARTSIZE] =
-						(mxUtils.getValue(this.state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1) ?
-							Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y))) :
-							Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
-				})];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED))
-				{
-					var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
-					handles.push(createArcHandle(state, size / 2));
-				}
-				
-				return handles;
-			},
-			'label': createArcHandleFunction(),
-			'ext': createArcHandleFunction(),
-			'rectangle': createArcHandleFunction(),
-			'triangle': createArcHandleFunction(),
-			'rhombus': createArcHandleFunction(),
-			'umlLifeline': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.height, parseFloat(mxUtils.getValue(this.state.style, 'size', UmlLifeline.prototype.size))));
-					
-					return new mxPoint(bounds.getCenterX(), bounds.y + size);
-				}, function(bounds, pt)
-				{	
-					this.state.style['size'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)));
-				}, false)];
-			},
-			'umlFrame': function(state)
-			{
-				var handles = [createHandle(state, ['width', 'height'], function(bounds)
-				{
-					var w0 = Math.max(UmlFrame.prototype.corner, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'width', UmlFrame.prototype.width)));
-					var h0 = Math.max(UmlFrame.prototype.corner * 1.5, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'height', UmlFrame.prototype.height)));
-
-					return new mxPoint(bounds.x + w0, bounds.y + h0);
-				}, function(bounds, pt)
-				{
-					this.state.style['width'] = Math.round(Math.max(UmlFrame.prototype.corner, Math.min(bounds.width, pt.x - bounds.x)));
-					this.state.style['height'] = Math.round(Math.max(UmlFrame.prototype.corner * 1.5, Math.min(bounds.height, pt.y - bounds.y)));
-				}, false)];
-				
-				return handles;
-			},
-			'process': function(state)
-			{
-				var handles = [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(0.5, parseFloat(mxUtils.getValue(this.state.style, 'size', ProcessShape.prototype.size))));
-
-					return new mxPoint(bounds.x + bounds.width * size, bounds.y + bounds.height / 4);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(0.5, (pt.x - bounds.x) / bounds.width));
-				})];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			},
-			'cross': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var m = Math.min(bounds.width, bounds.height);
-					var size = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'size', CrossShape.prototype.size))) * m / 2;
-
-					return new mxPoint(bounds.getCenterX() - size, bounds.getCenterY() - size);
-				}, function(bounds, pt)
-				{
-					var m = Math.min(bounds.width, bounds.height);
-					this.state.style['size'] = Math.max(0, Math.min(1, Math.min((Math.max(0, bounds.getCenterY() - pt.y) / m) * 2,
-							(Math.max(0, bounds.getCenterX() - pt.x) / m) * 2)));
-				})];
-			},
-			'note': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.width, Math.min(bounds.height, parseFloat(
-						mxUtils.getValue(this.state.style, 'size', NoteShape.prototype.size)))));
-					
-					return new mxPoint(bounds.x + bounds.width - size, bounds.y + size);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.round(Math.max(0, Math.min(Math.min(bounds.width, bounds.x + bounds.width - pt.x),
-							Math.min(bounds.height, pt.y - bounds.y))));
-				})];
-			},
-			'manualInput': function(state)
-			{
-				var handles = [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'size', ManualInputShape.prototype.size)));
-					
-					return new mxPoint(bounds.x + bounds.width / 4, bounds.y + size * 3 / 4);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.round(Math.max(0, Math.min(bounds.height, (pt.y - bounds.y) * 4 / 3)));
-				})];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			},
-			'dataStorage': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.state.style, 'size', DataStorageShape.prototype.size))));
-
-					return new mxPoint(bounds.x + (1 - size) * bounds.width, bounds.getCenterY());
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(1, (bounds.x + bounds.width - pt.x) / bounds.width));
-				})];
-			},
-			'callout': function(state)
-			{
-				var handles = [createHandle(state, ['size', 'position'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'size', CalloutShape.prototype.size)));
-					var position = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'position', CalloutShape.prototype.position)));
-					var base = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'base', CalloutShape.prototype.base)));
-					
-					return new mxPoint(bounds.x + position * bounds.width, bounds.y + bounds.height - size);
-				}, function(bounds, pt)
-				{
-					var base = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'base', CalloutShape.prototype.base)));
-					this.state.style['size'] = Math.round(Math.max(0, Math.min(bounds.height, bounds.y + bounds.height - pt.y)));
-					this.state.style['position'] = Math.round(Math.max(0, Math.min(1, (pt.x - bounds.x) / bounds.width)) * 100) / 100;
-				}), createHandle(state, ['position2'], function(bounds)
-				{
-					var position2 = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'position2', CalloutShape.prototype.position2)));
-
-					return new mxPoint(bounds.x + position2 * bounds.width, bounds.y + bounds.height);
-				}, function(bounds, pt)
-				{
-					this.state.style['position2'] = Math.round(Math.max(0, Math.min(1, (pt.x - bounds.x) / bounds.width)) * 100) / 100;
-				}), createHandle(state, ['base'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'size', CalloutShape.prototype.size)));
-					var position = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'position', CalloutShape.prototype.position)));
-					var base = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'base', CalloutShape.prototype.base)));
-					
-					return new mxPoint(bounds.x + Math.min(bounds.width, position * bounds.width + base), bounds.y + bounds.height - size);
-				}, function(bounds, pt)
-				{
-					var position = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'position', CalloutShape.prototype.position)));
-
-					this.state.style['base'] = Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x - position * bounds.width)));
-				})];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			},
-			'internalStorage': function(state)
-			{
-				var handles = [createHandle(state, ['dx', 'dy'], function(bounds)
-				{
-					var dx = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'dx', InternalStorageShape.prototype.dx)));
-					var dy = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'dy', InternalStorageShape.prototype.dy)));
-
-					return new mxPoint(bounds.x + dx, bounds.y + dy);
-				}, function(bounds, pt)
-				{
-					this.state.style['dx'] = Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
-					this.state.style['dy'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)));
-				})];
-				
-				if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
-				{
-					handles.push(createArcHandle(state));
-				}
-				
-				return handles;
-			},
-			'module': function(state)
-			{
-				var handles = [createHandle(state, ['jettyWidth', 'jettyHeight'], function(bounds)
-				{
-					var dx = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'jettyWidth', ModuleShape.prototype.jettyWidth)));
-					var dy = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'jettyHeight', ModuleShape.prototype.jettyHeight)));
-
-					return new mxPoint(bounds.x + dx / 2, bounds.y + dy * 2);
-				}, function(bounds, pt)
-				{
-					this.state.style['jettyWidth'] = Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)) * 2);
-					this.state.style['jettyHeight'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)) / 2);
-				})];
-				
-				return handles;
-			},
-			'corner': function(state)
-			{
-				return [createHandle(state, ['dx', 'dy'], function(bounds)
-				{
-					var dx = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'dx', CornerShape.prototype.dx)));
-					var dy = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'dy', CornerShape.prototype.dy)));
-
-					return new mxPoint(bounds.x + dx, bounds.y + dy);
-				}, function(bounds, pt)
-				{
-					this.state.style['dx'] = Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
-					this.state.style['dy'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)));
-				})];
-			},
-			'tee': function(state)
-			{
-				return [createHandle(state, ['dx', 'dy'], function(bounds)
-				{
-					var dx = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'dx', TeeShape.prototype.dx)));
-					var dy = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'dy', TeeShape.prototype.dy)));
-
-					return new mxPoint(bounds.x + (bounds.width + dx) / 2, bounds.y + dy);
-				}, function(bounds, pt)
-				{
-					this.state.style['dx'] = Math.round(Math.max(0, Math.min(bounds.width / 2, (pt.x - bounds.x - bounds.width / 2)) * 2));
-					this.state.style['dy'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)));
-				})];
-			},
-			'singleArrow': createArrowHandleFunction(1),
-			'doubleArrow': createArrowHandleFunction(0.5),			
-			'folder': function(state)
-			{
-				return [createHandle(state, ['tabWidth', 'tabHeight'], function(bounds)
-				{
-					var tw = Math.max(0, Math.min(bounds.width, mxUtils.getValue(this.state.style, 'tabWidth', FolderShape.prototype.tabWidth)));
-					var th = Math.max(0, Math.min(bounds.height, mxUtils.getValue(this.state.style, 'tabHeight', FolderShape.prototype.tabHeight)));
-					
-					if (mxUtils.getValue(this.state.style, 'tabPosition', FolderShape.prototype.tabPosition) == mxConstants.ALIGN_RIGHT)
-					{
-						tw = bounds.width - tw;
-					}
-					
-					return new mxPoint(bounds.x + tw, bounds.y + th);
-				}, function(bounds, pt)
-				{
-					var tw = Math.max(0, Math.min(bounds.width, pt.x - bounds.x));
-					
-					if (mxUtils.getValue(this.state.style, 'tabPosition', FolderShape.prototype.tabPosition) == mxConstants.ALIGN_RIGHT)
-					{
-						tw = bounds.width - tw;
-					}
-					
-					this.state.style['tabWidth'] = Math.round(tw);
-					this.state.style['tabHeight'] = Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y)));
-				})];
-			},
-			'document': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.state.style, 'size', DocumentShape.prototype.size))));
-
-					return new mxPoint(bounds.x + 3 * bounds.width / 4, bounds.y + (1 - size) * bounds.height);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(1, (bounds.y + bounds.height - pt.y) / bounds.height));
-				})];
-			},
-			'tape': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.state.style, 'size', TapeShape.prototype.size))));
-
-					return new mxPoint(bounds.getCenterX(), bounds.y + size * bounds.height / 2);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(1, ((pt.y - bounds.y) / bounds.height) * 2));
-				})];
-			},
-			'offPageConnector': function(state)
-			{
-				return [createHandle(state, ['size'], function(bounds)
-				{
-					var size = Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.state.style, 'size', OffPageConnectorShape.prototype.size))));
-
-					return new mxPoint(bounds.getCenterX(), bounds.y + (1 - size) * bounds.height);
-				}, function(bounds, pt)
-				{
-					this.state.style['size'] = Math.max(0, Math.min(1, (bounds.y + bounds.height - pt.y) / bounds.height));
-				})];
-			},
-			'step': createDisplayHandleFunction(StepShape.prototype.size, true, null, true, StepShape.prototype.fixedSize),
-			'hexagon': createDisplayHandleFunction(HexagonShape.prototype.size, true, 0.5, true),
-			'curlyBracket': createDisplayHandleFunction(CurlyBracketShape.prototype.size, false),
-			'display': createDisplayHandleFunction(DisplayShape.prototype.size, false),
-			'cube': createCubeHandleFunction(1, CubeShape.prototype.size, false),
-			'card': createCubeHandleFunction(0.5, CardShape.prototype.size, true),
-			'loopLimit': createCubeHandleFunction(0.5, LoopLimitShape.prototype.size, true),
-			'trapezoid': createTrapezoidHandleFunction(0.5),
-			'parallelogram': createTrapezoidHandleFunction(1)
-		};
-		
-		// Exposes custom handles
-		Graph.createHandle = createHandle;
-		Graph.handleFactory = handleFactory;
-
-		mxVertexHandler.prototype.createCustomHandles = function()
-		{
-			if (this.graph.isCellRotatable(this.state.cell))
-			// LATER: Make locked state independent of rotatable flag, fix toggle if default is false
-			//if (this.graph.isCellResizable(this.state.cell) || this.graph.isCellMovable(this.state.cell))
-			{
-				var name = this.state.style['shape'];
-
-				if (mxCellRenderer.defaultShapes[name] == null &&
-					mxStencilRegistry.getStencil(name) == null)
-				{
-					name = mxConstants.SHAPE_RECTANGLE;
-				}
-				
-				var fn = handleFactory[name];
-				
-				if (fn == null && this.state.shape != null && this.state.shape.isRoundable())
-				{
-					fn = handleFactory[mxConstants.SHAPE_RECTANGLE];
-				}
-			
-				if (fn != null)
-				{
-					return fn(this.state);
-				}
-			}
-			
-			return null;
-		};
-
-		mxEdgeHandler.prototype.createCustomHandles = function()
-		{
-			var name = this.state.style['shape'];
-			
-			if (mxCellRenderer.defaultShapes[name] == null &&
-				mxStencilRegistry.getStencil(name) == null)
-			{
-				name = mxConstants.SHAPE_CONNECTOR;
-			}
-			
-			var fn = handleFactory[name];
-			
-			if (fn != null)
-			{
-				return fn(this.state);
-			}
-			
-			return null;
-		}
-	}
-	else
-	{
-		// Dummy entries to avoid NPE in embed mode
-		Graph.createHandle = function() {};
-		Graph.handleFactory = {};
-	}
-	 
-	 var isoHVector = new mxPoint(1, 0);
-	 var isoVVector = new mxPoint(1, 0);
-		
-	 var alpha1 = mxUtils.toRadians(-30);
-		
-	 var cos1 = Math.cos(alpha1);
-	 var sin1 = Math.sin(alpha1);
-
-	 isoHVector = mxUtils.getRotatedPoint(isoHVector, cos1, sin1);
-
-	 var alpha2 = mxUtils.toRadians(-150);
-	 
-	 var cos2 = Math.cos(alpha2);
-	 var sin2 = Math.sin(alpha2);
-
-	 isoVVector = mxUtils.getRotatedPoint(isoVVector, cos2, sin2);
-	
-	 mxEdgeStyle.IsometricConnector = function (state, source, target, points, result)
-	 {
-		var view = state.view;
-		var pt = (points != null && points.length > 0) ? points[0] : null;
-		var pts = state.absolutePoints;
-		var p0 = pts[0];
-		var pe = pts[pts.length-1];
-		
-		if (pt != null)
-		{
-			pt = view.transformControlPoint(state, pt);
-		}
-		
-		if (p0 == null)
-		{
-			if (source != null)
-			{
-				p0 = new mxPoint(source.getCenterX(), source.getCenterY());
-			}
-		}
-		
-		if (pe == null)
-		{
-			if (target != null)
-			{
-				pe = new mxPoint(target.getCenterX(), target.getCenterY());
-			}
-		}		
-		
-		var a1 = isoHVector.x;
-		var a2 = isoHVector.y;
-		
-		var b1 = isoVVector.x;
-		var b2 = isoVVector.y;
-		
-		var elbow = mxUtils.getValue(state.style, 'elbow', 'horizontal') == 'horizontal';
-		
-		if (pe != null && p0 != null)
-		{
-			var last = p0;
-			
-			function isoLineTo(x, y, ignoreFirst)
-			{
-				var c1 = x - last.x;
-				var c2 = y - last.y;
-
-				// Solves for isometric base vectors
-				var h = (b2 * c1 - b1 * c2) / (a1 * b2 - a2 * b1);
-				var v = (a2 * c1 - a1 * c2) / (a2 * b1 - a1 * b2);
-				
-				if (elbow)
-				{
-					if (ignoreFirst)
-					{
-						last = new mxPoint(last.x + a1 * h, last.y + a2 * h);
-						result.push(last);
-					}
-	
-					last = new mxPoint(last.x + b1 * v, last.y + b2 * v);
-					result.push(last);
-				}
-				else
-				{
-					if (ignoreFirst)
-					{
-						last = new mxPoint(last.x + b1 * v, last.y + b2 * v);
-						result.push(last);
-					}
-
-					last = new mxPoint(last.x + a1 * h, last.y + a2 * h);
-					result.push(last);
-				}
-			};
-
-			if (pt == null)
-			{
-				pt = new mxPoint(p0.x + (pe.x - p0.x) / 2, p0.y + (pe.y - p0.y) / 2);
-			}
-			
-			isoLineTo(pt.x, pt.y, true);
-			isoLineTo(pe.x, pe.y, false);
-		}
-	 };
-
-	 mxStyleRegistry.putValue('isometricEdgeStyle', mxEdgeStyle.IsometricConnector);
-	
-	 var graphCreateEdgeHandler = Graph.prototype.createEdgeHandler;
-	 Graph.prototype.createEdgeHandler = function(state, edgeStyle)
-	 {
-	 	if (edgeStyle == mxEdgeStyle.IsometricConnector)
-	 	{
-	 		var handler = new mxElbowEdgeHandler(state);
-	 		handler.snapToTerminals = false;
-	 		
-	 		return handler;
-	 	}
-	 	
-	 	return graphCreateEdgeHandler.apply(this, arguments);
-	 };
-
-	// Defines connection points for all shapes
-	IsoRectangleShape.prototype.constraints = [];
-	
-	IsoCubeShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var tan30 = Math.tan(mxUtils.toRadians(30));
-		var tan30Dx = (0.5 - tan30) / 2;
-		var m = Math.min(w, h / (0.5 + tan30));
-		var dx = (w - m) / 2;
-		var dy = (h - m) / 2;
-
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, dy + 0.25 * m));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx + 0.5 * m, dy + m * tan30Dx));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx + m, dy + 0.25 * m));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx + m, dy + 0.75 * m));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx + 0.5 * m, dy + (1 - tan30Dx) * m));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, dy + 0.75 * m));
-
-		return (constr);
-	};
-
-	CalloutShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
-		var s = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var dx = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'position', this.position))));
-		var dx2 = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'position2', this.position2))));
-		var base = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'base', this.base))));
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.25, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.75, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h - s) * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, h - s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx2, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h - s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - s) * 0.5));
-		
-		if (w >= s * 2)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		}
-
-		return (constr);
-	};
-	
-	mxRectangleShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0), true),
-											  new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(1, 0), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.75, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 1), true)];
-	mxEllipse.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0), true), new mxConnectionConstraint(new mxPoint(1, 0), true),
-	                                   new mxConnectionConstraint(new mxPoint(0, 1), true), new mxConnectionConstraint(new mxPoint(1, 1), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.5, 0), true), new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-	          	              		   new mxConnectionConstraint(new mxPoint(0, 0.5), true), new mxConnectionConstraint(new mxPoint(1, 0.5))];
-	mxLabel.prototype.constraints = mxRectangleShape.prototype.constraints;
-	mxImageShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	mxSwimlane.prototype.constraints = mxRectangleShape.prototype.constraints;
-	PlusShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-
-	NoteShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - s) * 0.5, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s * 0.5, s * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h + s) * 0.5 ));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
-		
-		if (w >= s * 2)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		}
-
-		return (constr);
-	};
-	
-	CardShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + s) * 0.5, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s * 0.5, s * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h + s) * 0.5 ));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
-		
-		if (w >= s * 2)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		}
-
-		return (constr);
-	};
-	
-	CubeShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - s) * 0.5, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s * 0.5, s * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h + s) * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + s) * 0.5, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s * 0.5, h - s * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h - s));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - s) * 0.5));
-		
-		return (constr);
-	};
-	
-	FolderShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'tabWidth', this.tabWidth))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'tabHeight', this.tabHeight))));
-		var tp = mxUtils.getValue(this.style, 'tabPosition', this.tabPosition);
-
-		if (tp == 'left')
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx * 0.5, 0));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, 0));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, dy));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + dx) * 0.5, dy));
-		}
-		else
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(1, 0), false));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - dx * 0.5, 0));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - dx, 0));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - dx, dy));
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - dx) * 0.5, dy));
-		}
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h - dy) * 0.25 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h - dy) * 0.5 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h - dy) * 0.75 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - dy) * 0.25 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - dy) * 0.5 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - dy) * 0.75 + dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.25, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.75, 1), false));
-
-		return (constr);
-	}
-
-	InternalStorageShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	DataStorageShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	TapeDataShape.prototype.constraints = mxEllipse.prototype.constraints;
-	OrEllipseShape.prototype.constraints = mxEllipse.prototype.constraints;
-	SumEllipseShape.prototype.constraints = mxEllipse.prototype.constraints;
-	LineEllipseShape.prototype.constraints = mxEllipse.prototype.constraints;
-	ManualInputShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	DelayShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-
-	DisplayShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var dx = Math.min(w, h / 2);
-		var s = Math.min(w - dx, Math.max(0, parseFloat(mxUtils.getValue(this.style, 'size', this.size))) * w);
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false, null));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (s + w - dx) * 0.5, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - dx, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false, null));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - dx, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (s + w - dx) * 0.5, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s, h));
-		
-		return (constr);
-	};
-	
-	ModuleShape.prototype.getConstraints = function(style, w, h)
-	{
-		var x0 = parseFloat(mxUtils.getValue(style, 'jettyWidth', ModuleShape.prototype.jettyWidth)) / 2;
-		var dy = parseFloat(mxUtils.getValue(style, 'jettyHeight', ModuleShape.prototype.jettyHeight));
-		var constr = [new mxConnectionConstraint(new mxPoint(0, 0), false, null, x0),
-			new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-			new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-			new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-			new mxConnectionConstraint(new mxPoint(1, 0), true),
-			new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-			new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-			new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-			new mxConnectionConstraint(new mxPoint(0, 1), false, null, x0),
-			new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-			new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-			new mxConnectionConstraint(new mxPoint(0.75, 1), true),
-			new mxConnectionConstraint(new mxPoint(1, 1), true),
-			new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, Math.min(h - 0.5 * dy, 1.5 * dy)),
-			new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, Math.min(h - 0.5 * dy, 3.5 * dy))];
-		
-		if (h > 5 * dy)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0.75), false, null, x0));
-		}
-		
-		if (h > 8 * dy)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false, null, x0));
-		}
-		
-		if (h > 15 * dy)
-		{
-			constr.push(new mxConnectionConstraint(new mxPoint(0, 0.25), false, null, x0));
-		}
-		
-		return constr;
-	};
-	
-	LoopLimitShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	OffPageConnectorShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	mxCylinder.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.15, 0.05), false),
+    // Cube Shape, supports size style
+    function CubeShape()
+    {
+        mxCylinder.call(this);
+    }
+    mxUtils.extend(CubeShape, mxCylinder);
+    CubeShape.prototype.size = 20;
+    CubeShape.prototype.darkOpacity = 0;
+    CubeShape.prototype.darkOpacity2 = 0;
+    CubeShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
+        var op = Math.max(-1, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'darkOpacity', this.darkOpacity))));
+        var op2 = Math.max(-1, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'darkOpacity2', this.darkOpacity2))));
+        c.translate(x, y);
+
+        c.begin();
+        c.moveTo(0, 0);
+        c.lineTo(w - s, 0);
+        c.lineTo(w, s);
+        c.lineTo(w, h);
+        c.lineTo(s, h);
+        c.lineTo(0, h - s);
+        c.lineTo(0, 0);
+        c.close();
+        c.end();
+        c.fillAndStroke();
+
+        if (!this.outline)
+        {
+            c.setShadow(false);
+
+            if (op != 0)
+            {
+                c.setFillAlpha(Math.abs(op));
+                c.setFillColor((op < 0) ? '#FFFFFF' : '#000000');
+                c.begin();
+                c.moveTo(0, 0);
+                c.lineTo(w - s, 0);
+                c.lineTo(w, s);
+                c.lineTo(s, s);
+                c.close();
+                c.fill();
+            }
+
+            if (op2 != 0)
+            {
+                c.setFillAlpha(Math.abs(op2));
+                c.setFillColor((op2 < 0) ? '#FFFFFF' : '#000000');
+                c.begin();
+                c.moveTo(0, 0);
+                c.lineTo(s, s);
+                c.lineTo(s, h);
+                c.lineTo(0, h - s);
+                c.close();
+                c.fill();
+            }
+
+            c.begin();
+            c.moveTo(s, h);
+            c.lineTo(s, s);
+            c.lineTo(0, 0);
+            c.moveTo(s, s);
+            c.lineTo(w, s);
+            c.end();
+            c.stroke();
+        }
+    };
+    CubeShape.prototype.getLabelMargins = function (rect)
+    {
+        if (mxUtils.getValue(this.style, 'boundedLbl', false))
+        {
+            var s = parseFloat(mxUtils.getValue(this.style, 'size', this.size)) * this.scale;
+
+            return new mxRectangle(s, s, 0, 0);
+        }
+
+        return null;
+    };
+    mxCellRenderer.registerShape('cube', CubeShape);
+
+    var cylinderGetCylinderSize = mxCylinder.prototype.getCylinderSize;
+    mxCylinder.prototype.getCylinderSize = function (x, y, w, h)
+    {
+        var size = mxUtils.getValue(this.style, 'size');
+        if (size != null)
+            return h * Math.max(0, Math.min(1, size));
+        return cylinderGetCylinderSize.apply(this, arguments);
+    };
+    mxCylinder.prototype.getLabelMargins = function (rect)
+    {
+        if (mxUtils.getValue(this.style, 'boundedLbl', false))
+        {
+            var size = mxUtils.getValue(this.style, 'size', 0.15) * 2;
+            return new mxRectangle(0, Math.min(this.maxHeight * this.scale, rect.height * size), 0, 0);
+        }
+        return null;
+    };
+
+    // Parallelogram shape
+    function ParallelogramShape()
+    {
+        mxActor.call(this);
+    }
+    mxUtils.extend(ParallelogramShape, mxActor);
+    ParallelogramShape.prototype.size = 0.2;
+    ParallelogramShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    ParallelogramShape.prototype.redrawPath = function (c, x, y, w, h)
+    {
+        var dx = w * Math.max(0, Math.min(0.9, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
+        var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
+        this.addPoints(c, [new mxPoint(0, h), new mxPoint(dx, 0), new mxPoint(w, 0), new mxPoint(w - dx, h)],
+            this.isRounded, arcSize, true);
+        c.end();
+    };
+    mxCellRenderer.registerShape('parallelogram', ParallelogramShape);
+
+    // Trapezoid shape
+    function TrapezoidShape()
+    {
+        mxActor.call(this);
+    }
+    mxUtils.extend(TrapezoidShape, mxActor);
+    TrapezoidShape.prototype.size = 0.2;
+    TrapezoidShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    TrapezoidShape.prototype.redrawPath = function (c, x, y, w, h)
+    {
+        var dx = w * Math.max(0, Math.min(0.5, parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
+        var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
+        this.addPoints(c, [new mxPoint(0, h), new mxPoint(dx, 0), new mxPoint(w - dx, 0), new mxPoint(w, h)],
+            this.isRounded, arcSize, true);
+    };
+    mxCellRenderer.registerShape('trapezoid', TrapezoidShape); 
+
+    // Overrides painting of rhombus shape to allow for double style
+    var mxRhombusPaintVertexShape = mxRhombus.prototype.paintVertexShape;
+    mxRhombus.prototype.getLabelBounds = function (rect)
+    {
+        if (this.style['double'] == 1)
+        {
+            var margin = (Math.max(2, this.strokewidth + 1) * 2 + parseFloat(
+                this.style[mxConstants.STYLE_MARGIN] || 0)) * this.scale;
+
+            return new mxRectangle(rect.x + margin, rect.y + margin,
+                rect.width - 2 * margin, rect.height - 2 * margin);
+        }
+
+        return rect;
+    };
+    mxRhombus.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        mxRhombusPaintVertexShape.apply(this, arguments);
+
+        if (!this.outline && this.style['double'] == 1)
+        {
+            var margin = Math.max(2, this.strokewidth + 1) * 2 +
+                parseFloat(this.style[mxConstants.STYLE_MARGIN] || 0);
+            x += margin;
+            y += margin;
+            w -= 2 * margin;
+            h -= 2 * margin;
+
+            if (w > 0 && h > 0)
+            {
+                c.setShadow(false);
+
+                // Workaround for closure compiler bug where the lines with x and y above
+                // are removed if arguments is used as second argument in call below.
+                mxRhombusPaintVertexShape.apply(this, [c, x, y, w, h]);
+            }
+        }
+    };
+
+    // Perimeters
+    mxPerimeter.OrthogonalPerimeter = function (bounds, vertex, next, orthogonal)
+    {
+        orthogonal = true;
+        return mxPerimeter.RectanglePerimeter.apply(this, arguments);
+    };
+    mxStyleRegistry.putValue('orthogonalPerimeter', mxPerimeter.OrthogonalPerimeter);
+
+    mxPerimeter.ParallelogramPerimeter = function (bounds, vertex, next, orthogonal)
+    {
+        var size = ParallelogramShape.prototype.size;
+
+        if (vertex != null)
+            size = mxUtils.getValue(vertex.style, 'size', size);
+
+        var x = bounds.x;
+        var y = bounds.y;
+        var w = bounds.width;
+        var h = bounds.height;
+
+        var direction = (vertex != null) ? mxUtils.getValue(
+            vertex.style, mxConstants.STYLE_DIRECTION,
+            mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+        var vertical = direction == mxConstants.DIRECTION_NORTH ||
+            direction == mxConstants.DIRECTION_SOUTH;
+        var points;
+
+        if (vertical)
+        {
+            var dy = h * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x, y), new mxPoint(x + w, y + dy),
+            new mxPoint(x + w, y + h), new mxPoint(x, y + h - dy), new mxPoint(x, y)];
+        }
+        else
+        {
+            var dx = w * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x + dx, y), new mxPoint(x + w, y),
+            new mxPoint(x + w - dx, y + h), new mxPoint(x, y + h), new mxPoint(x + dx, y)];
+        }
+
+        var cx = bounds.getCenterX();
+        var cy = bounds.getCenterY();
+
+        var p1 = new mxPoint(cx, cy);
+
+        if (orthogonal)
+        {
+            if (next.x < x || next.x > x + w)
+            {
+                p1.y = next.y;
+            }
+            else
+            {
+                p1.x = next.x;
+            }
+        }
+
+        return mxUtils.getPerimeterPoint(points, p1, next);
+    };
+    mxStyleRegistry.putValue('parallelogramPerimeter', mxPerimeter.ParallelogramPerimeter);
+
+    mxPerimeter.TrapezoidPerimeter = function (bounds, vertex, next, orthogonal)
+    {
+        var size = TrapezoidShape.prototype.size;
+
+        if (vertex != null)
+            size = mxUtils.getValue(vertex.style, 'size', size);
+
+        var x = bounds.x;
+        var y = bounds.y;
+        var w = bounds.width;
+        var h = bounds.height;
+
+        var direction = (vertex != null) ? mxUtils.getValue(
+            vertex.style, mxConstants.STYLE_DIRECTION,
+            mxConstants.DIRECTION_EAST) : mxConstants.DIRECTION_EAST;
+        var points;
+
+        if (direction == mxConstants.DIRECTION_EAST)
+        {
+            var dx = w * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x + dx, y), new mxPoint(x + w - dx, y),
+            new mxPoint(x + w, y + h), new mxPoint(x, y + h), new mxPoint(x + dx, y)];
+        }
+        else if (direction == mxConstants.DIRECTION_WEST)
+        {
+            var dx = w * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x, y), new mxPoint(x + w, y),
+            new mxPoint(x + w - dx, y + h), new mxPoint(x + dx, y + h), new mxPoint(x, y)];
+        }
+        else if (direction == mxConstants.DIRECTION_NORTH)
+        {
+            var dy = h * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x, y + dy), new mxPoint(x + w, y),
+            new mxPoint(x + w, y + h), new mxPoint(x, y + h - dy), new mxPoint(x, y + dy)];
+        }
+        else
+        {
+            var dy = h * Math.max(0, Math.min(1, size));
+            points = [new mxPoint(x, y), new mxPoint(x + w, y + dy),
+            new mxPoint(x + w, y + h - dy), new mxPoint(x, y + h), new mxPoint(x, y)];
+        }
+
+        var cx = bounds.getCenterX();
+        var cy = bounds.getCenterY();
+
+        var p1 = new mxPoint(cx, cy);
+
+        if (orthogonal)
+        {
+            if (next.x < x || next.x > x + w)
+            {
+                p1.y = next.y;
+            }
+            else
+            {
+                p1.x = next.x;
+            }
+        }
+
+        return mxUtils.getPerimeterPoint(points, p1, next);
+    };
+    mxStyleRegistry.putValue('trapezoidPerimeter', mxPerimeter.TrapezoidPerimeter);
+
+    // Link shape
+    function LinkShape()
+    {
+        mxArrowConnector.call(this);
+        this.spacing = 0;
+    }
+    mxUtils.extend(LinkShape, mxArrowConnector);
+    LinkShape.prototype.defaultWidth = 4;
+    LinkShape.prototype.isOpenEnded = function ()
+    {
+        return true;
+    };
+    LinkShape.prototype.getEdgeWidth = function ()
+    {
+        return mxUtils.getNumber(this.style, 'width', this.defaultWidth) + Math.max(0, this.strokewidth - 1);
+    };
+    LinkShape.prototype.isArrowRounded = function ()
+    {
+        return this.isRounded;
+    };
+    mxCellRenderer.registerShape('link', LinkShape);
+
+    // Generic arrow
+    function FlexArrowShape()
+    {
+        mxArrowConnector.call(this);
+        this.spacing = 0;
+    }
+    mxUtils.extend(FlexArrowShape, mxArrowConnector);
+    FlexArrowShape.prototype.defaultWidth = 10;
+    FlexArrowShape.prototype.defaultArrowWidth = 20;
+    FlexArrowShape.prototype.getStartArrowWidth = function ()
+    {
+        return this.getEdgeWidth() + mxUtils.getNumber(this.style, 'startWidth', this.defaultArrowWidth);
+    };
+    FlexArrowShape.prototype.getEndArrowWidth = function ()
+    {
+        return this.getEdgeWidth() + mxUtils.getNumber(this.style, 'endWidth', this.defaultArrowWidth);
+    };
+    FlexArrowShape.prototype.getEdgeWidth = function ()
+    {
+        return mxUtils.getNumber(this.style, 'width', this.defaultWidth) + Math.max(0, this.strokewidth - 1);
+    };
+    mxCellRenderer.registerShape('flexArrow', FlexArrowShape);
+
+    // Single Arrow
+    function SingleArrowShape()
+    {
+        mxActor.call(this);
+    }
+    mxUtils.extend(SingleArrowShape, mxActor);
+    SingleArrowShape.prototype.arrowWidth = 0.3;
+    SingleArrowShape.prototype.arrowSize = 0.2;
+    SingleArrowShape.prototype.redrawPath = function (c, x, y, w, h)
+    {
+        var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', this.arrowWidth))));
+        var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', this.arrowSize))));
+        var at = (h - aw) / 2;
+        var ab = at + aw;
+
+        var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
+        this.addPoints(c, [new mxPoint(0, at), new mxPoint(w - as, at), new mxPoint(w - as, 0), new mxPoint(w, h / 2),
+        new mxPoint(w - as, h), new mxPoint(w - as, ab), new mxPoint(0, ab)],
+            this.isRounded, arcSize, true);
+        c.end();
+    };
+    mxCellRenderer.registerShape('singleArrow', SingleArrowShape);
+
+    // Double Arrow
+    function DoubleArrowShape()
+    {
+        mxActor.call(this);
+    }
+    mxUtils.extend(DoubleArrowShape, mxActor);
+    DoubleArrowShape.prototype.redrawPath = function (c, x, y, w, h)
+    {
+        var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth))));
+        var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', SingleArrowShape.prototype.arrowSize))));
+        var at = (h - aw) / 2;
+        var ab = at + aw;
+
+        var arcSize = mxUtils.getValue(this.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
+        this.addPoints(c, [new mxPoint(0, h / 2), new mxPoint(as, 0), new mxPoint(as, at), new mxPoint(w - as, at),
+        new mxPoint(w - as, 0), new mxPoint(w, h / 2), new mxPoint(w - as, h),
+        new mxPoint(w - as, ab), new mxPoint(as, ab), new mxPoint(as, h)],
+            this.isRounded, arcSize, true);
+        c.end();
+    };
+    mxCellRenderer.registerShape('doubleArrow', DoubleArrowShape);
+
+    // FilledEdge shape
+    function FilledEdge()
+    {
+        mxConnector.call(this);
+    };
+    mxUtils.extend(FilledEdge, mxConnector);
+    FilledEdge.prototype.origPaintEdgeShape = FilledEdge.prototype.paintEdgeShape;
+    FilledEdge.prototype.paintEdgeShape = function (c, pts, rounded)
+    {
+        // Markers modify incoming points array
+        var temp = [];
+
+        for (var i = 0; i < pts.length; i++)
+        {
+            temp.push(mxUtils.clone(pts[i]));
+        }
+
+        // paintEdgeShape resets dashed to false
+        var dashed = c.state.dashed;
+        var fixDash = c.state.fixDash;
+        FilledEdge.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
+
+        if (c.state.strokeWidth >= 3)
+        {
+            var fillClr = mxUtils.getValue(this.style, 'fillColor', null);
+            if (fillClr != null)
+            {
+                c.setStrokeColor(fillClr);
+                c.setStrokeWidth(c.state.strokeWidth - 2);
+                c.setDashed(dashed, fixDash);
+                FilledEdge.prototype.origPaintEdgeShape.apply(this, [c, pts, rounded]);
+            }
+        }
+    };
+    mxCellRenderer.registerShape('filledEdge', FilledEdge);
+
+    // Arc Shape
+    function ArcShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(ArcShape, mxShape);
+    ArcShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    ArcShape.prototype.paintBackground = function (c, x, y, w, h)
+    {
+        c.translate(x, y);
+
+        c.begin();
+        c.moveTo(0, 0);
+        c.arcTo(w, h/2, 0, 1, 1, 0, h);
+        c.end();
+        c.stroke();
+    };
+    ArcShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0, 0),   false, 'N'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E'),
+        new mxConnectionConstraint(new mxPoint(0, 1),   false, 'S')
+    ];
+    mxCellRenderer.registerShape('arc', ArcShape);
+
+    // Sound Shape
+    function SoundShape()
+    {
+        mxImage.call(this);
+    }
+    mxUtils.extend(SoundShape, mxImageShape);
+    SoundShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    SoundShape.prototype.isConnectable = function ()
+    {
+        return false;
+    };
+    SoundShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('sound', SoundShape);
+
+    // Table Shape
+    function TableShape()
+    {
+        mxSwimlane.call(this);
+    }
+    mxUtils.extend(TableShape, mxSwimlane);
+    TableShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    TableShape.prototype.isConnectable = function ()
+    {
+        return true;
+    };
+    TableShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('table', TableShape);
+
+    // Button Shape
+    function ButtonShape()
+    {
+        mxLabel.call(this);
+    }
+    mxUtils.extend(ButtonShape, mxLabel);
+    ButtonShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    ButtonShape.prototype.isConnectable = function ()
+    {
+        return true;
+    };
+    ButtonShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('button', ButtonShape);
+
+    // Bus Shape
+    function BusShape()
+    {
+        mxRectangleShape.call(this);
+    }
+    mxUtils.extend(BusShape, mxRectangleShape);
+    BusShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    BusShape.prototype.isSizerVisible = function (index)
+    {
+        return index != 0 && index != 2 && index != 5 && index != 7;
+    };
+    BusShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        mxRectangleShape.prototype.paintVertexShape.apply(this, arguments);
+        //c.begin();
+        //c.moveTo(x + (w / 2), y + 0 + ((h / 8) * 2));
+        //c.lineTo(x + (w / 2), y + h - ((h / 8) * 2));
+        //c.end();
+        //c.stroke();
+    };
+    BusShape.prototype.paintBackground = function (c, x, y, w, h)
+    {
+        mxRectangleShape.prototype.paintBackground.apply(this, arguments);
+    };
+    BusShape.prototype.paintForeground = function (c, x, y, w, h)
+    {
+        mxRectangleShape.prototype.paintForeground.apply(this, arguments);
+    };
+    BusShape.prototype.getConstraints = function (style, w, h)
+    {
+        var constr = [];
+        // left side
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false, "W"));
+        // right side
+        constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false, "E"));
+
+        var graph = this.state.view.graph;
+        var step = graph.gridEnabled ? graph.gridSize || 5 : 5;
+        if (w > step)
+        {
+            var i = 0;
+            for (var dx = step; dx < w; dx += step)
+                constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false, "P" + i, dx, 0));
+        }
+
+        return (constr);
+    };
+    mxCellRenderer.registerShape('bus', BusShape);
+
+    // Switch Shape
+    function SwitchShape()
+    {
+        mxRectangleShape.call(this);
+    }
+    mxUtils.extend(SwitchShape, mxRectangleShape);
+    SwitchShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    SwitchShape.prototype.on = true;
+    SwitchShape.prototype.position = true;
+    SwitchShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        mxRectangleShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    SwitchShape.prototype.paintBackground = function (c, x, y, w, h)
+    {
+        mxRectangleShape.prototype.paintBackground.apply(this, arguments);
+    };
+    SwitchShape.prototype.paintForeground = function (c, x, y, w, h)
+    {
+        if (this.position)
+        {
+            c.begin();
+            if (this.on)
+            {
+                c.moveTo(x + (w / 2), y + 0 + ((h / 8) * 2));
+                c.lineTo(x + (w / 2), y + h - ((h / 8) * 2));
+            }
+            else
+            {
+                c.moveTo(x + (w / 8) * 2, y + (h / 2));
+                c.lineTo(x + w - ((w / 8) * 2), y + (h / 2));
+            }
+            c.end();
+            c.fillAndStroke();
+        }
+        mxRectangleShape.prototype.paintForeground.apply(this, arguments);
+    };
+    SwitchShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('switch', SwitchShape);
+
+    // RollSwitch Shape
+    function RollSwitchShape()
+    {
+        mxRectangleShape.call(this);
+    }
+    mxUtils.extend(RollSwitchShape, mxRectangleShape);
+    RollSwitchShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    RollSwitchShape.prototype.on = true;
+    RollSwitchShape.prototype.position = true;
+    RollSwitchShape.prototype.roll = 'UNKNOWN';
+    RollSwitchShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        // draw roll state
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // top
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x, y + h / 9);
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x + w, y + h / 9);
+
+        if (this.roll == "UNKNOWN" || this.roll == "IN")
+        {
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x, y + h / 9 + (h / 15));
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x + w, y + h / 9 + (h / 15));
+
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x + (w / 2), y + h / 3);
+        }
+        
+        // bottom
+        c.moveTo(x + (w / 2), y + h);
+        c.lineTo(x, y + h - h / 9);
+        c.moveTo(x + (w / 2), y + h);
+        c.lineTo(x + w, y + h - h / 9);
+
+        if (this.roll == "UNKNOWN" || this.roll == "IN")
+        {
+            c.moveTo(x + (w / 2), y + h - (h / 15));
+            c.lineTo(x, y + h - h / 9 - (h / 15));
+            c.moveTo(x + (w / 2), y + h - (h / 15));
+            c.lineTo(x + w, y + h - h / 9 - (h / 15));
+
+            c.moveTo(x + (w / 2), y + h - (h / 15));
+            c.lineTo(x + (w / 2), y + h - h / 3);
+        }
+
+        c.fillAndStroke();
+        c.end();
+
+        mxRectangleShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    RollSwitchShape.prototype.paintBackground = function (c, x, y, w, h)
+    {
+        if (this.roll == 'DAMAGE')
+        {
+            c.setStrokeColor('#FFFFFF');
+            c.setFillColor(this.on ? '#FFFFFF' : 'none');
+        }
+        if (this.roll == "DAMAGE|DAMAGE")
+        {
+            c.setStrokeColor('#FF0000');
+            c.setFillColor('none');
+        }
+        mxRectangleShape.prototype.paintBackground.apply(this, [c, x, y + h / 3, w, h / 3]);
+    };
+    RollSwitchShape.prototype.paintForeground = function (c, x, y, w, h)
+    {
+        if (this.position)
+        {
+            c.begin();
+            c.setStrokeColor('#000000');
+            if (this.on)
+            {
+                c.moveTo(x + (w / 2), y + (h / 3) + ((h / 24) * 2));
+                c.lineTo(x + (w / 2), y + (h / 3) * 2 - ((h / 24) * 2));
+            }
+            else
+            {
+                c.moveTo(x + (w / 8) * 2, y + (h / 2));
+                c.lineTo(x + w - ((w / 8) * 2), y + (h / 2));
+            }
+            c.fillAndStroke();
+            c.end();
+        }
+        mxRectangleShape.prototype.paintForeground.apply(this, arguments);
+    };
+    RollSwitchShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('rollswitch', RollSwitchShape);
+
+    // RollDisconnector Shape
+    function RollDisconnectorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(RollDisconnectorShape, mxShape);
+    RollDisconnectorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    RollDisconnectorShape.prototype.roll = 'UNKNOWN';
+    RollDisconnectorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        // draw roll state
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // top
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x, y + h / 9);
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x + w, y + h / 9);
+
+        if (this.roll != "CONTROL")
+        {
+            // top
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x, y + h / 9 + (h / 15));
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x + w, y + h / 9 + (h / 15));
+
+            // line
+            c.moveTo(x + (w / 2), y + (h / 15));
+            c.lineTo(x + (w / 2), y + h - (h / 15));
+
+            // bottom
+            c.moveTo(x + (w / 2), y + h - (h / 15));
+            c.lineTo(x, y + h - h / 9 - (h / 15));
+            c.moveTo(x + (w / 2), y + h - (h / 15));
+            c.lineTo(x + w, y + h - h / 9 - (h / 15));
+        }
+
+        // bottom
+        c.moveTo(x + (w / 2), y + h);
+        c.lineTo(x, y + h - h / 9);
+        c.moveTo(x + (w / 2), y + h);
+        c.lineTo(x + w, y + h - h / 9);
+
+        c.fillAndStroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    RollDisconnectorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('rolldisconnector', RollDisconnectorShape);
+
+    // Disconnector Shape
+    function DisconnectorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(DisconnectorShape, mxShape);
+    DisconnectorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    DisconnectorShape.prototype._state = 'UNKNOWN';
+    DisconnectorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        // draw roll state
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // top
+        let space = (w / 10);
+        c.moveTo(x + space, y + 0);
+        c.lineTo(x + w - space, y + 0);
+
+        // middle
+        if (this._state == "UNKNOWN" || this._state == "ON")
+        {
+            c.moveTo(x + (w / 2), y + (h / 8));
+            c.lineTo(x + (w / 2), y + h - (h / 8));
+        }
+        else if (this._state == "OFF")
+        {
+            c.moveTo(x, y + (h / 2));
+            c.lineTo(x + w, y + (h / 2));
+        }
+        else if (this._state == "MIDDLE")
+        {
+            c.moveTo(x, y + h - (h / 4));
+            c.lineTo(x + w, y + (h / 4));
+        }
+
+        // bottom
+        c.moveTo(x + space, y + h);
+        c.lineTo(x + w - space, y + h);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    DisconnectorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('disconnector', DisconnectorShape);
+
+    // Separator Shape
+    function SeparatorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(SeparatorShape, mxShape);
+    SeparatorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    SeparatorShape.prototype._state = 'UNKNOWN';
+    SeparatorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        c.setFillColor('#000000');
+
+        let rsize = h / 10;
+        let space = (w / 10);
+
+        // top
+        c.begin();
+        c.moveTo(x + space, y + 0);
+        c.lineTo(x + w - space, y + 0);
+        c.stroke();
+        c.end();
+
+        // middle
+        if (this._state == "UNKNOWN" || this._state == "ON")
+        {
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + (h / 8));
+            c.lineTo(x + (w / 2), y + h - (h / 8));
+
+            c.moveTo(x + (w / 2), y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 + rsize);
+            c.lineTo(x + (w / 2), y + h / 2 + rsize);
+            c.rotate(0, false, false, x + (w / 2), y + (h / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+        }
+        else if (this._state == "OFF")
+        {
+            c.begin();
+            c.moveTo(x, y + (h / 2));
+            c.lineTo(x + w, y + (h / 2));
+            c.stroke();
+            c.end();
+
+            c.save();
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 + rsize);
+            c.lineTo(x + (w / 2), y + h / 2 + rsize);
+            c.rotate(90, false, false, x + (w / 2), y + (h / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+            c.restore();
+        }
+        else if (this._state == "MIDDLE")
+        {
+            c.save();
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + (h / 8));
+            c.lineTo(x + (w / 2), y + h - (h / 8));
+
+            c.moveTo(x + (w / 2), y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + h / 2 + rsize);
+            c.lineTo(x + (w / 2), y + h / 2 + rsize);
+            c.rotate(45, false, false, x + (w / 2), y + (h / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+            c.restore();
+        }
+
+        // bottom
+        c.begin();
+        c.moveTo(x + space, y + h);
+        c.lineTo(x + w - space, y + h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    SeparatorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('separator', SeparatorShape);
+
+    // Ground Shape
+    function GroundShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(GroundShape, mxShape);
+    GroundShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    GroundShape.prototype._state = 'UNKNOWN';
+    GroundShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let space = (w / 10);
+        let gsize = (h / 3);
+        let gstep = gsize / 3;
+
+        let height = h - gsize;
+
+        // top
+        c.moveTo(x + space, y + 0);
+        c.lineTo(x + w - space, y + 0);
+
+        // middle
+        if (this._state == "UNKNOWN" || this._state == "ON")
+        {
+            c.moveTo(x + (w / 2), y + (height / 8));
+            c.lineTo(x + (w / 2), y + height - (height / 8));
+        }
+        else if (this._state == "OFF")
+        {
+            c.moveTo(x, y + (height / 2));
+            c.lineTo(x + w, y + (height / 2));
+        }
+        else if (this._state == "MIDDLE")
+        {
+            c.moveTo(x, y + height - (height / 4));
+            c.lineTo(x + w, y + (height / 4));
+        }
+
+        // bottom
+        c.moveTo(x + space, y + height);
+        c.lineTo(x + w - space, y + height);
+
+        // ground
+        c.moveTo(x + w / 2, y + height);
+        c.lineTo(x + w / 2, y + height + gstep * 1);
+
+        // 1
+        c.moveTo(x + space * 0, y + height + gstep * 1);
+        c.lineTo(x + w - space * 0, y + height + gstep * 1);
+
+        // 2
+        c.moveTo(x + space * 2, y + height + gstep * 2);
+        c.lineTo(x + w - space * 2, y + height + gstep * 2);
+
+        // 3
+        c.moveTo(x + space * 3, y + height + gstep * 3);
+        c.lineTo(x + w - space * 3, y + height + gstep * 3);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    GroundShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('ground', GroundShape);
+
+    // Contactor Shape
+    function ContactorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(ContactorShape, mxShape);
+    ContactorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    ContactorShape.prototype._state = 'UNKNOWN';
+    ContactorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        c.setFillColor('#000000');
+
+        let rsize  = h / 10;
+        let space  = (w / 10);
+        let gsize  = (h / 3);
+        let gstep  = gsize / 3;
+        let height = h - gsize;
+
+        // top
+        c.begin();  
+        c.moveTo(x + space, y + 0);
+        c.lineTo(x + w - space, y + 0);
+        c.stroke();
+        c.end();
+
+        // middle
+        if (this._state == "UNKNOWN" || this._state == "ON")
+        {
+            //c.moveTo(x + (w / 2), y + (height / 8));
+            //c.lineTo(x + (w / 2), y + height - (height / 8));
+
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + (height / 8));
+            c.lineTo(x + (w / 2), y + height - (height / 8));
+
+            c.moveTo(x + (w / 2), y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 + rsize);
+            c.lineTo(x + (w / 2), y + height / 2 + rsize);
+            c.rotate(0, false, false, x + (w / 2), y + (height / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+        }
+        else if (this._state == "OFF")
+        {
+            //c.moveTo(x, y + (height / 2));
+            //c.lineTo(x + w, y + (height / 2));
+            c.begin();
+            c.moveTo(x, y + (height / 2));
+            c.lineTo(x + w, y + (height / 2));
+            c.stroke();
+            c.end();
+
+            c.save();
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 + rsize);
+            c.lineTo(x + (w / 2), y + height / 2 + rsize);
+            c.rotate(90, false, false, x + (w / 2), y + (height / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+            c.restore();
+        }
+        else if (this._state == "MIDDLE")
+        {
+            //c.moveTo(x, y + height - (height / 4));
+            //c.lineTo(x + w, y + (height / 4));
+            c.save();
+            c.begin();
+
+            c.moveTo(x + (w / 2), y + (height / 8));
+            c.lineTo(x + (w / 2), y + height - (height / 8));
+
+            c.moveTo(x + (w / 2), y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 - rsize);
+            c.lineTo(x + (w / 2) + rsize / 2, y + height / 2 + rsize);
+            c.lineTo(x + (w / 2), y + height / 2 + rsize);
+            c.rotate(45, false, false, x + (w / 2), y + (height / 2));
+
+            c.close();
+            c.fillAndStroke();
+            c.end();
+            c.restore();
+        }
+
+        c.begin();
+
+        // bottom
+        c.moveTo(x + space, y + height);
+        c.lineTo(x + w - space, y + height);
+
+        // ground
+        c.moveTo(x + w / 2, y + height);
+        c.lineTo(x + w / 2, y + height + gstep * 1);
+
+        // 1
+        c.moveTo(x + space * 0, y + height + gstep * 1);
+        c.lineTo(x + w - space * 0, y + height + gstep * 1);
+
+        // 2
+        c.moveTo(x + space * 2, y + height + gstep * 2);
+        c.lineTo(x + w - space * 2, y + height + gstep * 2);
+
+        // 3
+        c.moveTo(x + space * 3, y + height + gstep * 3);
+        c.lineTo(x + w - space * 3, y + height + gstep * 3);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    ContactorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('contactor', ContactorShape);
+
+    // Roll element Shape
+    function RollElementShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(RollElementShape, mxShape);
+    RollElementShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    RollElementShape.prototype._state = 'UNKNOWN';
+    RollElementShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        // draw roll state
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // top
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x, y + h / 2);
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x + w, y + h / 2);
+
+        if (this._state == "UNKNOWN" || this._state == "IN")
+        {
+            c.moveTo(x + (w / 2), y + (h / 2));
+            c.lineTo(x, y + h);
+            c.moveTo(x + (w / 2), y + (h / 2));
+            c.lineTo(x + w, y + h);
+        }
+
+        c.fillAndStroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    RollElementShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N')
+    ];
+    mxCellRenderer.registerShape('rollelement', RollElementShape);
+
+    // Actuator Shape
+    function ActuatorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(ActuatorShape, mxShape);
+    ActuatorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    ActuatorShape.prototype._state = 'UNKNOWN';
+    ActuatorShape.prototype.fill_1 = null;
+    ActuatorShape.prototype.fill_2 = null;
+    ActuatorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // left
+        c.save();
+        c.begin();
+        if (this.fill_1 != null)
+            c.setFillColor(this.fill_1);
+        c.moveTo(x, y);
+        c.lineTo(x + w / 2, y + h / 2);
+        c.lineTo(x, y + h);
+        c.close();
+        c.fillAndStroke();
+        c.end();
+        c.restore();
+
+        // right
+        c.save();
+        c.begin();
+        if (this.fill_2 != null)
+            c.setFillColor(this.fill_2);
+        c.moveTo(x + w, y);
+        c.lineTo(x + w / 2, y + h / 2);
+        c.lineTo(x + w, y + h);
+        c.close();
+        c.fillAndStroke();
+        c.end();
+        c.restore();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    ActuatorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0, 0.5),   false, 'W'),
+        new mxConnectionConstraint(new mxPoint(0.5, 0.5), false, 'M'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5),   false, 'E')
+    ];
+    mxCellRenderer.registerShape('actuator', ActuatorShape);
+
+    // Simple switch Shape
+    function SimpleSwitchShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(SimpleSwitchShape, mxShape);
+    SimpleSwitchShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    SimpleSwitchShape.prototype._state = 'UNKNOWN';
+    SimpleSwitchShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        c.setFillColor(c.state.strokeColor);
+
+        let size  = w / 2;
+        let csize = w / 4;
+
+        // top
+        c.begin();
+        c.moveTo(x + (w / 2) - size / 2, y + 0);
+        c.lineTo(x + (w / 2) + size / 2, y + 0);
+        c.stroke();
+        c.end();
+
+        // middle
+        if (this._state == "UNKNOWN" || this._state == "OFF")
+        {
+            c.begin();
+            c.moveTo(x, y + (h / 8));
+            c.lineTo(x + (w / 2), y + h);
+            c.stroke();
+            c.end();
+        }
+        else if (this._state == "ON")
+        {
+            c.begin();
+            c.moveTo(x + (w / 2), y + (h / 10));
+            c.lineTo(x + (w / 2), y + h);
+            c.stroke();
+            c.end();
+        }
+        
+        // bottom
+        c.begin();
+        //c.moveTo(x + (w / 2), y + h);
+        c.ellipse(x + (w / 2) - csize / 2, y + h - csize / 2, csize, csize);
+        c.fillAndStroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    SimpleSwitchShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('simpleswitch', SimpleSwitchShape);
+
+    // Chart Shape
+    function ChartShape()
+    {
+        mxLabel.call(this);
+    }
+    mxUtils.extend(ChartShape, mxLabel);
+    ChartShape.prototype.isRoundable = function ()
+    {
+        return true;
+    };
+    ChartShape.prototype.isConnectable = function ()
+    {
+        return true;
+    };
+    ChartShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('chart', ChartShape);
+
+    // BMRZ Shape
+    function BmrzShape()
+    {
+        mxImage.call(this);
+    }
+    mxUtils.extend(BmrzShape, mxImageShape);
+    BmrzShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    BmrzShape.prototype.isConnectable = function ()
+    {
+        return true;
+    };
+    BmrzShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('bmrz', BmrzShape);
+
+    //--------- static elements ------------//
+
+    // WINDING STAR
+    function WStarShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(WStarShape, mxShape);
+    WStarShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    WStarShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        
+        c.begin();
+        // left
+        c.moveTo(x + (w / 2), y + (h / 3));
+        c.lineTo(x, y + 0);
+        // right
+        c.moveTo(x + (w / 2), y + (h / 3));
+        c.lineTo(x + w, y + 0);
+        // bottom
+        c.moveTo(x + (w / 2), y + (h / 3));
+        c.lineTo(x + w / 2, y + h);
+        // stroke
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    WStarShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('wstar', WStarShape);
+
+    // WINDING TRIANGLE
+    function WTriangleShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(WTriangleShape, mxShape);
+    WTriangleShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    WTriangleShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        c.begin();
+        c.moveTo(x + (w / 2), y + 0);
+        c.lineTo(x, y + h);
+        c.lineTo(x + w, y + h);
+        c.close();
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    WTriangleShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('wtriangle', WTriangleShape);
+
+    // WINDING TORN TRIANGLE
+    function WTornShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(WTornShape, mxShape);
+    WTornShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    WTornShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        c.begin();
+        c.moveTo(x + (w / 4), y + 0);
+        c.lineTo(x, y + h);
+        c.lineTo(x + w, y + h);
+        c.lineTo(x + w - (w / 4), y + 0);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    WTornShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('wtorn', WTornShape);
+
+    // FUSE
+    function FuseShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(FuseShape, mxShape);
+    FuseShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    FuseShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        c.begin();
+        c.moveTo(x, y);
+        c.rect(x, y, w, h);
+        c.stroke();
+        c.end();
+
+        c.begin();        
+        c.moveTo(x + w / 2, y);
+        c.lineTo(x + w / 2, y + h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    FuseShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('fuse', FuseShape);
+
+    // CURRENT_TRANSFORMER
+    function CurrentTransformerShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CurrentTransformerShape, mxShape);
+    CurrentTransformerShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CurrentTransformerShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        c.setFillColor(c.state.strokeColor);
+
+        let csize = w / 6;
+
+        // ellipse
+        c.begin();
+        c.ellipse(x, y + h / 7, w, (h / 7) * 5);
+        c.stroke();
+        c.end();
+
+        // line
+        c.begin();
+        c.moveTo(x + w / 2, y);
+        c.lineTo(x + w / 2, y + h);
+        c.stroke();
+        c.end();
+
+        // c1
+        c.begin();
+        c.ellipse(x + w / 2 - csize / 2, y - csize / 2, csize, csize);
+        c.fill();
+        c.end();
+
+        // c2
+        c.begin();
+        c.ellipse(x + w / 2 - csize / 2, y + h - csize / 2, csize, csize);
+        c.fill();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CurrentTransformerShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('current_transformer', CurrentTransformerShape);
+
+    // CURRENT_TRANSFORMER_RU
+    function CurrentTransformerRUShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CurrentTransformerRUShape, mxShape);
+    CurrentTransformerRUShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CurrentTransformerRUShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        
+        // vline
+        c.begin();
+        c.moveTo(x + w - w / 4, y);
+        c.lineTo(x + w - w / 4, y + h);
+        c.stroke();
+        c.end();
+
+        // line1
+        c.begin();
+        c.moveTo(x + w - (w / 4) * 2, y);
+        c.lineTo(x + w, y);
+        c.stroke();
+        c.end();
+
+        // line2
+        c.begin();
+        c.moveTo(x + w - (w / 4) * 2, y + h);
+        c.lineTo(x + w, y + h);
+        c.stroke();
+        c.end();
+
+        // arc1
+        c.begin();
+        c.moveTo(x + w - (w / 4) * 2, y);
+        c.arcTo(h / 4, w / 2, 90, 0, 0, x + w - (w / 4) * 2, y + h / 2);
+        c.stroke();
+        c.end();
+
+        // arc2
+        c.begin();
+        c.moveTo(x + w - (w / 4) * 2, y + h);
+        c.arcTo(h / 4, w / 2, 90, 0, 1, x + w - (w / 4) * 2, y + h / 2);
+        c.stroke();
+        c.end();
+        
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CurrentTransformerRUShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.75, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.75, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('current_transformer_ru', CurrentTransformerRUShape);
+
+    // CURRENT_TRANSFORMER_FSK
+    function CurrentTransformerFSKShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CurrentTransformerFSKShape, mxShape);
+    CurrentTransformerFSKShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CurrentTransformerFSKShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // vline
+        c.begin();
+        c.ellipse(x, y, (w / 4) * 3, h);
+        c.stroke();
+        c.end();
+
+        // line1
+        c.begin();
+        c.moveTo(x + w - (w / 8) * 2, y + (h / 6) * 2);
+        c.lineTo(x + w, y + (h / 6) * 2);
+        c.stroke();
+        c.end();
+
+        // line2
+        c.begin();
+        c.moveTo(x + w - (w / 8) * 2, y + h - (h / 6) * 2);
+        c.lineTo(x + w, y + h - (h / 6) * 2);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CurrentTransformerFSKShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.375, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.375, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('current_transformer_fsk', CurrentTransformerFSKShape);
+
+    // Reactor
+    function ReactorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(ReactorShape, mxShape);
+    ReactorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    ReactorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // arc
+        c.begin();
+        c.moveTo(x + w / 2, y);
+        c.arcTo(h / 2, w / 2, 0, 1, 1, x, y + h / 2);
+        c.stroke();
+        c.end();
+
+        // line1
+        c.begin();
+        c.moveTo(x, y + h / 2);
+        c.lineTo(x + w / 2, y + h / 2);
+        c.stroke();
+        c.end();
+
+        // line2
+        c.begin();
+        c.moveTo(x + w / 2, y + h / 2);
+        c.lineTo(x + w / 2, y + h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    ReactorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('reactor', ReactorShape);
+
+    // OPN
+    function OPNShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(OPNShape, mxShape);
+    OPNShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    OPNShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let space  = w / 5;
+        let vspace = h / 8;
+
+        // rect
+        c.begin();
+        c.rect(x + space, y, w - space * 2, h);
+        c.stroke();
+        c.end();
+
+        // line
+        c.begin();
+        c.moveTo(x + w, y);
+        c.lineTo(x, y + h - vspace * 2);
+        c.lineTo(x, y + h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    OPNShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('opn', OPNShape);
+
+    // OPN non linear
+    function OPNLShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(OPNLShape, mxShape);
+    OPNLShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    OPNLShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let space  = w / 5;
+        let vspace = h / 8;
+
+        // rect
+        c.begin();
+        c.rect(x + space, y, w - space * 2, h);
+        c.stroke();
+        c.end();
+
+        // line
+        c.begin();
+        c.moveTo(x + w, y + h);
+        c.lineTo(x, y + vspace * 2);
+        c.lineTo(x, y);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    OPNLShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('opn_nl', OPNLShape);
+
+    // Rezistor
+    function RezistorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(RezistorShape, mxShape);
+    RezistorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    RezistorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // rect
+        c.begin();
+        c.rect(x, y, w, h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    RezistorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('rezistor', RezistorShape);
+
+    // Condensator
+    function CondensatorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CondensatorShape, mxShape);
+    CondensatorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CondensatorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let vspace = h / 3;
+
+        c.begin();
+
+        c.moveTo(x + w / 2, y);
+        c.lineTo(x + w / 2, y + vspace);
+
+        c.moveTo(x, y + vspace);
+        c.lineTo(x + w, y + vspace);
+
+        c.moveTo(x, y + vspace * 2);
+        c.lineTo(x + w, y + vspace * 2);
+
+        c.moveTo(x + w / 2, y + vspace * 2);
+        c.lineTo(x + w / 2, y + h);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CondensatorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('condensator', CondensatorShape);
+
+    // Inductance
+    function InductanceShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(InductanceShape, mxShape);
+    InductanceShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    InductanceShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let vstep = h / 3;
+
+        // arcs
+        c.begin();
+        c.moveTo(x, y);
+        c.arcTo(vstep / 2, w, 90, 0, 1, x, y + vstep * 1);
+        c.arcTo(vstep / 2, w, 90, 0, 1, x, y + vstep * 2);
+        c.arcTo(vstep / 2, w, 90, 0, 1, x, y + h);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    InductanceShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0, 1), false, 'S')
+    ];
+    mxCellRenderer.registerShape('inductance', InductanceShape);
+
+    // Ground1 Shape
+    function Ground1Shape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(Ground1Shape, mxShape);
+    Ground1Shape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    Ground1Shape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let space = (w / 8);
+
+        // 1
+        c.moveTo(x, y);
+        c.lineTo(x + w, y);
+
+        // 2
+        c.moveTo(x + space * 1, y + h / 2);
+        c.lineTo(x + w - space * 1, y + h / 2);
+
+        // 3
+        c.moveTo(x + space * 2, y + h);
+        c.lineTo(x + w - space * 2, y + h);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    Ground1Shape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N')
+    ];
+    mxCellRenderer.registerShape('ground1', Ground1Shape);
+
+    // CABLE_CONE
+    function CableConeShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CableConeShape, mxShape);
+    CableConeShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CableConeShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.begin();
+
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // triangle
+        c.moveTo(x, y);
+        c.lineTo(x + w, y);
+        c.lineTo(x + w / 2, y + h);
+        c.close();
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CableConeShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('cable_cone', CableConeShape);
+
+    // AC shape
+    function ACShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(ACShape, mxShape);
+    ACShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    ACShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        // arcs
+        c.begin();
+        c.moveTo(x, y + h / 3);
+        c.arcTo(w / 4, h / 2, 0, 0, 0, x + w / 2, y + h / 2);
+        c.arcTo(w / 4, h / 2, 0, 0, 1, x + w, y + h - h / 3);
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    ACShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('ac', ACShape);
+
+    // Load shape
+    function LoadShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(LoadShape, mxShape);
+    LoadShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    LoadShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+        c.setFillColor(c.state.strokeColor);
+
+        // arcs
+        c.begin();
+        c.moveTo(x + w / 2, y);
+        c.lineTo(x + w / 2, y + h / 2);
+        c.moveTo(x, y + h / 2);
+        c.lineTo(x + w, y + h / 2);
+        c.lineTo(x + w / 2, y + h);
+        c.close();
+        c.fillAndStroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    LoadShape.prototype.constraints = [];
+    mxCellRenderer.registerShape('load', LoadShape);
+
+    // Compensator shape
+    function CompensatorShape()
+    {
+        mxShape.call(this);
+    }
+    mxUtils.extend(CompensatorShape, mxShape);
+    CompensatorShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    CompensatorShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        c.setLineCap('round');
+        c.setLineJoin('round');
+
+        let step = w / 5;
+
+        c.begin();
+        c.ellipse(x, y, w, h);
+        c.stroke();
+        c.end();
+
+        c.begin();
+
+        // line1
+        c.moveTo(x + step, y + h / 2 - h / 8);
+        c.lineTo(x + w - step, y + h / 2 - h / 8);
+        // line2
+        c.moveTo(x + step, y + h / 2 + h / 8);
+        c.lineTo(x + w - step, y + h / 2 + h / 8);
+
+        c.stroke();
+        c.end();
+
+        mxShape.prototype.paintVertexShape.apply(this, arguments);
+    };
+    CompensatorShape.prototype.constraints = [
+        new mxConnectionConstraint(new mxPoint(0.5, 0), false, 'N'),
+        new mxConnectionConstraint(new mxPoint(0.5, 1), false, 'S'),
+        new mxConnectionConstraint(new mxPoint(0, 0.5), false, 'W'),
+        new mxConnectionConstraint(new mxPoint(1, 0.5), false, 'E')
+    ];
+    mxCellRenderer.registerShape('compensator', CompensatorShape);
+
+    // Poster shape
+    function PosterShape() {
+        mxImageShape.call(this);
+    }
+    mxUtils.extend(PosterShape, mxImageShape);
+    PosterShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    /**
+     * https://stackoverflow.com/questions/35969656
+     * @param {*} hex - color
+     * @param {*} bw - black and white mode
+     * @returns hex color string
+     */
+    PosterShape.prototype.getContrastColor = function invertColor(hex, bw) {
+        const padZero = (str, len) => {
+            len = len || 2;
+            var zeros = new Array(len).join('0');
+            return (zeros + str).slice(-len);
+        };
+
+        if (hex.indexOf('#') === 0) {
+            hex = hex.slice(1);
+        }
+        // convert 3-digit hex to 6-digits.
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        if (hex.length !== 6) {
+            throw new Error('Invalid HEX color.');
+        }
+        var r = parseInt(hex.slice(0, 2), 16),
+            g = parseInt(hex.slice(2, 4), 16),
+            b = parseInt(hex.slice(4, 6), 16);
+        if (bw) {
+            // http://stackoverflow.com/a/3943023/112731
+            return (r * 0.299 + g * 0.587 + b * 0.114) > 186
+                ? '#000000'
+                : '#FFFFFF';
+        }
+        // invert color components
+        r = (255 - r).toString(16);
+        g = (255 - g).toString(16);
+        b = (255 - b).toString(16);
+        // pad each with zeros and return
+        return "#" + padZero(r) + padZero(g) + padZero(b);
+    };
+    PosterShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        const cell = this.state.cell;
+        const poster = this.state.cell._model;
+        const graph = this.state.view.graph;
+        const renderEmtyShape = () => {
+            const backgroundColor = graph.background ? graph.background : "#FFFFFF";
+            const contrastColor = this.getContrastColor(backgroundColor === "none" ? "#FFFFFF" : backgroundColor);
+            c.setStrokeColor(contrastColor);
+            c.setFontColor(contrastColor);
+            c.setFontSize(Math.round(h / 3));
+            c.text(x + w/2, y + h/2, w, h, "Плакатов\nнет", mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, false, "", true, false, 0);
+            mxRectangleShape.prototype.paintVertexShape.apply(this, arguments);
+        };
+        if (!poster) {
+            renderEmtyShape();
+            return;
+        }
+        const resData = poster.data.type.split("-") || [];
+        const settedPosters = API.POSTERS.metadata.filter(meta => resData.includes(meta.key));
+        const xOffset = w / 10;
+        const yOffset = h / 10;
+        /* check if this function has ben called from tracker process */
+        if (cell._isHighlightRender) {
+            /* render highlight rect */
+            const steps = settedPosters.length > 1 ? settedPosters.length - 1 : 0;
+            const rectWidth = w + xOffset * steps;
+            const rectHeight = h + yOffset * steps;
+            mxRectangleShape.prototype.paintVertexShape.call(this, c, x, y, rectWidth, rectHeight);
+            /* reset hacking property */
+            cell._isHighlightRender = false;
+        } else {
+            /* normal poster images render */
+            for (let i = settedPosters.length - 1; i >= 0; i--) {
+                this.image = settedPosters[i].src;
+                mxImageShape.prototype.paintVertexShape.call(this, c, x + i * xOffset, y + i * yOffset, w, h);
+            }
+            if (settedPosters.length === 0) {
+                renderEmtyShape();
+            }
+        }
+    };
+    PosterShape.prototype.constraints = [];
+    mxCellRenderer.registerShape("poster", PosterShape);
+
+    // Dispatcher mark shapes
+    function DispatcherMarkShape() {
+        mxImageShape.call(this);
+    }
+    mxUtils.extend(DispatcherMarkShape, mxImageShape);
+    DispatcherMarkShape.prototype.isRoundable = function ()
+    {
+        return false;
+    };
+    DispatcherMarkShape.prototype.paintVertexShape = function (c, x, y, w, h)
+    {
+        const cell = this.state.cell;
+        const dispatcherMark = cell._model;
+
+        const renderDefaultShape = () => {
+            this.image = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjEwMCIKICAgaGVpZ2h0PSIxMDAiCiAgIHZpZXdCb3g9IjAgMCAyNi40NTgzMzMgMjYuNDU4MzM0IgogICB2ZXJzaW9uPSIxLjEiCiAgIGlkPSJzdmc4IgogICBzb2RpcG9kaTpkb2NuYW1lPSJpbmZvLnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS4wLjItMiAoZTg2Yzg3MDg3OSwgMjAyMS0wMS0xNSkiPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwMDAwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDAxIgogICAgIGlkPSJuYW1lZHZpZXc5IgogICAgIHNob3dncmlkPSJ0cnVlIgogICAgIGlua3NjYXBlOnpvb209IjQuNDI3NDY3MyIKICAgICBpbmtzY2FwZTpjeD0iMTUuNzI1NjEzIgogICAgIGlua3NjYXBlOmN5PSI2Mi4xMjE2NTYiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii05IgogICAgIGlua3NjYXBlOndpbmRvdy15PSItOSIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyMSIKICAgICBpbmtzY2FwZTpkb2N1bWVudC1yb3RhdGlvbj0iMCIKICAgICBpbmtzY2FwZTpzbmFwLWdsb2JhbD0idHJ1ZSI+CiAgICA8aW5rc2NhcGU6Z3JpZAogICAgICAgdHlwZT0ieHlncmlkIgogICAgICAgaWQ9ImdyaWQ4MzMiCiAgICAgICBzcGFjaW5neD0iMC4yNjQ1ODMzMyIKICAgICAgIHNwYWNpbmd5PSIwLjI2NDU4MzMzIgogICAgICAgZW1wc3BhY2luZz0iMTAiIC8+CiAgPC9zb2RpcG9kaTpuYW1lZHZpZXc+CiAgPGRlZnMKICAgICBpZD0iZGVmczIiIC8+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhNSI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsKICAgICAgICAgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PgogICAgICAgIDxkYzp0eXBlCiAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4KICAgICAgICA8ZGM6dGl0bGUgLz4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPGcKICAgICBpZD0ibGF5ZXIxIgogICAgIHN0eWxlPSJzdHJva2Utd2lkdGg6MS4wNTgzMztzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjI2NDU4MzMyLDAuMjY0NTgxNTMpIj4KICAgIDx0ZXh0CiAgICAgICB4bWw6c3BhY2U9InByZXNlcnZlIgogICAgICAgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MjIuNTc3OHB4O2xpbmUtaGVpZ2h0OjEuMjU7Zm9udC1mYW1pbHk6c2Fucy1zZXJpZjtmaWxsOiNlNjQ2ZTY7ZmlsbC1vcGFjaXR5OjE7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMjgwMDE2IgogICAgICAgeD0iOS43MDQ5MDE3IgogICAgICAgeT0iMjAuODY5MDM0IgogICAgICAgaWQ9InRleHQ4NTEiPjx0c3BhbgogICAgICAgICBzb2RpcG9kaTpyb2xlPSJsaW5lIgogICAgICAgICBpZD0idHNwYW44NDkiCiAgICAgICAgIHg9IjkuNzA0OTAxNyIKICAgICAgICAgeT0iMjAuODY5MDM0IgogICAgICAgICBzdHlsZT0iZm9udC1zdHlsZTpub3JtYWw7Zm9udC12YXJpYW50Om5vcm1hbDtmb250LXdlaWdodDpib2xkO2ZvbnQtc3RyZXRjaDpub3JtYWw7Zm9udC1zaXplOjIyLjU3NzhweDtmb250LWZhbWlseTonVGltZXMgTmV3IFJvbWFuJzstaW5rc2NhcGUtZm9udC1zcGVjaWZpY2F0aW9uOidUaW1lcyBOZXcgUm9tYW4sIEJvbGQnO2ZpbGw6I2U2NDZlNjtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4yODAwMTYiPmk8L3RzcGFuPjwvdGV4dD4KICA8L2c+Cjwvc3ZnPgo=";
+            mxImageShape.prototype.paintVertexShape.apply(this, arguments);
+        };
+        const renderGroundingNumber = () => {
+            c.setFontColor("#000000");
+            const length = dispatcherMark.data.number.length;
+            if (length <= 5) {
+                c.setFontSize(Math.round(h / 3));
+            } else {
+                c.setFontSize(Math.round(h * 1.5 / length));
+            }
+            c.text(x + w / 2, y + h / 2, w, h, dispatcherMark.data.number, mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, false, "", true, false, 0);
+        };
+
+        if (!dispatcherMark) {
+            renderDefaultShape();
+            return;
+        }
+        let mark = null;
+        for (const meta of API.DISPATCHER_MARKS.metadata) {
+            if (meta.key === dispatcherMark.data.type) {
+                mark = meta;
+                break;
+            }
+        }
+        /* check if this function has ben called from tracker process */
+        if (cell._isHighlightRender) {
+            /* render highlight rect */
+            mxRectangleShape.prototype.paintVertexShape.call(this, c, x, y, w, h);
+            /* reset hacking property */
+            cell._isHighlightRender = false;
+        } else {
+            /* normal mark image render */
+            if (mark) {
+                this.image = mark.src;
+                mxImageShape.prototype.paintVertexShape.apply(this, arguments);
+                if (mark.key === "numPortableGrounding")
+                    renderGroundingNumber();
+            } else {
+                renderDefaultShape();
+            }
+        }
+    };
+    DispatcherMarkShape.prototype.constraints = [];
+    mxCellRenderer.registerShape("dispatcher_mark", DispatcherMarkShape);
+
+    // Registers and defines the custom markers
+    mxMarker.addMarker('dash', function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        var nx = unitX * (size + sw + 1);
+        var ny = unitY * (size + sw + 1);
+
+        return function ()
+        {
+            c.begin();
+            c.moveTo(pe.x - nx / 2 - ny / 2, pe.y - ny / 2 + nx / 2);
+            c.lineTo(pe.x + ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 - nx / 2);
+            c.stroke();
+        };
+    });
+    mxMarker.addMarker('cross', function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        var nx = unitX * (size + sw + 1);
+        var ny = unitY * (size + sw + 1);
+
+        return function ()
+        {
+            c.begin();
+            c.moveTo(pe.x - nx / 2 - ny / 2, pe.y - ny / 2 + nx / 2);
+            c.lineTo(pe.x + ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 - nx / 2);
+            c.moveTo(pe.x - nx / 2 + ny / 2, pe.y - ny / 2 - nx / 2);
+            c.lineTo(pe.x - ny / 2 - 3 * nx / 2, pe.y - 3 * ny / 2 + nx / 2);
+            c.stroke();
+        };
+    });
+
+    function circleMarker(c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        var a = size / 2;
+        var size = size + sw;
+
+        var pt = pe.clone();
+
+        pe.x -= unitX * (2 * size + sw);
+        pe.y -= unitY * (2 * size + sw);
+
+        unitX = unitX * (size + sw);
+        unitY = unitY * (size + sw);
+
+        return function ()
+        {
+            c.ellipse(pt.x - unitX - size, pt.y - unitY - size, 2 * size, 2 * size);
+
+            if (filled)
+            {
+                c.fillAndStroke();
+            }
+            else
+            {
+                c.stroke();
+            }
+        };
+    }
+    mxMarker.addMarker('circle', circleMarker);
+    mxMarker.addMarker('circlePlus', function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        var pt = pe.clone();
+        var fn = circleMarker.apply(this, arguments);
+        var nx = unitX * (size + 2 * sw); // (size + sw + 1);
+        var ny = unitY * (size + 2 * sw); //(size + sw + 1);
+
+        return function ()
+        {
+            fn.apply(this, arguments);
+
+            c.begin();
+            c.moveTo(pt.x - unitX * (sw), pt.y - unitY * (sw));
+            c.lineTo(pt.x - 2 * nx + unitX * (sw), pt.y - 2 * ny + unitY * (sw));
+            c.moveTo(pt.x - nx - ny + unitY * sw, pt.y - ny + nx - unitX * sw);
+            c.lineTo(pt.x + ny - nx - unitY * sw, pt.y - ny - nx + unitX * sw);
+            c.stroke();
+        };
+    });
+    mxMarker.addMarker('halfCircle', function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        var nx = unitX * (size + sw + 1);
+        var ny = unitY * (size + sw + 1);
+        var pt = pe.clone();
+
+        pe.x -= nx;
+        pe.y -= ny;
+
+        return function ()
+        {
+            c.begin();
+            c.moveTo(pt.x - ny, pt.y + nx);
+            c.quadTo(pe.x - ny, pe.y + nx, pe.x, pe.y);
+            c.quadTo(pe.x + ny, pe.y - nx, pt.x + ny, pt.y - nx);
+            c.stroke();
+        };
+    });
+
+    mxMarker.addMarker('async', function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        // The angle of the forward facing arrow sides against the x axis is
+        // 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 ( / 2 allows for
+        // only half the strokewidth is processed ).
+        var endOffsetX = unitX * sw * 1.118;
+        var endOffsetY = unitY * sw * 1.118;
+
+        unitX = unitX * (size + sw);
+        unitY = unitY * (size + sw);
+
+        var pt = pe.clone();
+        pt.x -= endOffsetX;
+        pt.y -= endOffsetY;
+
+        var f = 1;
+        pe.x += -unitX * f - endOffsetX;
+        pe.y += -unitY * f - endOffsetY;
+
+        return function ()
+        {
+            c.begin();
+            c.moveTo(pt.x, pt.y);
+
+            if (source)
+            {
+                c.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+            }
+            else
+            {
+                c.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+            }
+
+            c.lineTo(pt.x - unitX, pt.y - unitY);
+            c.close();
+
+            if (filled)
+            {
+                c.fillAndStroke();
+            }
+            else
+            {
+                c.stroke();
+            }
+        };
+    });
+//---fix---//
+    //function createOpenAsyncArrow(widthFactor)
+    function createOpenAsyncArrow(widthFactor = 2)
+    //---fix---//
+    {
+        widthFactor = (widthFactor != null) ? widthFactor : 2;
+
+        return function (c, shape, type, pe, unitX, unitY, size, source, sw, filled)
+        {
+            unitX = unitX * (size + sw);
+            unitY = unitY * (size + sw);
+
+            var pt = pe.clone();
+
+            return function ()
+            {
+                c.begin();
+                c.moveTo(pt.x, pt.y);
+
+                if (source)
+                {
+                    c.lineTo(pt.x - unitX - unitY / widthFactor, pt.y - unitY + unitX / widthFactor);
+                }
+                else
+                {
+                    c.lineTo(pt.x + unitY / widthFactor - unitX, pt.y - unitY - unitX / widthFactor);
+                }
+
+                c.stroke();
+            };
+        }
+    }
+    mxMarker.addMarker('openAsync', createOpenAsyncArrow(2));
+
+    function arrow(canvas, shape, type, pe, unitX, unitY, size, source, sw, filled)
+    {
+        // The angle of the forward facing arrow sides against the x axis is 26.565 degrees, 1/sin(26.565) = 2.236 / 2 = 1.118 
+        // (/ 2 allows for only half the strokewidth is processed ).
+        var endOffsetX = unitX * sw * 1.118;
+        var endOffsetY = unitY * sw * 1.118;
+
+        unitX = unitX * (size + sw);
+        unitY = unitY * (size + sw);
+
+        var pt = pe.clone();
+        pt.x -= endOffsetX;
+        pt.y -= endOffsetY;
+
+        var f = (type != mxConstants.ARROW_CLASSIC && type != mxConstants.ARROW_CLASSIC_THIN) ? 1 : 3 / 4;
+        pe.x += -unitX * f - endOffsetX;
+        pe.y += -unitY * f - endOffsetY;
+
+        return function ()
+        //----fix----//
+        // {
+        //     canvas.begin();
+        //     canvas.moveTo(pt.x, pt.y);
+        //     canvas.lineTo(pt.x - unitX - unitY / widthFactor, pt.y - unitY + unitX / widthFactor);
+
+        //     if (type == mxConstants.ARROW_CLASSIC || type == mxConstants.ARROW_CLASSIC_THIN)
+        //     {
+        //         canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+        //     }
+
+        //     canvas.lineTo(pt.x + unitY / widthFactor - unitX, pt.y - unitY - unitX / widthFactor);
+        //     canvas.close();
+
+        //     if (filled)
+        //     {
+        //         canvas.fillAndStroke();
+        //     }
+        //     else
+        //     {
+        //         canvas.stroke();
+        //     }
+        // };
+        {
+            canvas.begin();
+            canvas.moveTo(pt.x, pt.y);
+          
+            canvas.lineTo(pt.x - unitX - unitY / 2, pt.y - unitY + unitX / 2);
+
+            if (type == mxConstants.ARROW_CLASSIC || type == mxConstants.ARROW_CLASSIC_THIN)
+            {
+                canvas.lineTo(pt.x - unitX * 3 / 4, pt.y - unitY * 3 / 4);
+            }
+
+            canvas.lineTo(pt.x + unitY / 2 - unitX, pt.y - unitY - unitX / 2);
+            canvas.close();
+
+            if (filled)
+            {
+                canvas.fillAndStroke();
+            }
+            else
+            {
+                canvas.stroke();
+            }
+        };
+            //----fix----//
+    }
+
+    // Handlers are only added if mxVertexHandler is defined (ie. not in embedded graph)
+    if (typeof mxVertexHandler !== 'undefined')
+    {
+        function createHandle(state, keys, getPositionFn, setPositionFn, ignoreGrid, redrawEdges)
+        {
+            var handle = new mxHandle(state, null, mxVertexHandler.prototype.secondaryHandleImage);
+
+            handle.execute = function ()
+            {
+                for (var i = 0; i < keys.length; i++)
+                {
+                    this.copyStyle(keys[i]);
+                }
+            };
+
+            handle.getPosition = getPositionFn;
+            handle.setPosition = setPositionFn;
+            handle.ignoreGrid = (ignoreGrid != null) ? ignoreGrid : true;
+
+            // Overridden to update connected edges
+            if (redrawEdges)
+            {
+                var positionChanged = handle.positionChanged;
+                handle.positionChanged = function ()
+                {
+                    positionChanged.apply(this, arguments);
+
+                    // Redraws connected edges TODO: Include child edges
+                    state.view.invalidate(this.state.cell);
+                    state.view.validate();
+                };
+            }
+
+            return handle;
+        }
+        function createArcHandle(state, yOffset)
+        {
+            return createHandle(state, [mxConstants.STYLE_ARCSIZE], function (bounds)
+            {
+                var tmp = (yOffset != null) ? yOffset : bounds.height / 8;
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ABSOLUTE_ARCSIZE, 0) == '1')
+                {
+                    var arcSize = mxUtils.getValue(state.style, mxConstants.STYLE_ARCSIZE, mxConstants.LINE_ARCSIZE) / 2;
+                    return new mxPoint(bounds.x + bounds.width - Math.min(bounds.width / 2, arcSize), bounds.y + tmp);
+                }
+                else
+                {
+                    var arcSize = Math.max(0, parseFloat(mxUtils.getValue(state.style,
+                        mxConstants.STYLE_ARCSIZE, mxConstants.RECTANGLE_ROUNDING_FACTOR * 100))) / 100;
+                    return new mxPoint(bounds.x + bounds.width - Math.min(Math.max(bounds.width / 2, bounds.height / 2),
+                        Math.min(bounds.width, bounds.height) * arcSize), bounds.y + tmp);
+                }
+            }, function (bounds, pt, me)
+                {
+                    if (mxUtils.getValue(state.style, mxConstants.STYLE_ABSOLUTE_ARCSIZE, 0) == '1')
+                    {
+                        this.state.style[mxConstants.STYLE_ARCSIZE] = Math.round(Math.max(0, Math.min(bounds.width, (bounds.x + bounds.width - pt.x) * 2)));
+                    }
+                    else
+                    {
+                        var f = Math.min(50, Math.max(0, (bounds.width - pt.x + bounds.x) * 100 / Math.min(bounds.width, bounds.height)));
+                        this.state.style[mxConstants.STYLE_ARCSIZE] = Math.round(f);
+                    }
+                });
+        }
+        function createArcHandleFunction()
+        {
+            return function (state)
+            {
+                var handles = [];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
+                {
+                    handles.push(createArcHandle(state));
+                }
+
+                return handles;
+            };
+        }
+        function createParallelogramHandleFunction()
+        {
+            var max = 1;
+            return function (state)
+            {
+                var handles = [createHandle(state, ['size'], function (bounds)
+                {
+                    var size = Math.max(0, Math.min(max, parseFloat(mxUtils.getValue(this.state.style, 'size', TrapezoidShape.prototype.size))));
+
+                    return new mxPoint(bounds.x + size * bounds.width * 0.75, bounds.y + bounds.height / 4);
+                }, function (bounds, pt)
+                    {
+                        this.state.style['size'] = Math.max(0, Math.min(max, (pt.x - bounds.x) / (bounds.width * 0.75)));
+                    }, null, true)];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
+                {
+                    handles.push(createArcHandle(state));
+                }
+
+                return handles;
+            };
+        }
+        function createTrapezoidHandleFunction()
+        {
+            var max = 0.5;
+            return function (state)
+            {
+                var handles = [createHandle(state, ['size'], function (bounds)
+                {
+                    var size = Math.max(0, Math.min(max, parseFloat(mxUtils.getValue(this.state.style, 'size', TrapezoidShape.prototype.size))));
+
+                    return new mxPoint(bounds.x + size * bounds.width * 0.75, bounds.y + bounds.height / 4);
+                }, function (bounds, pt)
+                    {
+                        this.state.style['size'] = Math.max(0, Math.min(max, (pt.x - bounds.x) / (bounds.width * 0.75)));
+                    }, null, true)];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
+                {
+                    handles.push(createArcHandle(state));
+                }
+
+                return handles;
+            };
+        }
+        function createCubeHandleFunction(factor, defaultValue, allowArcHandle)
+        {
+            var factor = 1;
+            var defaultValue = CubeShape.prototype.size;
+            var allowArcHandle = false;
+
+            return function (state)
+            {
+                var handles = [createHandle(state, ['size'], function (bounds)
+                {
+                    var size = Math.max(0, Math.min(bounds.width, Math.min(bounds.height, parseFloat(
+                        mxUtils.getValue(this.state.style, 'size', defaultValue))))) * factor;
+
+                    return new mxPoint(bounds.x + size, bounds.y + size);
+                }, function (bounds, pt)
+                    {
+                        this.state.style['size'] = Math.round(Math.max(0, Math.min(Math.min(bounds.width, pt.x - bounds.x),
+                            Math.min(bounds.height, pt.y - bounds.y))) / factor);
+                    })];
+
+                if (allowArcHandle && mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, false))
+                {
+                    handles.push(createArcHandle(state));
+                }
+
+                return handles;
+            };
+        }
+        function createArrowHandleFunction(maxSize)
+        {
+            return function (state)
+            {
+                return [createHandle(state, ['arrowWidth', 'arrowSize'], function (bounds)
+                {
+                    var aw = Math.max(0, Math.min(1, mxUtils.getValue(this.state.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth)));
+                    var as = Math.max(0, Math.min(maxSize, mxUtils.getValue(this.state.style, 'arrowSize', SingleArrowShape.prototype.arrowSize)));
+
+                    return new mxPoint(bounds.x + (1 - as) * bounds.width, bounds.y + (1 - aw) * bounds.height / 2);
+                }, function (bounds, pt)
+                    {
+                        this.state.style['arrowWidth'] = Math.max(0, Math.min(1, Math.abs(bounds.y + bounds.height / 2 - pt.y) / bounds.height * 2));
+                        this.state.style['arrowSize'] = Math.max(0, Math.min(maxSize, (bounds.x + bounds.width - pt.x) / (bounds.width)));
+                    })];
+            };
+        }
+        function createEdgeHandle(state, keys, start, getPosition, setPosition)
+        {
+            return createHandle(state, keys, function (bounds)
+            {
+                var pts = state.absolutePoints;
+                var n = pts.length - 1;
+
+                var tr = state.view.translate;
+                var s = state.view.scale;
+
+                var p0 = (start) ? pts[0] : pts[n];
+                var p1 = (start) ? pts[1] : pts[n - 1];
+                var dx = (start) ? p1.x - p0.x : p1.x - p0.x;
+                var dy = (start) ? p1.y - p0.y : p1.y - p0.y;
+
+                var dist = Math.sqrt(dx * dx + dy * dy);
+
+                var pt = getPosition.call(this, dist, dx / dist, dy / dist, p0, p1);
+
+                return new mxPoint(pt.x / s - tr.x, pt.y / s - tr.y);
+            }, function (bounds, pt, me)
+                {
+                    var pts = state.absolutePoints;
+                    var n = pts.length - 1;
+
+                    var tr = state.view.translate;
+                    var s = state.view.scale;
+
+                    var p0 = (start) ? pts[0] : pts[n];
+                    var p1 = (start) ? pts[1] : pts[n - 1];
+                    var dx = (start) ? p1.x - p0.x : p1.x - p0.x;
+                    var dy = (start) ? p1.y - p0.y : p1.y - p0.y;
+
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    pt.x = (pt.x + tr.x) * s;
+                    pt.y = (pt.y + tr.y) * s;
+
+                    setPosition.call(this, dist, dx / dist, dy / dist, p0, p1, pt, me);
+                });
+        }
+        function createEdgeWidthHandle(state, start, spacing)
+        {
+            return createEdgeHandle(state, ['width'], start, function (dist, nx, ny, p0, p1)
+            {
+                var w = state.shape.getEdgeWidth() * state.view.scale + spacing;
+                return new mxPoint(p0.x + nx * dist / 4 + ny * w / 2, p0.y + ny * dist / 4 - nx * w / 2);
+            }, function (dist, nx, ny, p0, p1, pt)
+                {
+                    var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
+                    state.style['width'] = Math.round(w * 2) / state.view.scale - spacing;
+                });
+        }
+
+        var handleFactory = {
+            'link': function (state)
+            {
+                var spacing = 10;
+                return [createEdgeWidthHandle(state, true, spacing), createEdgeWidthHandle(state, false, spacing)];
+            },
+            'flexArrow': function (state)
+            {
+                // Do not use state.shape.startSize/endSize since it is cached
+                var tol = state.view.graph.gridSize / state.view.scale;
+                var handles = [];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_STARTARROW, mxConstants.NONE) != mxConstants.NONE)
+                {
+                    handles.push(createEdgeHandle(state, ['width', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], true, function (dist, nx, ny, p0, p1)
+                    {
+                        var w = (state.shape.getEdgeWidth() - state.shape.strokewidth) * state.view.scale;
+                        var l = mxUtils.getNumber(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
+
+                        return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) + ny * w / 2,
+                            p0.y + ny * (l + state.shape.strokewidth * state.view.scale) - nx * w / 2);
+                    }, function (dist, nx, ny, p0, p1, pt, me)
+                        {
+                            var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
+                            var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
+
+                            state.style[mxConstants.STYLE_STARTSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
+                            state.style['width'] = Math.round(w * 2) / state.view.scale;
+
+                            // Applies to opposite side
+                            if (mxEvent.isControlDown(me.getEvent()))
+                            {
+                                state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
+                            }
+
+                            // Snaps to end geometry
+                            if (!mxEvent.isAltDown(me.getEvent()))
+                            {
+                                if (Math.abs(parseFloat(state.style[mxConstants.STYLE_STARTSIZE]) - parseFloat(state.style[mxConstants.STYLE_ENDSIZE])) < tol / 6)
+                                {
+                                    state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
+                                }
+                            }
+                        }));
+                    handles.push(createEdgeHandle(state, ['startWidth', 'endWidth', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], true, function (dist, nx, ny, p0, p1)
+                    {
+                        var w = (state.shape.getStartArrowWidth() - state.shape.strokewidth) * state.view.scale;
+                        var l = mxUtils.getNumber(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
+
+                        return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) + ny * w / 2,
+                            p0.y + ny * (l + state.shape.strokewidth * state.view.scale) - nx * w / 2);
+                    }, function (dist, nx, ny, p0, p1, pt, me)
+                        {
+                            var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
+                            var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
+
+                            state.style[mxConstants.STYLE_STARTSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
+                            state.style['startWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
+
+                            // Applies to opposite side
+                            if (mxEvent.isControlDown(me.getEvent()))
+                            {
+                                state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
+                                state.style['endWidth'] = state.style['startWidth'];
+                            }
+
+                            // Snaps to endWidth
+                            if (!mxEvent.isAltDown(me.getEvent()))
+                            {
+                                if (Math.abs(parseFloat(state.style[mxConstants.STYLE_STARTSIZE]) - parseFloat(state.style[mxConstants.STYLE_ENDSIZE])) < tol / 6)
+                                {
+                                    state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
+                                }
+
+                                if (Math.abs(parseFloat(state.style['startWidth']) - parseFloat(state.style['endWidth'])) < tol)
+                                {
+                                    state.style['startWidth'] = state.style['endWidth'];
+                                }
+                            }
+                        }));
+                }
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ENDARROW, mxConstants.NONE) != mxConstants.NONE)
+                {
+                    handles.push(createEdgeHandle(state, ['width', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], false, function (dist, nx, ny, p0, p1)
+                    {
+                        var w = (state.shape.getEdgeWidth() - state.shape.strokewidth) * state.view.scale;
+                        var l = mxUtils.getNumber(state.style, mxConstants.STYLE_ENDSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
+
+                        return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) - ny * w / 2,
+                            p0.y + ny * (l + state.shape.strokewidth * state.view.scale) + nx * w / 2);
+                    }, function (dist, nx, ny, p0, p1, pt, me)
+                        {
+                            var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
+                            var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
+
+                            state.style[mxConstants.STYLE_ENDSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
+                            state.style['width'] = Math.round(w * 2) / state.view.scale;
+
+                            // Applies to opposite side
+                            if (mxEvent.isControlDown(me.getEvent()))
+                            {
+                                state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
+                            }
+
+                            // Snaps to start geometry
+                            if (!mxEvent.isAltDown(me.getEvent()))
+                            {
+                                if (Math.abs(parseFloat(state.style[mxConstants.STYLE_ENDSIZE]) - parseFloat(state.style[mxConstants.STYLE_STARTSIZE])) < tol / 6)
+                                {
+                                    state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
+                                }
+                            }
+                        }));
+                    handles.push(createEdgeHandle(state, ['startWidth', 'endWidth', mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE], false, function (dist, nx, ny, p0, p1)
+                    {
+                        var w = (state.shape.getEndArrowWidth() - state.shape.strokewidth) * state.view.scale;
+                        var l = mxUtils.getNumber(state.style, mxConstants.STYLE_ENDSIZE, mxConstants.ARROW_SIZE / 5) * 3 * state.view.scale;
+
+                        return new mxPoint(p0.x + nx * (l + state.shape.strokewidth * state.view.scale) - ny * w / 2,
+                            p0.y + ny * (l + state.shape.strokewidth * state.view.scale) + nx * w / 2);
+                    }, function (dist, nx, ny, p0, p1, pt, me)
+                        {
+                            var w = Math.sqrt(mxUtils.ptSegDistSq(p0.x, p0.y, p1.x, p1.y, pt.x, pt.y));
+                            var l = mxUtils.ptLineDist(p0.x, p0.y, p0.x + ny, p0.y - nx, pt.x, pt.y);
+
+                            state.style[mxConstants.STYLE_ENDSIZE] = Math.round((l - state.shape.strokewidth) * 100 / 3) / 100 / state.view.scale;
+                            state.style['endWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
+
+                            // Applies to opposite side
+                            if (mxEvent.isControlDown(me.getEvent()))
+                            {
+                                state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
+                                state.style['startWidth'] = state.style['endWidth'];
+                            }
+
+                            // Snaps to start geometry
+                            if (!mxEvent.isAltDown(me.getEvent()))
+                            {
+                                if (Math.abs(parseFloat(state.style[mxConstants.STYLE_ENDSIZE]) - parseFloat(state.style[mxConstants.STYLE_STARTSIZE])) < tol / 6)
+                                {
+                                    state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
+                                }
+
+                                if (Math.abs(parseFloat(state.style['endWidth']) - parseFloat(state.style['startWidth'])) < tol)
+                                {
+                                    state.style['endWidth'] = state.style['startWidth'];
+                                }
+                            }
+                        }));
+                }
+
+                return handles;
+            },
+            'swimlane': function (state)
+            {
+                var handles = [createHandle(state, [mxConstants.STYLE_STARTSIZE], function (bounds)
+                {
+                    var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
+
+                    if (mxUtils.getValue(state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1)
+                    {
+                        return new mxPoint(bounds.getCenterX(), bounds.y + Math.max(0, Math.min(bounds.height, size)));
+                    }
+                    else
+                    {
+                        return new mxPoint(bounds.x + Math.max(0, Math.min(bounds.width, size)), bounds.getCenterY());
+                    }
+                }, function (bounds, pt)
+                    {
+                        state.style[mxConstants.STYLE_STARTSIZE] =
+                            (mxUtils.getValue(this.state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1) ?
+                                Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y))) :
+                                Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
+                    })];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED))
+                {
+                    var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
+                    handles.push(createArcHandle(state, size / 2));
+                }
+
+                return handles;
+            },
+            'table': function (state)
+            {
+                var handles = [createHandle(state, [mxConstants.STYLE_STARTSIZE], function (bounds)
+                {
+                    var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
+
+                    if (mxUtils.getValue(state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1)
+                    {
+                        return new mxPoint(bounds.getCenterX(), bounds.y + Math.max(0, Math.min(bounds.height, size)));
+                    }
+                    else
+                    {
+                        return new mxPoint(bounds.x + Math.max(0, Math.min(bounds.width, size)), bounds.getCenterY());
+                    }
+                }, function (bounds, pt)
+                    {
+                        state.style[mxConstants.STYLE_STARTSIZE] =
+                            (mxUtils.getValue(this.state.style, mxConstants.STYLE_HORIZONTAL, 1) == 1) ?
+                                Math.round(Math.max(0, Math.min(bounds.height, pt.y - bounds.y))) :
+                                Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
+                    })];
+
+                if (mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED))
+                {
+                    var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
+                    handles.push(createArcHandle(state, size / 2));
+                }
+
+                return handles;
+            },
+            'label': createArcHandleFunction(),
+            'rectangle': createArcHandleFunction(),
+            'triangle': createArcHandleFunction(),
+            'rhombus': createArcHandleFunction(),
+            'singleArrow': createArrowHandleFunction(1),
+            'doubleArrow': createArrowHandleFunction(0.5),
+            'cube': createCubeHandleFunction(),
+            'trapezoid': createTrapezoidHandleFunction(), 
+            'parallelogram': createParallelogramHandleFunction()
+        };
+
+        // Exposes custom handles
+        Graph.createHandle  = createHandle;
+        Graph.handleFactory = handleFactory;
+
+        mxVertexHandler.prototype.createCustomHandles = function ()
+        {
+            // Not rotatable means locked
+            if (this.state.view.graph.getSelectionCount() == 1)
+            {
+                //if (this.graph.isCellRotatable(this.state.cell))
+                // LATER: Make locked state independent of rotatable flag, fix toggle if default is false
+                //if (this.graph.isCellResizable(this.state.cell) || this.graph.isCellMovable(this.state.cell))
+                {
+                    var name = this.state.style['shape'];
+                    if (mxCellRenderer.defaultShapes[name] == null)
+                        name = mxConstants.SHAPE_RECTANGLE;
+
+                    var fn = handleFactory[name];
+                    if (fn == null && this.state.shape != null && this.state.shape.isRoundable())
+                        fn = handleFactory[mxConstants.SHAPE_RECTANGLE];
+
+                    if (fn != null)
+                        return fn(this.state);
+                }
+            }
+
+            return null;
+        };
+        mxEdgeHandler.prototype.createCustomHandles = function ()
+        {
+            if (this.state.view.graph.getSelectionCount() == 1)
+            {
+                var name = this.state.style['shape'];
+                if (mxCellRenderer.defaultShapes[name] == null)
+                    name = mxConstants.SHAPE_CONNECTOR;
+
+                var fn = handleFactory[name];
+                if (fn != null)
+                    return fn(this.state);
+            }
+
+            return null;
+        };
+    }
+
+    mxEdgeStyle.IsometricConnector = function (state, source, target, points, result)
+    {
+        var isoHVector = new mxPoint(1, 0);
+        var alpha1 = mxUtils.toRadians(-30);
+        isoHVector = mxUtils.getRotatedPoint(isoHVector, Math.cos(alpha1), Math.sin(alpha1));
+
+        var isoVVector = new mxPoint(1, 0);
+        var alpha2 = mxUtils.toRadians(-150);
+        isoVVector = mxUtils.getRotatedPoint(isoVVector, Math.cos(alpha2), Math.sin(alpha2));
+
+        var view = state.view;
+        var pt = (points != null && points.length > 0) ? points[0] : null;
+        var pts = state.absolutePoints;
+        var p0 = pts[0];
+        var pe = pts[pts.length - 1];
+
+        if (pt != null)
+            pt = view.transformControlPoint(state, pt);
+
+        if (p0 == null)
+        {
+            if (source != null)
+                p0 = new mxPoint(source.getCenterX(), source.getCenterY());
+        }
+
+        if (pe == null)
+        {
+            if (target != null)
+                pe = new mxPoint(target.getCenterX(), target.getCenterY());
+        }
+
+        var a1 = isoHVector.x;
+        var a2 = isoHVector.y;
+
+        var b1 = isoVVector.x;
+        var b2 = isoVVector.y;
+
+        var elbow = mxUtils.getValue(state.style, 'elbow', 'horizontal') == 'horizontal';
+
+        if (pe != null && p0 != null)
+        {
+            var last = p0;
+            function isoLineTo(x, y, ignoreFirst)
+            {
+                var c1 = x - last.x;
+                var c2 = y - last.y;
+
+                // Solves for isometric base vectors
+                var h = (b2 * c1 - b1 * c2) / (a1 * b2 - a2 * b1);
+                var v = (a2 * c1 - a1 * c2) / (a2 * b1 - a1 * b2);
+
+                if (elbow)
+                {
+                    if (ignoreFirst)
+                    {
+                        last = new mxPoint(last.x + a1 * h, last.y + a2 * h);
+                        result.push(last);
+                    }
+
+                    last = new mxPoint(last.x + b1 * v, last.y + b2 * v);
+                    result.push(last);
+                }
+                else
+                {
+                    if (ignoreFirst)
+                    {
+                        last = new mxPoint(last.x + b1 * v, last.y + b2 * v);
+                        result.push(last);
+                    }
+
+                    last = new mxPoint(last.x + a1 * h, last.y + a2 * h);
+                    result.push(last);
+                }
+            }
+
+            if (pt == null)
+                pt = new mxPoint(p0.x + (pe.x - p0.x) / 2, p0.y + (pe.y - p0.y) / 2);
+
+            isoLineTo(pt.x, pt.y, true);
+            isoLineTo(pe.x, pe.y, false);
+        }
+    };
+    mxStyleRegistry.putValue(mxConstants.EDGESTYLE_ISOMETRIC, mxEdgeStyle.IsometricConnector);
+
+    var graphCreateEdgeHandler = Graph.prototype.createEdgeHandler;
+    Graph.prototype.createEdgeHandler = function (state, edgeStyle)
+    {
+        if (edgeStyle == mxEdgeStyle.IsometricConnector)
+        {
+            var handler = new mxElbowEdgeHandler(state);
+            handler.snapToTerminals = false;
+            return handler;
+        }
+        return graphCreateEdgeHandler.apply(this, arguments);
+    };
+
+    // Defines connection points for all shapes
+    mxRectangleShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.5, 0), true, 'N'),
+                                              new mxConnectionConstraint(new mxPoint(0, 0.5), true, 'W'),
+                                              new mxConnectionConstraint(new mxPoint(1, 0.5), true, 'E'),
+                                              new mxConnectionConstraint(new mxPoint(0.5, 1), true, 'S')];
+    mxEllipse.prototype.constraints       = mxRectangleShape.prototype.constraints;
+    mxLabel.prototype.constraints         = mxRectangleShape.prototype.constraints;
+    mxImageShape.prototype.constraints    = mxRectangleShape.prototype.constraints;
+    mxSwimlane.prototype.constraints      = mxRectangleShape.prototype.constraints;
+    mxDoubleEllipse.prototype.constraints = mxRectangleShape.prototype.constraints;
+    mxRhombus.prototype.constraints       = mxRectangleShape.prototype.constraints;
+
+    mxTriangle.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.5), true),
                                         new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-                                        new mxConnectionConstraint(new mxPoint(0.85, 0.05), false),
-      	              		 new mxConnectionConstraint(new mxPoint(0, 0.3), true),
-      	              		 new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-      	              		 new mxConnectionConstraint(new mxPoint(0, 0.7), true),
-      	            		 new mxConnectionConstraint(new mxPoint(1, 0.3), true),
-      	            		 new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-      	            		 new mxConnectionConstraint(new mxPoint(1, 0.7), true),
-      	            		 new mxConnectionConstraint(new mxPoint(0.15, 0.95), false),
-      	            		 new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-      	            		 new mxConnectionConstraint(new mxPoint(0.85, 0.95), false)];
-	UmlActorShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0.1), false),
-	                                          new mxConnectionConstraint(new mxPoint(0.5, 0), false),
-	                                          new mxConnectionConstraint(new mxPoint(0.75, 0.1), false),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 1/3), false),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 1), false),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 1/3), false),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 1), false),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.5, 0.5), false)];
-	ComponentShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.3), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.7), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(0.75, 1), true)];
-	mxActor.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-   	              		 new mxConnectionConstraint(new mxPoint(0.25, 0.2), false),
-   	              		 new mxConnectionConstraint(new mxPoint(0.1, 0.5), false),
-   	              		 new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-   	            		 new mxConnectionConstraint(new mxPoint(0.75, 0.25), false),
-   	            		 new mxConnectionConstraint(new mxPoint(0.9, 0.5), false),
-   	            		 new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-   	            		 new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-   	            		 new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-   	            		 new mxConnectionConstraint(new mxPoint(0.75, 1), true)];
-	SwitchShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0), false),
-                                         new mxConnectionConstraint(new mxPoint(0.5, 0.25), false),
-                                         new mxConnectionConstraint(new mxPoint(1, 0), false),
-			       	              		 new mxConnectionConstraint(new mxPoint(0.25, 0.5), false),
-			       	              		 new mxConnectionConstraint(new mxPoint(0.75, 0.5), false),
-			       	              		 new mxConnectionConstraint(new mxPoint(0, 1), false),
-			       	            		 new mxConnectionConstraint(new mxPoint(0.5, 0.75), false),
-			       	            		 new mxConnectionConstraint(new mxPoint(1, 1), false)];
-	TapeShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.35), false),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.65), false),
-	                                   new mxConnectionConstraint(new mxPoint(1, 0.35), false),
-		                                new mxConnectionConstraint(new mxPoint(1, 0.5), false),
-		                                new mxConnectionConstraint(new mxPoint(1, 0.65), false),
-										new mxConnectionConstraint(new mxPoint(0.25, 1), false),
-										new mxConnectionConstraint(new mxPoint(0.75, 0), false)];
-	StepShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-									new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-									new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-									new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-									new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-									new mxConnectionConstraint(new mxPoint(0.75, 1), true),
-									new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-									new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-									new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-									new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-									new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-									new mxConnectionConstraint(new mxPoint(1, 0.75), true)];
-	mxLine.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-	                                new mxConnectionConstraint(new mxPoint(0.25, 0.5), false),
-	                                new mxConnectionConstraint(new mxPoint(0.75, 0.5), false),
-									new mxConnectionConstraint(new mxPoint(1, 0.5), false)];
-	LollipopShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.5, 0), false),
-										new mxConnectionConstraint(new mxPoint(0.5, 1), false)];
-	mxDoubleEllipse.prototype.constraints = mxEllipse.prototype.constraints;
-	mxRhombus.prototype.constraints = mxEllipse.prototype.constraints;
-	mxTriangle.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-	                                    new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-	                                   new mxConnectionConstraint(new mxPoint(1, 0.5), true)];
-	mxHexagon.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.375, 0), true),
-	                                    new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.625, 0), true),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-	                                   new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-	                                   new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-	                                   new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-	                                   new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.375, 1), true),
-	                                    new mxConnectionConstraint(new mxPoint(0.5, 1), true),
-	                                   new mxConnectionConstraint(new mxPoint(0.625, 1), true)];
-	mxCloud.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0.25), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.4, 0.1), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.16, 0.55), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.07, 0.4), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.31, 0.8), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.13, 0.77), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.8, 0.8), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.55, 0.95), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.875, 0.5), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.96, 0.7), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.625, 0.2), false),
-	                                 new mxConnectionConstraint(new mxPoint(0.88, 0.25), false)];
-	ParallelogramShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	TrapezoidShape.prototype.constraints = mxRectangleShape.prototype.constraints;
-	DocumentShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.5, 0), true),
-	                                          new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.5), true),
-	        	              		 new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.5), true),
-	        	            		 new mxConnectionConstraint(new mxPoint(1, 0.75), true)];
-	mxArrow.prototype.constraints = null;
+                                        new mxConnectionConstraint(new mxPoint(0.5, 1), true),
+                                        new mxConnectionConstraint(new mxPoint(1, 0.5), true)];
+    mxHexagon.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.375, 0), true),
+                                        new mxConnectionConstraint(new mxPoint(0.5, 0), true),
+                                        new mxConnectionConstraint(new mxPoint(0.625, 0), true),
+                                        new mxConnectionConstraint(new mxPoint(0, 0.25), true),
+                                        new mxConnectionConstraint(new mxPoint(0, 0.5), true),
+                                        new mxConnectionConstraint(new mxPoint(0, 0.75), true),
+                                        new mxConnectionConstraint(new mxPoint(1, 0.25), true),
+                                        new mxConnectionConstraint(new mxPoint(1, 0.5), true),
+                                        new mxConnectionConstraint(new mxPoint(1, 0.75), true),
+                                        new mxConnectionConstraint(new mxPoint(0.375, 1), true),
+                                        new mxConnectionConstraint(new mxPoint(0.5, 1), true),
+                                        new mxConnectionConstraint(new mxPoint(0.625, 1), true)];
+    mxCloud.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.25, 0.25), false),
+                                    new mxConnectionConstraint(new mxPoint(0.4, 0.1), false),
+                                    new mxConnectionConstraint(new mxPoint(0.16, 0.55), false),
+                                    new mxConnectionConstraint(new mxPoint(0.07, 0.4), false),
+                                    new mxConnectionConstraint(new mxPoint(0.31, 0.8), false),
+                                    new mxConnectionConstraint(new mxPoint(0.13, 0.77), false),
+                                    new mxConnectionConstraint(new mxPoint(0.8, 0.8), false),
+                                    new mxConnectionConstraint(new mxPoint(0.55, 0.95), false),
+                                    new mxConnectionConstraint(new mxPoint(0.875, 0.5), false),
+                                    new mxConnectionConstraint(new mxPoint(0.96, 0.7), false),
+                                    new mxConnectionConstraint(new mxPoint(0.625, 0.2), false),
+                                    new mxConnectionConstraint(new mxPoint(0.88, 0.25), false)];
+    mxCylinder.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.5, 0), true),
+                                        new mxConnectionConstraint(new mxPoint(0, 0.5), true),
+                                        new mxConnectionConstraint(new mxPoint(1, 0.5), true),
+                                        new mxConnectionConstraint(new mxPoint(0.5, 1), true)];
+    mxActor.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.5, 0), true),
+                                     new mxConnectionConstraint(new mxPoint(0.25, 0.2), false),
+                                     new mxConnectionConstraint(new mxPoint(0.1, 0.5), false),
+                                     new mxConnectionConstraint(new mxPoint(0, 0.75), true),
+                                     new mxConnectionConstraint(new mxPoint(0.75, 0.25), false),
+                                     new mxConnectionConstraint(new mxPoint(0.9, 0.5), false),
+                                     new mxConnectionConstraint(new mxPoint(1, 0.75), true),
+                                     new mxConnectionConstraint(new mxPoint(0.25, 1), true),
+                                     new mxConnectionConstraint(new mxPoint(0.5, 1), true),
+                                     new mxConnectionConstraint(new mxPoint(0.75, 1), true)];
+    mxLine.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.5), false),
+                                    new mxConnectionConstraint(new mxPoint(0.25, 0.5), false),
+                                    new mxConnectionConstraint(new mxPoint(0.75, 0.5), false),
+                                    new mxConnectionConstraint(new mxPoint(1, 0.5), false)];
 
-	TeeShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'dx', this.dx))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'dy', this.dy))));
-		var w2 = Math.abs(w - dx) / 2;
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, dy * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.75 + dx * 0.25, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + dx) * 0.5, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + dx) * 0.5, (h + dy) * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + dx) * 0.5, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - dx) * 0.5, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - dx) * 0.5, (h + dy) * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - dx) * 0.5, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.25 - dx * 0.25, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, dy * 0.5));
-		
-		return (constr);
-	};
+    mxArrow.prototype.constraints = null;
 
-	CornerShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var dx = Math.max(0, Math.min(w, parseFloat(mxUtils.getValue(this.style, 'dx', this.dx))));
-		var dy = Math.max(0, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'dy', this.dy))));
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, dy * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + dx) * 0.5, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, dy));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, (h + dy) * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, dx * 0.5, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 1), false));
-		
-		return (constr);
-	};
+    TrapezoidShape.prototype.constraints     = mxRectangleShape.prototype.constraints;
+    ParallelogramShape.prototype.constraints = mxRectangleShape.prototype.constraints;
 
-	CrossbarShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0), false),
-        new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(0, 1), false),
-        new mxConnectionConstraint(new mxPoint(0.25, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(0.5, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(0.75, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(1, 0), false),
-        new mxConnectionConstraint(new mxPoint(1, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(1, 1), false)];
+    CubeShape.prototype.getConstraints = function (style, w, h)
+    {
+        var constr = [];
+        var s = Math.max(0, Math.min(w, Math.min(h, parseFloat(mxUtils.getValue(this.style, 'size', this.size)))));
 
-	SingleArrowShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', this.arrowWidth))));
-		var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', this.arrowSize))));
-		var at = (h - aw) / 2;
-		var ab = at + aw;
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, at));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - as) * 0.5, at));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - as) * 0.5, h - at));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h - at));
-		
-		return (constr);
-	};
-	
-	DoubleArrowShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth))));
-		var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', SingleArrowShape.prototype.arrowSize))));
-		var at = (h - aw) / 2;
-		var ab = at + aw;
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, as, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.5, at));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.5, h - at));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, as, h));
-		
-		return (constr);
-	};
-	
-	CrossShape.prototype.getConstraints = function(style, w, h)
-	{
-		var constr = [];
-		var m = Math.min(h, w);
-		var size = Math.max(0, Math.min(m, m * parseFloat(mxUtils.getValue(this.style, 'size', this.size))));
-		var t = (h - size) / 2;
-		var b = t + size;
-		var l = (w - size) / 2;
-		var r = l + size;
-		
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, t * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 0), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, 0));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, t * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, t));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, h - t * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0.5, 1), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, h));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, h - t * 0.5));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, r, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + r) * 0.5, t));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, t));
-		constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + r) * 0.5, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l * 0.5, t));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, t));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l * 0.5, b));
-		constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, l, t));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - s) * 0.5, 0));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s, 0));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - s * 0.5, s * 0.5));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, s));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w, (h + s) * 0.5));
+        constr.push(new mxConnectionConstraint(new mxPoint(1, 1), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w + s) * 0.5, h));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s, h));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, s * 0.5, h - s * 0.5));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h - s));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, (h - s) * 0.5));
 
-		return (constr);
-	};
-	
-	UmlLifeline.prototype.constraints = null;
-	OrShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.25), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0, 0.75), false),
-	  	                             new mxConnectionConstraint(new mxPoint(1, 0.5), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.7, 0.1), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.7, 0.9), false)];
-	XorShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0.175, 0.25), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.25, 0.5), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.175, 0.75), false),
-	  	                             new mxConnectionConstraint(new mxPoint(1, 0.5), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.7, 0.1), false),
-	  	                             new mxConnectionConstraint(new mxPoint(0.7, 0.9), false)];
-	RequiredInterfaceShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-          new mxConnectionConstraint(new mxPoint(1, 0.5), false)];
-	ProvidedRequiredInterfaceShape.prototype.constraints = [new mxConnectionConstraint(new mxPoint(0, 0.5), false),
-        new mxConnectionConstraint(new mxPoint(1, 0.5), false)];
+        return (constr);
+    };
+    SingleArrowShape.prototype.getConstraints = function (style, w, h)
+    {
+        var constr = [];
+        var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', this.arrowWidth))));
+        var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', this.arrowSize))));
+        var at = (h - aw) / 2;
+        var ab = at + aw;
+
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, at));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - as) * 0.5, at));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, 0));
+        constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, h));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, (w - as) * 0.5, h - at));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, 0, h - at));
+
+        return (constr);
+    };
+    DoubleArrowShape.prototype.getConstraints = function (style, w, h)
+    {
+        var constr = [];
+        var aw = h * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowWidth', SingleArrowShape.prototype.arrowWidth))));
+        var as = w * Math.max(0, Math.min(1, parseFloat(mxUtils.getValue(this.style, 'arrowSize', SingleArrowShape.prototype.arrowSize))));
+        var at = (h - aw) / 2;
+        var ab = at + aw;
+
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0.5), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, as, 0));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.5, at));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, 0));
+        constr.push(new mxConnectionConstraint(new mxPoint(1, 0.5), false));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w - as, h));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, w * 0.5, h - at));
+        constr.push(new mxConnectionConstraint(new mxPoint(0, 0), false, null, as, h));
+
+        return (constr);
+    };
 })();
 
 //Shapes.js end
@@ -27328,7 +26009,9 @@ Action.prototype.isSelected = function()
  * Constructs a new graph editor
  */
 
-function EditorUi (editor, container, scheme) {
+ //export default function EditorUi (editor, container, scheme) {
+
+ function EditorUi (editor, container, scheme) {
     mxEventSource.call(this);
     
     this.destroyFunctions = [];
@@ -27348,10 +26031,9 @@ function EditorUi (editor, container, scheme) {
  
    // Creates the user interface
    this.actions = new Actions(this);
-   //---fix---//
    this.menus = this.createMenus();
-   //this.menus = new Menus(this)
-    //---fix---//
+  // this.menus = new Menus(this)
+  
    this.createDivs();
    this.createUi();
    this.refresh();
@@ -28071,7 +26753,9 @@ function EditorUi (editor, container, scheme) {
      this.open();
  
      this.marksService = new MarksService(this);
+   
      this.viewHandler = new ViewModeHandler(this);
+   
   
      this.marksService.modeEnabled = false;
    } else {
@@ -29122,6 +27806,7 @@ function EditorUi (editor, container, scheme) {
   */
  EditorUi.prototype.createTemporaryGraph = function (stylesheet) {
    var graph = new Graph(document.createElement('div'), null, null, stylesheet);
+  
    graph.resetViewOnRootChange = false;
    graph.setConnectable(false);
    graph.gridEnabled = false;
@@ -31699,1154 +30384,1152 @@ Toolbar.prototype.destroy = function()
 
 //Menus.js start
 
-
-
-
 /**
  * Constructs a new graph menu
  */
- function Menus (editorUi) {
-  this.editorUi = editorUi;
-  this.menus = new Object();
-  this.init();
-};
 
-/**
- * Sets the default font family.
- */
-Menus.prototype.defaultFont = mxConstants.DEFAULT_FONTFAMILY;
 
-/**
- * Sets the default font size.
- */
-Menus.prototype.defaultFontSize = '12';
-
-/**
- * Sets the default font size.
- */
-Menus.prototype.defaultMenuItems = ['file', 'edit', 'view', 'arrange', 'extras'];
-
-/**
- * Adds the label menu items to the given menu and parent.
- */
-Menus.prototype.defaultFonts = ['PT Sans', 'Tahoma', 'Arial', 'Helvetica', 'Times New Roman', 'Verdana', 'Courier New', 'Lucida Console'];
-/**
- * Adds the label menu items to the given menu and parent.
- */
-Menus.prototype.init = function () {
-  var graph = this.editorUi.editor.graph;
-  var isGraphEnabled = mxUtils.bind(graph, graph.isEnabled);
-
-  this.customFonts = [];
-  this.customFontSizes = [];
-
-  this.put(
-    'fontFamily',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        var addItem = mxUtils.bind(this, function (fontname) {
-          var tr = this.styleChange(
-            menu,
-            fontname,
-            [mxConstants.STYLE_FONTFAMILY],
-            [fontname],
-            null,
-            parent,
-            function () {
-              document.execCommand('fontname', false, fontname);
-            },
-            function () {
-              graph.updateLabelElements(graph.getSelectionCells(), function (elt) {
-                elt.removeAttribute('face');
-                elt.style.fontFamily = null;
-
-                if (elt.nodeName == 'PRE') {
-                  graph.replaceElement(elt, 'div');
-                }
-              });
-            }
-          );
-          tr.firstChild.nextSibling.style.fontFamily = fontname;
-        });
-
-        for (var i = 0; i < this.defaultFonts.length; i++) {
-          addItem(this.defaultFonts[i]);
-        }
-
-        menu.addSeparator(parent);
-
-        if (this.customFonts.length > 0) {
-          for (var i = 0; i < this.customFonts.length; i++) addItem(this.customFonts[i]);
-
-          menu.addSeparator(parent);
-          menu.addItem(
-            mxResources.get('reset'),
-            null,
-            mxUtils.bind(this, function () {
-              this.customFonts = [];
-              this.editorUi.fireEvent(new mxEventObject('customFontsChanged'));
-            }),
-            parent
-          );
-
-          menu.addSeparator(parent);
-        }
-
-        this.promptChange(
-          menu,
-          mxResources.get('custom') + '...',
-          '',
-          mxConstants.DEFAULT_FONTFAMILY,
-          mxConstants.STYLE_FONTFAMILY,
-          parent,
-          true,
-          mxUtils.bind(this, function (newValue) {
-            if (mxUtils.indexOf(this.customFonts, newValue) < 0) {
-              this.customFonts.push(newValue);
-              this.editorUi.fireEvent(new mxEventObject('customFontsChanged'));
-            }
-          })
-        );
-      })
-    )
-  );
-  this.put(
-    'formatBlock',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        function addItem(label, tag) {
-          return menu.addItem(
-            label,
-            null,
-            mxUtils.bind(this, function () {
-              // TODO: Check if visible
-              if (graph.cellEditor.textarea != null) {
-                graph.cellEditor.textarea.focus();
-                document.execCommand('formatBlock', false, '<' + tag + '>');
-              }
-            }),
-            parent
-          );
-        }
-
-        addItem(mxResources.get('normal'), 'p');
-
-        addItem('', 'h1').firstChild.nextSibling.innerHTML = '<h1 style="margin:0px;">' + mxResources.get('heading') + ' 1</h1>';
-        addItem('', 'h2').firstChild.nextSibling.innerHTML = '<h2 style="margin:0px;">' + mxResources.get('heading') + ' 2</h2>';
-        addItem('', 'h3').firstChild.nextSibling.innerHTML = '<h3 style="margin:0px;">' + mxResources.get('heading') + ' 3</h3>';
-        addItem('', 'h4').firstChild.nextSibling.innerHTML = '<h4 style="margin:0px;">' + mxResources.get('heading') + ' 4</h4>';
-        addItem('', 'h5').firstChild.nextSibling.innerHTML = '<h5 style="margin:0px;">' + mxResources.get('heading') + ' 5</h5>';
-        addItem('', 'h6').firstChild.nextSibling.innerHTML = '<h6 style="margin:0px;">' + mxResources.get('heading') + ' 6</h6>';
-
-        addItem('', 'pre').firstChild.nextSibling.innerHTML = '<pre style="margin:0px;">' + mxResources.get('formatted') + '</pre>';
-        addItem('', 'blockquote').firstChild.nextSibling.innerHTML = '<blockquote style="margin-top:0px;margin-bottom:0px;">' + mxResources.get('blockquote') + '</blockquote>';
-      })
-    )
-  );
-  this.put(
-    'fontSize',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        var sizes = [6, 8, 9, 10, 11, 12, 14, 18, 24, 36, 48, 72];
-
-        var addItem = mxUtils.bind(this, function (fontsize) {
-          this.styleChange(menu, fontsize, [mxConstants.STYLE_FONTSIZE], [fontsize], null, parent, function () {
-            if (graph.cellEditor.textarea != null) {
-              // Creates an element with arbitrary size 3
-              document.execCommand('fontSize', false, '3');
-
-              // Changes the css font size of the first font element inside the in-place editor with size 3
-              // hopefully the above element that we've just created. LATER: Check for new element using
-              // previous result of getElementsByTagName (see other actions)
-              var elts = graph.cellEditor.textarea.getElementsByTagName('font');
-
-              for (var i = 0; i < elts.length; i++) {
-                if (elts[i].getAttribute('size') == '3') {
-                  elts[i].removeAttribute('size');
-                  elts[i].style.fontSize = fontsize + 'px';
-
-                  break;
-                }
-              }
-            }
-          });
-        });
-
-        for (var i = 0; i < sizes.length; i++) {
-          addItem(sizes[i]);
-        }
-
-        menu.addSeparator(parent);
-
-        if (this.customFontSizes.length > 0) {
-          for (var i = 0; i < this.customFontSizes.length; i++) {
-            addItem(this.customFontSizes[i]);
-          }
-
-          menu.addSeparator(parent);
-
-          menu.addItem(
-            mxResources.get('reset'),
-            null,
-            mxUtils.bind(this, function () {
-              this.customFontSizes = [];
-            }),
-            parent
-          );
-
-          menu.addSeparator(parent);
-        }
-
-        this.promptChange(
-          menu,
-          mxResources.get('custom') + '...',
-          '',
-          '12',
-          mxConstants.STYLE_FONTSIZE,
-          parent,
-          true,
-          mxUtils.bind(this, function (newValue) {
-            this.customFontSizes.push(newValue);
-          })
-        );
-      })
-    )
-  );
-  this.put(
-    'direction',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        menu.addItem(
-          mxResources.get('flipH'),
-          null,
-          function () {
-            graph.toggleCellStyles(mxConstants.STYLE_FLIPH, false);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('flipV'),
-          null,
-          function () {
-            graph.toggleCellStyles(mxConstants.STYLE_FLIPV, false);
-          },
-          parent
-        );
-        this.addMenuItems(menu, ['-', 'rotation'], parent);
-      })
-    )
-  );
-  this.put(
-    'align',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        menu.addItem(
-          mxResources.get('leftAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_LEFT);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('centerAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_CENTER);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('rightAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_RIGHT);
-          },
-          parent
-        );
-        menu.addSeparator(parent);
-        menu.addItem(
-          mxResources.get('topAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_TOP);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('middleAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_MIDDLE);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('bottomAlign'),
-          null,
-          function () {
-            graph.alignCells(mxConstants.ALIGN_BOTTOM);
-          },
-          parent
-        );
-      })
-    )
-  );
-  this.put(
-    'distribute',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        menu.addItem(
-          mxResources.get('horizontal'),
-          null,
-          function () {
-            graph.distributeCells(true);
-          },
-          parent
-        );
-        menu.addItem(
-          mxResources.get('vertical'),
-          null,
-          function () {
-            graph.distributeCells(false);
-          },
-          parent
-        );
-      })
-    )
-  );
-  this.put(
-    'navigation',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, [/*'home', '-', 'exitGroup', 'enterGroup', '-', */ 'expand', 'collapse', '-', 'collapsible'], parent);
-      })
-    )
-  );
-  this.put(
-    'arrange',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['toFront', 'toBack', '-'], parent);
-        this.addSubmenu('direction', menu, parent);
-        this.addMenuItems(menu, ['turn', '-'], parent);
-        this.addSubmenu('align', menu, parent);
-        this.addSubmenu('distribute', menu, parent);
-        menu.addSeparator(parent);
-        this.addSubmenu('navigation', menu, parent);
-        this.addSubmenu('insert', menu, parent);
-        //this.addSubmenu('layout', menu, parent);
-        this.addMenuItems(menu, ['-', 'group', 'ungroup', 'removeFromGroup', '-', 'clearWaypoints', 'autosize'], parent);
-      })
-    )
-  ).isEnabled = isGraphEnabled;
-  this.put(
-    'insert',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['insertLink', 'insertImage'], parent);
-      })
-    )
-  );
-  this.put(
-    'view',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['sidebarPanel', 'formatPanel', 'outline', 'layers', 'bindings', '-', 'pageView', 'pageScale', '-', 'scrollbars', 'tooltips', '-', 'grid', 'guides', '-', 'connectionArrows', 'connectionPoints', '-', 'resetView', 'zoomIn', 'zoomOut'], parent);
-      })
-    )
-  );
-  // Two special dropdowns that are only used in the toolbar
-  this.put(
-    'viewPanels',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['sidebarPanel', 'formatPanel', 'outline', 'layers', 'bindings'], parent, null, null);
-      })
-    )
-  );
-  this.put(
-    'viewZoom',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['resetView', '-'], parent);
-        var scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
-
-        for (var i = 0; i < scales.length; i++) {
-          (function (scale) {
-            menu.addItem(
-              scale * 100 + '%',
+function Menus (editorUi) {
+    this.editorUi = editorUi;
+    this.menus = new Object();
+    this.init();
+  };
+  
+  /**
+   * Sets the default font family.
+   */
+  Menus.prototype.defaultFont = mxConstants.DEFAULT_FONTFAMILY;
+  
+  /**
+   * Sets the default font size.
+   */
+  Menus.prototype.defaultFontSize = '12';
+  
+  /**
+   * Sets the default font size.
+   */
+  Menus.prototype.defaultMenuItems = ['file', 'edit', 'view', 'arrange', 'extras'];
+  
+  /**
+   * Adds the label menu items to the given menu and parent.
+   */
+  Menus.prototype.defaultFonts = ['PT Sans', 'Tahoma', 'Arial', 'Helvetica', 'Times New Roman', 'Verdana', 'Courier New', 'Lucida Console'];
+  /**
+   * Adds the label menu items to the given menu and parent.
+   */
+  Menus.prototype.init = function () {
+    var graph = this.editorUi.editor.graph;
+    var isGraphEnabled = mxUtils.bind(graph, graph.isEnabled);
+  
+    this.customFonts = [];
+    this.customFontSizes = [];
+  
+    this.put(
+      'fontFamily',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          var addItem = mxUtils.bind(this, function (fontname) {
+            var tr = this.styleChange(
+              menu,
+              fontname,
+              [mxConstants.STYLE_FONTFAMILY],
+              [fontname],
               null,
+              parent,
               function () {
-                graph.zoomTo(scale);
+                document.execCommand('fontname', false, fontname);
               },
+              function () {
+                graph.updateLabelElements(graph.getSelectionCells(), function (elt) {
+                  elt.removeAttribute('face');
+                  elt.style.fontFamily = null;
+  
+                  if (elt.nodeName == 'PRE') {
+                    graph.replaceElement(elt, 'div');
+                  }
+                });
+              }
+            );
+            tr.firstChild.nextSibling.style.fontFamily = fontname;
+          });
+  
+          for (var i = 0; i < this.defaultFonts.length; i++) {
+            addItem(this.defaultFonts[i]);
+          }
+  
+          menu.addSeparator(parent);
+  
+          if (this.customFonts.length > 0) {
+            for (var i = 0; i < this.customFonts.length; i++) addItem(this.customFonts[i]);
+  
+            menu.addSeparator(parent);
+            menu.addItem(
+              mxResources.get('reset'),
+              null,
+              mxUtils.bind(this, function () {
+                this.customFonts = [];
+                this.editorUi.fireEvent(new mxEventObject('customFontsChanged'));
+              }),
               parent
             );
-          })(scales[i]);
-        }
-
-        this.addMenuItems(menu, ['-', 'fitWindow', 'fitPageWidth', 'fitPage', 'fitTwoPages', '-', 'customZoom'], parent);
-      })
-    )
-  );
-  this.put(
-    'file',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['new', 'open', '-', 'save', 'saveAs', '-', /*'import',*/ 'export', '-', 'pageSetup', 'print'], parent);
-      })
-    )
-  );
-  this.put(
-    'edit',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['undo', 'redo', '-', 'cut', 'copy', 'paste', 'delete', '-', 'duplicate', '-', 'editData', 'editTooltip', 'editStyle', '-', 'edit', '-', 'editLink', 'openLink', '-', 'selectVertices', 'selectEdges', 'selectAll', 'selectNone', '-', 'lockUnlock']);
-      })
-    )
-  );
-  this.put(
-    'extras',
-    new Menu(
-      mxUtils.bind(this, function (menu, parent) {
-        this.addMenuItems(menu, ['autosave', /*'copyConnect', 'collapseExpand',*/ '-', 'editDiagram']);
-      })
-    )
-  );
-};
-
-/**
- * Adds the label menu items to the given menu and parent.
- */
-Menus.prototype.put = function (name, menu) {
-  this.menus[name] = menu;
-
-  return menu;
-};
-
-/**
- * Adds the label menu items to the given menu and parent.
- */
-Menus.prototype.get = function (name) {
-  return this.menus[name];
-};
-
-/**
- * Adds the given submenu.
- */
-Menus.prototype.addSubmenu = function (name, menu, parent, label) {
-  var entry = this.get(name);
-
-  if (entry != null) {
-    var enabled = entry.isEnabled();
-
-    if (menu.showDisabled || enabled) {
-      var submenu = menu.addItem(label || mxResources.get(name), null, null, parent, null, enabled);
-      this.addMenu(name, menu, submenu);
-    }
-  }
-};
-
-/**
- * Adds the label menu items to the given menu and parent.
- */
-Menus.prototype.addMenu = function (name, popupMenu, parent) {
-  var menu = this.get(name);
-
-  if (menu != null && (popupMenu.showDisabled || menu.isEnabled())) {
-    this.get(name).execute(popupMenu, parent);
-  }
-};
-
-/**
- * Adds a menu item to insert a table.
- */
-Menus.prototype.addInsertTableItem = function (menu) {
-  var graph = this.editorUi.editor.graph;
-
-  function createTable(rows, cols) {
-    var html = ['<table>'];
-
-    for (var i = 0; i < rows; i++) {
-      html.push('<tr>');
-
-      for (var j = 0; j < cols; j++) {
-        html.push('<td><br></td>');
-      }
-
-      html.push('</tr>');
-    }
-
-    html.push('</table>');
-
-    return html.join('');
-  }
-
-  // Show table size dialog
-  var elt2 = menu.addItem(
-    '',
-    null,
-    mxUtils.bind(this, function (evt) {
-      var td = graph.getParentByName(mxEvent.getSource(evt), 'TD');
-
-      if (td != null && graph.cellEditor.textarea != null) {
-        var row2 = graph.getParentByName(td, 'TR');
-
-        // To find the new link, we create a list of all existing links first
-        // LATER: Refactor for reuse with code for finding inserted image below
-        var tmp = graph.cellEditor.textarea.getElementsByTagName('table');
-        var oldTables = [];
-
-        for (var i = 0; i < tmp.length; i++) {
-          oldTables.push(tmp[i]);
-        }
-
-        // Finding the new table will work with insertHTML, but IE does not support that
-        graph.container.focus();
-        graph.pasteHtmlAtCaret(createTable(row2.sectionRowIndex + 1, td.cellIndex + 1));
-
-        // Moves cursor to first table cell
-        var newTables = graph.cellEditor.textarea.getElementsByTagName('table');
-
-        if (newTables.length == oldTables.length + 1) {
-          // Inverse order in favor of appended tables
-          for (var i = newTables.length - 1; i >= 0; i--) {
-            if (i == 0 || newTables[i] != oldTables[i - 1]) {
-              graph.selectNode(newTables[i].rows[0].cells[0]);
-              break;
-            }
+  
+            menu.addSeparator(parent);
           }
-        }
-      }
-    })
-  );
-
-  function createPicker(rows, cols) {
-    var table2 = document.createElement('table');
-    table2.setAttribute('border', '1');
-    table2.style.borderCollapse = 'collapse';
-    table2.setAttribute('cellPadding', '8');
-
-    for (var i = 0; i < rows; i++) {
-      var row = table2.insertRow(i);
-      for (var j = 0; j < cols; j++) row.insertCell(-1);
-    }
-
-    return table2;
-  }
-  function extendPicker(picker, rows, cols) {
-    for (var i = picker.rows.length; i < rows; i++) {
-      var row = picker.insertRow(i);
-      for (var j = 0; j < picker.rows[0].cells.length; j++) row.insertCell(-1);
-    }
-    for (var i = 0; i < picker.rows.length; i++) {
-      var row = picker.rows[i];
-      for (var j = row.cells.length; j < cols; j++) row.insertCell(-1);
-    }
-  }
-
-  elt2.firstChild.innerHTML = '';
-  var picker = createPicker(5, 5);
-  elt2.firstChild.appendChild(picker);
-
-  var label = document.createElement('div');
-  label.style.padding = '4px';
-  label.style.fontSize = Menus.prototype.defaultFontSize + 'px';
-  label.innerHTML = '1x1';
-  elt2.firstChild.appendChild(label);
-
-  mxEvent.addListener(picker, 'mouseover', function (e) {
-    var td = graph.getParentByName(mxEvent.getSource(e), 'TD');
-    if (td != null) {
-      var row2 = graph.getParentByName(td, 'TR');
-      extendPicker(picker, Math.min(20, row2.sectionRowIndex + 2), Math.min(20, td.cellIndex + 2));
-      label.innerHTML = td.cellIndex + 1 + 'x' + (row2.sectionRowIndex + 1);
-
-      for (var i = 0; i < picker.rows.length; i++) {
-        var r = picker.rows[i];
-
-        for (var j = 0; j < r.cells.length; j++) {
-          var cell = r.cells[j];
-
-          if (i <= row2.sectionRowIndex && j <= td.cellIndex) {
-            cell.style.backgroundColor = 'blue';
-          } else {
-            cell.style.backgroundColor = 'white';
-          }
-        }
-      }
-
-      mxEvent.consume(e);
-    }
-  });
-};
-
-/**
- * Adds a style change item to the given menu.
- */
-Menus.prototype.edgeStyleChange = function (menu, label, keys, values, sprite, parent, reset) {
-  return menu.addItem(
-    label,
-    null,
-    mxUtils.bind(this, function () {
-      var graph = this.editorUi.editor.graph;
-      graph.stopEditing(false);
-
-      graph.getModel().beginUpdate();
-      try {
-        var cells = graph.getSelectionCells();
-        var edges = [];
-
-        for (var i = 0; i < cells.length; i++) {
-          var cell = cells[i];
-
-          if (graph.getModel().isEdge(cell)) {
-            if (reset) {
-              var geo = graph.getCellGeometry(cell);
-
-              // Resets all edge points
-              if (geo != null) {
-                geo = geo.clone();
-                geo.points = null;
-                graph.getModel().setGeometry(cell, geo);
+  
+          this.promptChange(
+            menu,
+            mxResources.get('custom') + '...',
+            '',
+            mxConstants.DEFAULT_FONTFAMILY,
+            mxConstants.STYLE_FONTFAMILY,
+            parent,
+            true,
+            mxUtils.bind(this, function (newValue) {
+              if (mxUtils.indexOf(this.customFonts, newValue) < 0) {
+                this.customFonts.push(newValue);
+                this.editorUi.fireEvent(new mxEventObject('customFontsChanged'));
               }
-            }
-
-            for (var j = 0; j < keys.length; j++) {
-              graph.setCellStyles(keys[j], values[j], [cell]);
-            }
-
-            edges.push(cell);
-          }
-        }
-
-        this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', keys, 'values', values, 'cells', edges));
-      } finally {
-        graph.getModel().endUpdate();
-      }
-    }),
-    parent,
-    sprite
-  );
-};
-
-/**
- * Adds a style change item to the given menu.
- */
-Menus.prototype.styleChange = function (menu, label, keys, values, sprite, parent, fn, post) {
-  var apply = this.createStyleChangeFunction(keys, values);
-
-  return menu.addItem(
-    label,
-    null,
-    mxUtils.bind(this, function () {
-      var graph = this.editorUi.editor.graph;
-
-      if (fn != null && graph.cellEditor.isContentEditing()) {
-        fn();
-      } else {
-        apply(post);
-      }
-    }),
-    parent,
-    sprite
-  );
-};
-
-Menus.prototype.createStyleChangeFunction = function (keys, values) {
-  return mxUtils.bind(this, function (post) {
-    var graph = this.editorUi.editor.graph;
-    graph.stopEditing(false);
-
-    graph.getModel().beginUpdate();
-    try {
-      for (var i = 0; i < keys.length; i++) {
-        graph.setCellStyles(keys[i], values[i]);
-
-        // Removes CSS alignment to produce consistent output
-        if (keys[i] == mxConstants.STYLE_ALIGN) {
-          graph.updateLabelElements(graph.getSelectionCells(), function (elt) {
-            elt.removeAttribute('align');
-            elt.style.textAlign = null;
-          });
-        }
-      }
-
-      if (post != null) {
-        post();
-      }
-
-      this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', keys, 'values', values, 'cells', graph.getSelectionCells()));
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  });
-};
-
-/**
- * Adds a style change item with a prompt to the given menu.
- */
-Menus.prototype.promptChange = function (menu, label, hint, defaultValue, key, parent, enabled, fn, sprite) {
-  return menu.addItem(
-    label,
-    null,
-    mxUtils.bind(this, function () {
-      var graph = this.editorUi.editor.graph;
-      var value = defaultValue;
-      var state = graph.getView().getState(graph.getSelectionCell());
-
-      if (state != null) {
-        value = state.style[key] || value;
-      }
-
-      var dlg = new FilenameDialog(
-        this.editorUi,
-        value,
-        mxResources.get('apply'),
-        mxUtils.bind(this, function (newValue) {
-          if (newValue != null && newValue.length > 0) {
-            graph.getModel().beginUpdate();
-            try {
-              graph.stopEditing(false);
-              graph.setCellStyles(key, newValue);
-            } finally {
-              graph.getModel().endUpdate();
-            }
-
-            if (fn != null) {
-              fn(newValue);
-            }
-          }
-        }),
-        mxResources.get('enterValue') + (hint.length > 0 ? ' ' + hint : '')
-      );
-      this.editorUi.showDialog(dlg.container, 300, 80, true, true);
-      dlg.init();
-    }),
-    parent,
-    sprite,
-    enabled
-  );
-};
-
-/**
- * Adds a handler for showing a menu in the given element.
- */
-Menus.prototype.pickColor = function (key, cmd, defaultValue) {
-  var graph = this.editorUi.editor.graph;
-  var h = 226 + (Math.ceil(ColorDialog.prototype.presetColors.length / 12) + Math.ceil(ColorDialog.prototype.defaultColors.length / 12)) * 17;
-
-  if (cmd != null && graph.cellEditor.isContentEditing()) {
-    // Saves and restores text selection for in-place editor
-    var selState = graph.cellEditor.saveSelection();
-
-    var dlg = new ColorDialog(
-      this.editorUi,
-      defaultValue || '000000',
-      mxUtils.bind(this, function (color) {
-        graph.cellEditor.restoreSelection(selState);
-        document.execCommand(cmd, false, color != mxConstants.NONE ? color : 'transparent');
-      }),
-      function () {
-        graph.cellEditor.restoreSelection(selState);
-      }
+            })
+          );
+        })
+      )
     );
-    this.editorUi.showDialog(dlg.container, 230, h, true, true);
-    dlg.init();
-  } else {
-    if (this.colorDialog == null) {
-      this.colorDialog = new ColorDialog(this.editorUi);
-    }
-
-    this.colorDialog.currentColorKey = key;
-    var state = graph.getView().getState(graph.getSelectionCell());
-    var color = 'none';
-
-    if (state != null) {
-      color = state.style[key] || color;
-    }
-
-    if (color == 'none') {
-      color = 'ffffff';
-      this.colorDialog.picker.fromString('ffffff');
-      this.colorDialog.colorInput.value = 'none';
-    } else {
-      this.colorDialog.picker.fromString(color);
-    }
-
-    this.editorUi.showDialog(this.colorDialog.container, 230, h, true, true);
-    this.colorDialog.init();
-  }
-};
-
-/**
- * Adds a handler for showing a menu in the given element.
- */
-Menus.prototype.toggleStyle = function (key, defaultValue) {
-  var graph = this.editorUi.editor.graph;
-  var value = graph.toggleCellStyles(key, defaultValue);
-  this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', [key], 'values', [value], 'cells', graph.getSelectionCells()));
-};
-
-/**
- * Creates the keyboard event handler for the current graph and history.
- */
-Menus.prototype.addMenuItem = function (menu, key, parent, trigger, sprite, label) {
-  var action = this.editorUi.actions.get(key);
-
-  if (action != null && (menu.showDisabled || action.isEnabled()) && action.visible) {
-    var item = menu.addItem(
-      label || action.label,
-      null,
-      function (evt) {
-        action.funct(trigger || evt);
-      },
-      parent,
-      sprite,
-      action.isEnabled()
+    this.put(
+      'formatBlock',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          function addItem(label, tag) {
+            return menu.addItem(
+              label,
+              null,
+              mxUtils.bind(this, function () {
+                // TODO: Check if visible
+                if (graph.cellEditor.textarea != null) {
+                  graph.cellEditor.textarea.focus();
+                  document.execCommand('formatBlock', false, '<' + tag + '>');
+                }
+              }),
+              parent
+            );
+          }
+  
+          addItem(mxResources.get('normal'), 'p');
+  
+          addItem('', 'h1').firstChild.nextSibling.innerHTML = '<h1 style="margin:0px;">' + mxResources.get('heading') + ' 1</h1>';
+          addItem('', 'h2').firstChild.nextSibling.innerHTML = '<h2 style="margin:0px;">' + mxResources.get('heading') + ' 2</h2>';
+          addItem('', 'h3').firstChild.nextSibling.innerHTML = '<h3 style="margin:0px;">' + mxResources.get('heading') + ' 3</h3>';
+          addItem('', 'h4').firstChild.nextSibling.innerHTML = '<h4 style="margin:0px;">' + mxResources.get('heading') + ' 4</h4>';
+          addItem('', 'h5').firstChild.nextSibling.innerHTML = '<h5 style="margin:0px;">' + mxResources.get('heading') + ' 5</h5>';
+          addItem('', 'h6').firstChild.nextSibling.innerHTML = '<h6 style="margin:0px;">' + mxResources.get('heading') + ' 6</h6>';
+  
+          addItem('', 'pre').firstChild.nextSibling.innerHTML = '<pre style="margin:0px;">' + mxResources.get('formatted') + '</pre>';
+          addItem('', 'blockquote').firstChild.nextSibling.innerHTML = '<blockquote style="margin-top:0px;margin-bottom:0px;">' + mxResources.get('blockquote') + '</blockquote>';
+        })
+      )
     );
-
-    // Adds checkmark image
-    if (action.toggleAction && action.isSelected()) menu.addCheckmark(item, Editor.checkmarkImage);
-
-    this.addShortcut(item, action);
-
-    return item;
-  }
-  return null;
-};
-
-/**
- * Adds a checkmark to the given menuitem.
- */
-Menus.prototype.addShortcut = function (item, action) {
-  if (action.shortcut != null) {
-    var td = item.firstChild.nextSibling.nextSibling;
-    var span = document.createElement('span');
-    span.style.color = 'gray';
-    mxUtils.write(span, action.shortcut);
-    td.appendChild(span);
-  }
-};
-
-Menus.prototype.addMenuItems = function (menu, keys, parent, trigger, sprites) {
-  for (var i = 0; i < keys.length; i++) {
-    if (keys[i] == '-') {
-      menu.addSeparator(parent);
-    } else {
-      this.addMenuItem(menu, keys[i], parent, trigger, sprites != null ? sprites[i] : null);
-    }
-  }
-};
-Menus.prototype.createPopupMenu = function (menu, cell, evt, bool) {
-  var editor = this.editorUi.editor;
-  var graph = editor.graph;
-  menu.smartSeparators = true;
-
-  if (!editor.isViewMode()) {
-    if (graph.isSelectionEmpty()) this.addMenuItems(menu, ['undo', 'redo', 'pasteHere'], null, evt);
-    else this.addMenuItems(menu, ['delete', '-', 'cut', 'copy', '-', 'duplicate'], null, evt);
-
-    if (!graph.isSelectionEmpty()) {
-      if (graph.getSelectionCount() == 1) {
-        this.addMenuItems(menu, ['setAsDefaultStyle'], null, evt);
-      }
-      menu.addSeparator();
-
-      cell = graph.getSelectionCell();
-      var state = graph.view.getState(cell);
-
-      if (state != null) {
-        var hasWaypoints = false;
-        this.addMenuItems(menu, ['toFront', 'toBack', '-'], null, evt);
-
-        if (graph.getModel().isEdge(cell) && mxUtils.getValue(state.style, mxConstants.STYLE_EDGE, null) != mxConstants.EDGESTYLE_ENTITY_RELATION && mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) != 'arrow') {
-          var handler = graph.selectionCellsHandler.getHandler(cell);
-          var isWaypoint = false;
-
-          if (handler instanceof mxEdgeHandler && handler.bends != null && handler.bends.length > 2) {
-            //index for longTouch
-            let index = null;
-
-            if (bool) {
-              const abspoints = handler.abspoints;
-              let minDistance = Number.MAX_VALUE;
-
-              if (handler.currentPoint) {
-                //---fix---//
-                let clickX = handler.currentPoint.x;
-                let clickY = handler.currentPoint.y;
-                 //---fix---//
-                // clickX = handler.currentPoint.x;
-                // clickY = handler.currentPoint.y;
-
-                if (clickX && clickY) {
-                  for (var i = 0; i < abspoints.length; i++) {
-                    const point = abspoints[i];
-                    const distance = Math.sqrt(Math.pow(clickX - point.x, 2) + Math.pow(clickY - point.y, 2));
-
-                    if (distance < minDistance) {
-                      minDistance = distance;
-                      index = i;
-                    }
+    this.put(
+      'fontSize',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          var sizes = [6, 8, 9, 10, 11, 12, 14, 18, 24, 36, 48, 72];
+  
+          var addItem = mxUtils.bind(this, function (fontsize) {
+            this.styleChange(menu, fontsize, [mxConstants.STYLE_FONTSIZE], [fontsize], null, parent, function () {
+              if (graph.cellEditor.textarea != null) {
+                // Creates an element with arbitrary size 3
+                document.execCommand('fontSize', false, '3');
+  
+                // Changes the css font size of the first font element inside the in-place editor with size 3
+                // hopefully the above element that we've just created. LATER: Check for new element using
+                // previous result of getElementsByTagName (see other actions)
+                var elts = graph.cellEditor.textarea.getElementsByTagName('font');
+  
+                for (var i = 0; i < elts.length; i++) {
+                  if (elts[i].getAttribute('size') == '3') {
+                    elts[i].removeAttribute('size');
+                    elts[i].style.fontSize = fontsize + 'px';
+  
+                    break;
                   }
                 }
               }
-            } else {
-              //index for rightClick
-              index = handler.getHandleForEvent(graph.updateMouseEvent(new mxMouseEvent(evt)));
+            });
+          });
+  
+          for (var i = 0; i < sizes.length; i++) {
+            addItem(sizes[i]);
+          }
+  
+          menu.addSeparator(parent);
+  
+          if (this.customFontSizes.length > 0) {
+            for (var i = 0; i < this.customFontSizes.length; i++) {
+              addItem(this.customFontSizes[i]);
             }
-            // Configures removeWaypoint action before execution
-            // Using trigger parameter is cleaner but have to find waypoint here anyway.
-            var rmWaypointAction = this.editorUi.actions.get('removeWaypoint');
-            rmWaypointAction.handler = handler;
-            rmWaypointAction.index = index;
-            isWaypoint = index > 0 && index < handler.bends.length - 1;
+  
+            menu.addSeparator(parent);
+  
+            menu.addItem(
+              mxResources.get('reset'),
+              null,
+              mxUtils.bind(this, function () {
+                this.customFontSizes = [];
+              }),
+              parent
+            );
+  
+            menu.addSeparator(parent);
           }
-          menu.addSeparator();
-          this.addMenuItem(menu, 'turn', null, evt, null, mxResources.get('reverse'));
-          this.addMenuItems(menu, [isWaypoint ? 'removeWaypoint' : 'addWaypoint'], null, evt);
-
-          // Adds reset waypoints option if waypoints exist
-          var geo = graph.getModel().getGeometry(cell);
-          hasWaypoints = geo != null && geo.points != null && geo.points.length > 0;
-        }
-
-        if (graph.getSelectionCount() == 1 && (hasWaypoints || (graph.getModel().isVertex(cell) && graph.getModel().getEdgeCount(cell) > 0))) {
-          this.addMenuItems(menu, ['clearWaypoints'], null, evt);
-        }
-
-        if (graph.getSelectionCount() > 1) {
-          menu.addSeparator();
-          this.addMenuItems(menu, ['group'], null, evt);
-        } else if (graph.getSelectionCount() == 1 && !graph.getModel().isEdge(cell) && !graph.isSwimlane(cell) && graph.getModel().getChildCount(cell) > 0) {
-          menu.addSeparator();
-          this.addMenuItems(menu, ['ungroup'], null, evt);
-        }
-
-        if (graph.getSelectionCount() == 1) {
-          menu.addSeparator();
-          this.addMenuItems(menu, ['editData', 'editLink'], null, evt);
-
-          // Shows edit image action if there is an image in the style
-          if (graph.getModel().isVertex(cell) && mxUtils.getValue(state.style, mxConstants.STYLE_IMAGE, null) != null) {
-            menu.addSeparator();
-            this.addMenuItem(menu, 'image', null, evt).firstChild.nextSibling.innerHTML = mxResources.get('editImage') + '...';
-          }
-
-          //menu.addSeparator();
-          //this.addMenuItem(menu, 'bindings', null, evt);
-        }
-      }
-    } else {
-      this.addMenuItems(menu, ['-', 'selectVertices', 'selectEdges', 'selectAll', '-', 'clearDefaultStyle', '-', 'editData'], null, evt);
-    }
-  }
-};
-Menus.prototype.createMenubar = function (container) {
-  var menubar = new Menubar(this.editorUi, container);
-  var menus = this.defaultMenuItems;
-
-  for (var i = 0; i < menus.length; i++) {
-    mxUtils.bind(this, function (menu) {
-      var elt = menubar.addMenu(
-        mxResources.get(menus[i]),
-        mxUtils.bind(this, function () {
-          // Allows extensions of menu.funct
-          menu.funct.apply(this, arguments);
+  
+          this.promptChange(
+            menu,
+            mxResources.get('custom') + '...',
+            '',
+            '12',
+            mxConstants.STYLE_FONTSIZE,
+            parent,
+            true,
+            mxUtils.bind(this, function (newValue) {
+              this.customFontSizes.push(newValue);
+            })
+          );
         })
+      )
+    );
+    this.put(
+      'direction',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          menu.addItem(
+            mxResources.get('flipH'),
+            null,
+            function () {
+              graph.toggleCellStyles(mxConstants.STYLE_FLIPH, false);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('flipV'),
+            null,
+            function () {
+              graph.toggleCellStyles(mxConstants.STYLE_FLIPV, false);
+            },
+            parent
+          );
+          this.addMenuItems(menu, ['-', 'rotation'], parent);
+        })
+      )
+    );
+    this.put(
+      'align',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          menu.addItem(
+            mxResources.get('leftAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_LEFT);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('centerAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_CENTER);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('rightAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_RIGHT);
+            },
+            parent
+          );
+          menu.addSeparator(parent);
+          menu.addItem(
+            mxResources.get('topAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_TOP);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('middleAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_MIDDLE);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('bottomAlign'),
+            null,
+            function () {
+              graph.alignCells(mxConstants.ALIGN_BOTTOM);
+            },
+            parent
+          );
+        })
+      )
+    );
+    this.put(
+      'distribute',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          menu.addItem(
+            mxResources.get('horizontal'),
+            null,
+            function () {
+              graph.distributeCells(true);
+            },
+            parent
+          );
+          menu.addItem(
+            mxResources.get('vertical'),
+            null,
+            function () {
+              graph.distributeCells(false);
+            },
+            parent
+          );
+        })
+      )
+    );
+    this.put(
+      'navigation',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, [/*'home', '-', 'exitGroup', 'enterGroup', '-', */ 'expand', 'collapse', '-', 'collapsible'], parent);
+        })
+      )
+    );
+    this.put(
+      'arrange',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['toFront', 'toBack', '-'], parent);
+          this.addSubmenu('direction', menu, parent);
+          this.addMenuItems(menu, ['turn', '-'], parent);
+          this.addSubmenu('align', menu, parent);
+          this.addSubmenu('distribute', menu, parent);
+          menu.addSeparator(parent);
+          this.addSubmenu('navigation', menu, parent);
+          this.addSubmenu('insert', menu, parent);
+          //this.addSubmenu('layout', menu, parent);
+          this.addMenuItems(menu, ['-', 'group', 'ungroup', 'removeFromGroup', '-', 'clearWaypoints', 'autosize'], parent);
+        })
+      )
+    ).isEnabled = isGraphEnabled;
+    this.put(
+      'insert',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['insertLink', 'insertImage'], parent);
+        })
+      )
+    );
+    this.put(
+      'view',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['sidebarPanel', 'formatPanel', 'outline', 'layers', 'bindings', '-', 'pageView', 'pageScale', '-', 'scrollbars', 'tooltips', '-', 'grid', 'guides', '-', 'connectionArrows', 'connectionPoints', '-', 'resetView', 'zoomIn', 'zoomOut'], parent);
+        })
+      )
+    );
+    // Two special dropdowns that are only used in the toolbar
+    this.put(
+      'viewPanels',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['sidebarPanel', 'formatPanel', 'outline', 'layers', 'bindings'], parent, null, null);
+        })
+      )
+    );
+    this.put(
+      'viewZoom',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['resetView', '-'], parent);
+          var scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
+  
+          for (var i = 0; i < scales.length; i++) {
+            (function (scale) {
+              menu.addItem(
+                scale * 100 + '%',
+                null,
+                function () {
+                  graph.zoomTo(scale);
+                },
+                parent
+              );
+            })(scales[i]);
+          }
+  
+          this.addMenuItems(menu, ['-', 'fitWindow', 'fitPageWidth', 'fitPage', 'fitTwoPages', '-', 'customZoom'], parent);
+        })
+      )
+    );
+    this.put(
+      'file',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['new', 'open', '-', 'save', 'saveAs', '-', /*'import',*/ 'export', '-', 'pageSetup', 'print'], parent);
+        })
+      )
+    );
+    this.put(
+      'edit',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['undo', 'redo', '-', 'cut', 'copy', 'paste', 'delete', '-', 'duplicate', '-', 'editData', 'editTooltip', 'editStyle', '-', 'edit', '-', 'editLink', 'openLink', '-', 'selectVertices', 'selectEdges', 'selectAll', 'selectNone', '-', 'lockUnlock']);
+        })
+      )
+    );
+    this.put(
+      'extras',
+      new Menu(
+        mxUtils.bind(this, function (menu, parent) {
+          this.addMenuItems(menu, ['autosave', /*'copyConnect', 'collapseExpand',*/ '-', 'editDiagram']);
+        })
+      )
+    );
+  };
+  
+  /**
+   * Adds the label menu items to the given menu and parent.
+   */
+  Menus.prototype.put = function (name, menu) {
+    this.menus[name] = menu;
+  
+    return menu;
+  };
+  
+  /**
+   * Adds the label menu items to the given menu and parent.
+   */
+  Menus.prototype.get = function (name) {
+    return this.menus[name];
+  };
+  
+  /**
+   * Adds the given submenu.
+   */
+  Menus.prototype.addSubmenu = function (name, menu, parent, label) {
+    var entry = this.get(name);
+  
+    if (entry != null) {
+      var enabled = entry.isEnabled();
+  
+      if (menu.showDisabled || enabled) {
+        var submenu = menu.addItem(label || mxResources.get(name), null, null, parent, null, enabled);
+        this.addMenu(name, menu, submenu);
+      }
+    }
+  };
+  
+  /**
+   * Adds the label menu items to the given menu and parent.
+   */
+  Menus.prototype.addMenu = function (name, popupMenu, parent) {
+    var menu = this.get(name);
+  
+    if (menu != null && (popupMenu.showDisabled || menu.isEnabled())) {
+      this.get(name).execute(popupMenu, parent);
+    }
+  };
+  
+  /**
+   * Adds a menu item to insert a table.
+   */
+  Menus.prototype.addInsertTableItem = function (menu) {
+    var graph = this.editorUi.editor.graph;
+  
+    function createTable(rows, cols) {
+      var html = ['<table>'];
+  
+      for (var i = 0; i < rows; i++) {
+        html.push('<tr>');
+  
+        for (var j = 0; j < cols; j++) {
+          html.push('<td><br></td>');
+        }
+  
+        html.push('</tr>');
+      }
+  
+      html.push('</table>');
+  
+      return html.join('');
+    }
+  
+    // Show table size dialog
+    var elt2 = menu.addItem(
+      '',
+      null,
+      mxUtils.bind(this, function (evt) {
+        var td = graph.getParentByName(mxEvent.getSource(evt), 'TD');
+  
+        if (td != null && graph.cellEditor.textarea != null) {
+          var row2 = graph.getParentByName(td, 'TR');
+  
+          // To find the new link, we create a list of all existing links first
+          // LATER: Refactor for reuse with code for finding inserted image below
+          var tmp = graph.cellEditor.textarea.getElementsByTagName('table');
+          var oldTables = [];
+  
+          for (var i = 0; i < tmp.length; i++) {
+            oldTables.push(tmp[i]);
+          }
+  
+          // Finding the new table will work with insertHTML, but IE does not support that
+          graph.container.focus();
+          graph.pasteHtmlAtCaret(createTable(row2.sectionRowIndex + 1, td.cellIndex + 1));
+  
+          // Moves cursor to first table cell
+          var newTables = graph.cellEditor.textarea.getElementsByTagName('table');
+  
+          if (newTables.length == oldTables.length + 1) {
+            // Inverse order in favor of appended tables
+            for (var i = newTables.length - 1; i >= 0; i--) {
+              if (i == 0 || newTables[i] != oldTables[i - 1]) {
+                graph.selectNode(newTables[i].rows[0].cells[0]);
+                break;
+              }
+            }
+          }
+        }
+      })
+    );
+  
+    function createPicker(rows, cols) {
+      var table2 = document.createElement('table');
+      table2.setAttribute('border', '1');
+      table2.style.borderCollapse = 'collapse';
+      table2.setAttribute('cellPadding', '8');
+  
+      for (var i = 0; i < rows; i++) {
+        var row = table2.insertRow(i);
+        for (var j = 0; j < cols; j++) row.insertCell(-1);
+      }
+  
+      return table2;
+    }
+    function extendPicker(picker, rows, cols) {
+      for (var i = picker.rows.length; i < rows; i++) {
+        var row = picker.insertRow(i);
+        for (var j = 0; j < picker.rows[0].cells.length; j++) row.insertCell(-1);
+      }
+      for (var i = 0; i < picker.rows.length; i++) {
+        var row = picker.rows[i];
+        for (var j = row.cells.length; j < cols; j++) row.insertCell(-1);
+      }
+    }
+  
+    elt2.firstChild.innerHTML = '';
+    var picker = createPicker(5, 5);
+    elt2.firstChild.appendChild(picker);
+  
+    var label = document.createElement('div');
+    label.style.padding = '4px';
+    label.style.fontSize = Menus.prototype.defaultFontSize + 'px';
+    label.innerHTML = '1x1';
+    elt2.firstChild.appendChild(label);
+  
+    mxEvent.addListener(picker, 'mouseover', function (e) {
+      var td = graph.getParentByName(mxEvent.getSource(e), 'TD');
+      if (td != null) {
+        var row2 = graph.getParentByName(td, 'TR');
+        extendPicker(picker, Math.min(20, row2.sectionRowIndex + 2), Math.min(20, td.cellIndex + 2));
+        label.innerHTML = td.cellIndex + 1 + 'x' + (row2.sectionRowIndex + 1);
+  
+        for (var i = 0; i < picker.rows.length; i++) {
+          var r = picker.rows[i];
+  
+          for (var j = 0; j < r.cells.length; j++) {
+            var cell = r.cells[j];
+  
+            if (i <= row2.sectionRowIndex && j <= td.cellIndex) {
+              cell.style.backgroundColor = 'blue';
+            } else {
+              cell.style.backgroundColor = 'white';
+            }
+          }
+        }
+  
+        mxEvent.consume(e);
+      }
+    });
+  };
+  
+  /**
+   * Adds a style change item to the given menu.
+   */
+  Menus.prototype.edgeStyleChange = function (menu, label, keys, values, sprite, parent, reset) {
+    return menu.addItem(
+      label,
+      null,
+      mxUtils.bind(this, function () {
+        var graph = this.editorUi.editor.graph;
+        graph.stopEditing(false);
+  
+        graph.getModel().beginUpdate();
+        try {
+          var cells = graph.getSelectionCells();
+          var edges = [];
+  
+          for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i];
+  
+            if (graph.getModel().isEdge(cell)) {
+              if (reset) {
+                var geo = graph.getCellGeometry(cell);
+  
+                // Resets all edge points
+                if (geo != null) {
+                  geo = geo.clone();
+                  geo.points = null;
+                  graph.getModel().setGeometry(cell, geo);
+                }
+              }
+  
+              for (var j = 0; j < keys.length; j++) {
+                graph.setCellStyles(keys[j], values[j], [cell]);
+              }
+  
+              edges.push(cell);
+            }
+          }
+  
+          this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', keys, 'values', values, 'cells', edges));
+        } finally {
+          graph.getModel().endUpdate();
+        }
+      }),
+      parent,
+      sprite
+    );
+  };
+  
+  /**
+   * Adds a style change item to the given menu.
+   */
+  Menus.prototype.styleChange = function (menu, label, keys, values, sprite, parent, fn, post) {
+    var apply = this.createStyleChangeFunction(keys, values);
+  
+    return menu.addItem(
+      label,
+      null,
+      mxUtils.bind(this, function () {
+        var graph = this.editorUi.editor.graph;
+  
+        if (fn != null && graph.cellEditor.isContentEditing()) {
+          fn();
+        } else {
+          apply(post);
+        }
+      }),
+      parent,
+      sprite
+    );
+  };
+  
+  Menus.prototype.createStyleChangeFunction = function (keys, values) {
+    return mxUtils.bind(this, function (post) {
+      var graph = this.editorUi.editor.graph;
+      graph.stopEditing(false);
+  
+      graph.getModel().beginUpdate();
+      try {
+        for (var i = 0; i < keys.length; i++) {
+          graph.setCellStyles(keys[i], values[i]);
+  
+          // Removes CSS alignment to produce consistent output
+          if (keys[i] == mxConstants.STYLE_ALIGN) {
+            graph.updateLabelElements(graph.getSelectionCells(), function (elt) {
+              elt.removeAttribute('align');
+              elt.style.textAlign = null;
+            });
+          }
+        }
+  
+        if (post != null) {
+          post();
+        }
+  
+        this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', keys, 'values', values, 'cells', graph.getSelectionCells()));
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    });
+  };
+  
+  /**
+   * Adds a style change item with a prompt to the given menu.
+   */
+  Menus.prototype.promptChange = function (menu, label, hint, defaultValue, key, parent, enabled, fn, sprite) {
+    return menu.addItem(
+      label,
+      null,
+      mxUtils.bind(this, function () {
+        var graph = this.editorUi.editor.graph;
+        var value = defaultValue;
+        var state = graph.getView().getState(graph.getSelectionCell());
+  
+        if (state != null) {
+          value = state.style[key] || value;
+        }
+  
+        var dlg = new FilenameDialog(
+          this.editorUi,
+          value,
+          mxResources.get('apply'),
+          mxUtils.bind(this, function (newValue) {
+            if (newValue != null && newValue.length > 0) {
+              graph.getModel().beginUpdate();
+              try {
+                graph.stopEditing(false);
+                graph.setCellStyles(key, newValue);
+              } finally {
+                graph.getModel().endUpdate();
+              }
+  
+              if (fn != null) {
+                fn(newValue);
+              }
+            }
+          }),
+          mxResources.get('enterValue') + (hint.length > 0 ? ' ' + hint : '')
+        );
+        this.editorUi.showDialog(dlg.container, 300, 80, true, true);
+        dlg.init();
+      }),
+      parent,
+      sprite,
+      enabled
+    );
+  };
+  
+  /**
+   * Adds a handler for showing a menu in the given element.
+   */
+  Menus.prototype.pickColor = function (key, cmd, defaultValue) {
+    var graph = this.editorUi.editor.graph;
+    var h = 226 + (Math.ceil(ColorDialog.prototype.presetColors.length / 12) + Math.ceil(ColorDialog.prototype.defaultColors.length / 12)) * 17;
+  
+    if (cmd != null && graph.cellEditor.isContentEditing()) {
+      // Saves and restores text selection for in-place editor
+      var selState = graph.cellEditor.saveSelection();
+  
+      var dlg = new ColorDialog(
+        this.editorUi,
+        defaultValue || '000000',
+        mxUtils.bind(this, function (color) {
+          graph.cellEditor.restoreSelection(selState);
+          document.execCommand(cmd, false, color != mxConstants.NONE ? color : 'transparent');
+        }),
+        function () {
+          graph.cellEditor.restoreSelection(selState);
+        }
       );
-
-      this.menuCreated(menu, elt);
-    })(this.get(menus[i]));
-  }
-
-  return menubar;
-};
-
-/**
- * Creates the keyboard event handler for the current graph and history.
- */
-Menus.prototype.menuCreated = function (menu, elt, className) {
-  if (elt != null) {
-    className = className != null ? className : 'geItem';
-
-    menu.addListener('stateChanged', function () {
-      elt.enabled = menu.enabled;
-
-      if (!menu.enabled) {
-        elt.className = className + ' mxDisabled';
-
-        if (document.documentMode == 8) {
-          elt.style.color = '#c3c3c3';
+      this.editorUi.showDialog(dlg.container, 230, h, true, true);
+      dlg.init();
+    } else {
+      if (this.colorDialog == null) {
+        this.colorDialog = new ColorDialog(this.editorUi);
+      }
+  
+      this.colorDialog.currentColorKey = key;
+      var state = graph.getView().getState(graph.getSelectionCell());
+      var color = 'none';
+  
+      if (state != null) {
+        color = state.style[key] || color;
+      }
+  
+      if (color == 'none') {
+        color = 'ffffff';
+        this.colorDialog.picker.fromString('ffffff');
+        this.colorDialog.colorInput.value = 'none';
+      } else {
+        this.colorDialog.picker.fromString(color);
+      }
+  
+      this.editorUi.showDialog(this.colorDialog.container, 230, h, true, true);
+      this.colorDialog.init();
+    }
+  };
+  
+  /**
+   * Adds a handler for showing a menu in the given element.
+   */
+  Menus.prototype.toggleStyle = function (key, defaultValue) {
+    var graph = this.editorUi.editor.graph;
+    var value = graph.toggleCellStyles(key, defaultValue);
+    this.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', [key], 'values', [value], 'cells', graph.getSelectionCells()));
+  };
+  
+  /**
+   * Creates the keyboard event handler for the current graph and history.
+   */
+  Menus.prototype.addMenuItem = function (menu, key, parent, trigger, sprite, label) {
+    var action = this.editorUi.actions.get(key);
+  
+    if (action != null && (menu.showDisabled || action.isEnabled()) && action.visible) {
+      var item = menu.addItem(
+        label || action.label,
+        null,
+        function (evt) {
+          action.funct(trigger || evt);
+        },
+        parent,
+        sprite,
+        action.isEnabled()
+      );
+  
+      // Adds checkmark image
+      if (action.toggleAction && action.isSelected()) menu.addCheckmark(item, Editor.checkmarkImage);
+  
+      this.addShortcut(item, action);
+  
+      return item;
+    }
+    return null;
+  };
+  
+  /**
+   * Adds a checkmark to the given menuitem.
+   */
+  Menus.prototype.addShortcut = function (item, action) {
+    if (action.shortcut != null) {
+      var td = item.firstChild.nextSibling.nextSibling;
+      var span = document.createElement('span');
+      span.style.color = 'gray';
+      mxUtils.write(span, action.shortcut);
+      td.appendChild(span);
+    }
+  };
+  
+  Menus.prototype.addMenuItems = function (menu, keys, parent, trigger, sprites) {
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i] == '-') {
+        menu.addSeparator(parent);
+      } else {
+        this.addMenuItem(menu, keys[i], parent, trigger, sprites != null ? sprites[i] : null);
+      }
+    }
+  };
+  Menus.prototype.createPopupMenu = function (menu, cell, evt, bool) {
+    var editor = this.editorUi.editor;
+    var graph = editor.graph;
+    menu.smartSeparators = true;
+  
+    if (!editor.isViewMode()) {
+      if (graph.isSelectionEmpty()) this.addMenuItems(menu, ['undo', 'redo', 'pasteHere'], null, evt);
+      else this.addMenuItems(menu, ['delete', '-', 'cut', 'copy', '-', 'duplicate'], null, evt);
+  
+      if (!graph.isSelectionEmpty()) {
+        if (graph.getSelectionCount() == 1) {
+          this.addMenuItems(menu, ['setAsDefaultStyle'], null, evt);
+        }
+        menu.addSeparator();
+  
+        cell = graph.getSelectionCell();
+        var state = graph.view.getState(cell);
+  
+        if (state != null) {
+          var hasWaypoints = false;
+          this.addMenuItems(menu, ['toFront', 'toBack', '-'], null, evt);
+  
+          if (graph.getModel().isEdge(cell) && mxUtils.getValue(state.style, mxConstants.STYLE_EDGE, null) != mxConstants.EDGESTYLE_ENTITY_RELATION && mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) != 'arrow') {
+            var handler = graph.selectionCellsHandler.getHandler(cell);
+            var isWaypoint = false;
+  
+            if (handler instanceof mxEdgeHandler && handler.bends != null && handler.bends.length > 2) {
+              //index for longTouch
+              let index = null;
+  
+              if (bool) {
+                const abspoints = handler.abspoints;
+                let minDistance = Number.MAX_VALUE;
+  
+                if (handler.currentPoint) {
+                  //---fix---//
+                  let clickX = handler.currentPoint.x;
+                  let clickY = handler.currentPoint.y;
+                   //---fix---//
+                  // clickX = handler.currentPoint.x;
+                  // clickY = handler.currentPoint.y;
+  
+                  if (clickX && clickY) {
+                    for (var i = 0; i < abspoints.length; i++) {
+                      const point = abspoints[i];
+                      const distance = Math.sqrt(Math.pow(clickX - point.x, 2) + Math.pow(clickY - point.y, 2));
+  
+                      if (distance < minDistance) {
+                        minDistance = distance;
+                        index = i;
+                      }
+                    }
+                  }
+                }
+              } else {
+                //index for rightClick
+                index = handler.getHandleForEvent(graph.updateMouseEvent(new mxMouseEvent(evt)));
+              }
+              // Configures removeWaypoint action before execution
+              // Using trigger parameter is cleaner but have to find waypoint here anyway.
+              var rmWaypointAction = this.editorUi.actions.get('removeWaypoint');
+              rmWaypointAction.handler = handler;
+              rmWaypointAction.index = index;
+              isWaypoint = index > 0 && index < handler.bends.length - 1;
+            }
+            menu.addSeparator();
+            this.addMenuItem(menu, 'turn', null, evt, null, mxResources.get('reverse'));
+            this.addMenuItems(menu, [isWaypoint ? 'removeWaypoint' : 'addWaypoint'], null, evt);
+  
+            // Adds reset waypoints option if waypoints exist
+            var geo = graph.getModel().getGeometry(cell);
+            hasWaypoints = geo != null && geo.points != null && geo.points.length > 0;
+          }
+  
+          if (graph.getSelectionCount() == 1 && (hasWaypoints || (graph.getModel().isVertex(cell) && graph.getModel().getEdgeCount(cell) > 0))) {
+            this.addMenuItems(menu, ['clearWaypoints'], null, evt);
+          }
+  
+          if (graph.getSelectionCount() > 1) {
+            menu.addSeparator();
+            this.addMenuItems(menu, ['group'], null, evt);
+          } else if (graph.getSelectionCount() == 1 && !graph.getModel().isEdge(cell) && !graph.isSwimlane(cell) && graph.getModel().getChildCount(cell) > 0) {
+            menu.addSeparator();
+            this.addMenuItems(menu, ['ungroup'], null, evt);
+          }
+  
+          if (graph.getSelectionCount() == 1) {
+            menu.addSeparator();
+            this.addMenuItems(menu, ['editData', 'editLink'], null, evt);
+  
+            // Shows edit image action if there is an image in the style
+            if (graph.getModel().isVertex(cell) && mxUtils.getValue(state.style, mxConstants.STYLE_IMAGE, null) != null) {
+              menu.addSeparator();
+              this.addMenuItem(menu, 'image', null, evt).firstChild.nextSibling.innerHTML = mxResources.get('editImage') + '...';
+            }
+  
+            //menu.addSeparator();
+            //this.addMenuItem(menu, 'bindings', null, evt);
+          }
         }
       } else {
-        elt.className = className;
-
-        if (document.documentMode == 8) {
-          elt.style.color = '';
+        this.addMenuItems(menu, ['-', 'selectVertices', 'selectEdges', 'selectAll', '-', 'clearDefaultStyle', '-', 'editData'], null, evt);
+      }
+    }
+  };
+  Menus.prototype.createMenubar = function (container) {
+    var menubar = new Menubar(this.editorUi, container);
+    var menus = this.defaultMenuItems;
+  
+    for (var i = 0; i < menus.length; i++) {
+      mxUtils.bind(this, function (menu) {
+        var elt = menubar.addMenu(
+          mxResources.get(menus[i]),
+          mxUtils.bind(this, function () {
+            // Allows extensions of menu.funct
+            menu.funct.apply(this, arguments);
+          })
+        );
+  
+        this.menuCreated(menu, elt);
+      })(this.get(menus[i]));
+    }
+  
+    return menubar;
+  };
+  
+  /**
+   * Creates the keyboard event handler for the current graph and history.
+   */
+  Menus.prototype.menuCreated = function (menu, elt, className) {
+    if (elt != null) {
+      className = className != null ? className : 'geItem';
+  
+      menu.addListener('stateChanged', function () {
+        elt.enabled = menu.enabled;
+  
+        if (!menu.enabled) {
+          elt.className = className + ' mxDisabled';
+  
+          if (document.documentMode == 8) {
+            elt.style.color = '#c3c3c3';
+          }
+        } else {
+          elt.className = className;
+  
+          if (document.documentMode == 8) {
+            elt.style.color = '';
+          }
         }
-      }
-    });
+      });
+    }
+  };
+  
+  /**
+   * Construcs a new menubar for the given editor.
+   */
+  function Menubar(editorUi, container) {
+    this.editorUi = editorUi;
+    this.container = container;
   }
-};
-
-/**
- * Construcs a new menubar for the given editor.
- */
-function Menubar(editorUi, container) {
-  this.editorUi = editorUi;
-  this.container = container;
-}
-
-/**
- * Adds the menubar elements.
- */
-Menubar.prototype.hideMenu = function () {
-  this.editorUi.hideCurrentMenu();
-};
-
-/**
- * Adds a submenu to this menubar.
- */
-Menubar.prototype.addMenu = function (label, funct, before) {
-  var elt = document.createElement('a');
-  elt.className = 'geItem';
-  mxUtils.write(elt, label);
-  this.addMenuHandler(elt, funct);
-
-  if (before != null) {
-    this.container.insertBefore(elt, before);
-  } else {
-    this.container.appendChild(elt);
-  }
-
-  return elt;
-};
-
-/**
- * Adds a handler for showing a menu in the given element.
- */
-Menubar.prototype.addMenuHandler = function (elt, funct) {
-  if (funct != null) {
-    var show = true;
-
-    var clickHandler = mxUtils.bind(this, function (evt) {
-      if ((show && elt.enabled == null) || elt.enabled) {
-        this.editorUi.editor.graph.popupMenuHandler.hideMenu();
-        var menu = new mxPopupMenu(funct);
-        menu.div.className = ' webix_view webix_window webix_popup webix_win_content geMenubarMenu';
-        menu.smartSeparators = true;
-        menu.showDisabled = true;
-        menu.autoExpand = true;
-
-        // Disables autoexpand and destroys menu when hidden
-        menu.hideMenu = mxUtils.bind(this, function () {
-          mxPopupMenu.prototype.hideMenu.apply(menu, arguments);
-          this.editorUi.resetCurrentMenu();
-          menu.destroy();
-        });
-
-        var offset = mxUtils.getOffset(elt);
-        menu.popup(offset.x, offset.y + elt.offsetHeight, null, evt);
-        this.editorUi.setCurrentMenu(menu, elt);
-      }
-
-      mxEvent.consume(evt);
-    });
-
-    // Shows menu automatically while in expanded state
-    mxEvent.addListener(
-      elt,
-      'mousemove',
-      mxUtils.bind(this, function (evt) {
-        if (this.editorUi.currentMenu != null && this.editorUi.currentMenuElt != elt) {
-          this.editorUi.hideCurrentMenu();
+  
+  /**
+   * Adds the menubar elements.
+   */
+  Menubar.prototype.hideMenu = function () {
+    this.editorUi.hideCurrentMenu();
+  };
+  
+  /**
+   * Adds a submenu to this menubar.
+   */
+  Menubar.prototype.addMenu = function (label, funct, before) {
+    var elt = document.createElement('a');
+    elt.className = 'geItem';
+    mxUtils.write(elt, label);
+    this.addMenuHandler(elt, funct);
+  
+    if (before != null) {
+      this.container.insertBefore(elt, before);
+    } else {
+      this.container.appendChild(elt);
+    }
+  
+    return elt;
+  };
+  
+  /**
+   * Adds a handler for showing a menu in the given element.
+   */
+  Menubar.prototype.addMenuHandler = function (elt, funct) {
+    if (funct != null) {
+      var show = true;
+  
+      var clickHandler = mxUtils.bind(this, function (evt) {
+        if ((show && elt.enabled == null) || elt.enabled) {
+          this.editorUi.editor.graph.popupMenuHandler.hideMenu();
+          var menu = new mxPopupMenu(funct);
+          menu.div.className = ' webix_view webix_window webix_popup webix_win_content geMenubarMenu';
+          menu.smartSeparators = true;
+          menu.showDisabled = true;
+          menu.autoExpand = true;
+  
+          // Disables autoexpand and destroys menu when hidden
+          menu.hideMenu = mxUtils.bind(this, function () {
+            mxPopupMenu.prototype.hideMenu.apply(menu, arguments);
+            this.editorUi.resetCurrentMenu();
+            menu.destroy();
+          });
+  
+          var offset = mxUtils.getOffset(elt);
+          menu.popup(offset.x, offset.y + elt.offsetHeight, null, evt);
+          this.editorUi.setCurrentMenu(menu, elt);
+        }
+  
+        mxEvent.consume(evt);
+      });
+  
+      // Shows menu automatically while in expanded state
+      mxEvent.addListener(
+        elt,
+        'mousemove',
+        mxUtils.bind(this, function (evt) {
+          if (this.editorUi.currentMenu != null && this.editorUi.currentMenuElt != elt) {
+            this.editorUi.hideCurrentMenu();
+            clickHandler(evt);
+          }
+        })
+      );
+  
+      // Hides menu if already showing and prevents focus
+      mxEvent.addListener(
+        elt,
+        mxClient.IS_POINTER ? 'pointerdown' : 'mousedown',
+        mxUtils.bind(this, function (evt) {
+          show = this.currentElt != elt;
+          evt.preventDefault();
+        })
+      );
+  
+      mxEvent.addListener(
+        elt,
+        'click',
+        mxUtils.bind(this, function (evt) {
           clickHandler(evt);
-        }
-      })
-    );
-
-    // Hides menu if already showing and prevents focus
-    mxEvent.addListener(
-      elt,
-      mxClient.IS_POINTER ? 'pointerdown' : 'mousedown',
-      mxUtils.bind(this, function (evt) {
-        show = this.currentElt != elt;
-        evt.preventDefault();
-      })
-    );
-
-    mxEvent.addListener(
-      elt,
-      'click',
-      mxUtils.bind(this, function (evt) {
-        clickHandler(evt);
-        show = true;
-      })
-    );
+          show = true;
+        })
+      );
+    }
+  };
+  
+  /**
+   * Creates the keyboard event handler for the current graph and history.
+   */
+  Menubar.prototype.destroy = function () {
+    // do nothing
+  };
+  
+  /**
+   * Constructs a new action for the given parameters.
+   */
+  function Menu(funct, enabled) {
+    mxEventSource.call(this);
+    this.funct = funct;
+    this.enabled = enabled != null ? enabled : true;
   }
-};
-
-/**
- * Creates the keyboard event handler for the current graph and history.
- */
-Menubar.prototype.destroy = function () {
-  // do nothing
-};
-
-/**
- * Constructs a new action for the given parameters.
- */
-function Menu(funct, enabled) {
-  mxEventSource.call(this);
-  this.funct = funct;
-  this.enabled = enabled != null ? enabled : true;
-}
-
-// Menu inherits from mxEventSource
-mxUtils.extend(Menu, mxEventSource);
-
-/**
- * Sets the enabled state of the action and fires a stateChanged event.
- */
-Menu.prototype.isEnabled = function () {
-  return this.enabled;
-};
-
-/**
- * Sets the enabled state of the action and fires a stateChanged event.
- */
-Menu.prototype.setEnabled = function (value) {
-  if (this.enabled != value) {
-    this.enabled = value;
-    this.fireEvent(new mxEventObject('stateChanged'));
-  }
-};
-
-/**
- * Sets the enabled state of the action and fires a stateChanged event.
- */
-Menu.prototype.execute = function (menu, parent) {
-  this.funct(menu, parent);
-};
-
-/**
- * "Installs" menus in EditorUi.
- */
-EditorUi.prototype.createMenus = function () {
-  return new Menus(this);
-};
+  
+  // Menu inherits from mxEventSource
+  mxUtils.extend(Menu, mxEventSource);
+  
+  /**
+   * Sets the enabled state of the action and fires a stateChanged event.
+   */
+  Menu.prototype.isEnabled = function () {
+    return this.enabled;
+  };
+  
+  /**
+   * Sets the enabled state of the action and fires a stateChanged event.
+   */
+  Menu.prototype.setEnabled = function (value) {
+    if (this.enabled != value) {
+      this.enabled = value;
+      this.fireEvent(new mxEventObject('stateChanged'));
+    }
+  };
+  
+  /**
+   * Sets the enabled state of the action and fires a stateChanged event.
+   */
+  Menu.prototype.execute = function (menu, parent) {
+    this.funct(menu, parent);
+  };
+  
+  /**
+   * "Installs" menus in EditorUi.
+   */
+  EditorUi.prototype.createMenus = function () {
+    return new Menus(this);
+  };
 
 //Menus.js end
 
 //Dialogs.js start
 
-
-
 /**
  * Fix minimize/maximize localization
  */
+
 function mtWindow(title, content, x, y, width, height, minimizable, moveable, replace, style)
 {
     mxWindow.call(this, title, content, x, y, width, height, minimizable, moveable, replace, style);
@@ -34025,18 +32708,16 @@ ExportDialog.exportFile = function(editorUi, name, format, bg, s, b)
     
     if (format == 'xml')
     {
-       
         ExportDialog.saveLocalFile(editorUi, mxUtils.getXml(editorUi.editor.getGraphXml()), name, format);
     }
     else if (format == 'svg')
     {
-       
         ExportDialog.saveLocalFile(editorUi, mxUtils.getXml(graph.getSvg(bg, s, b)), name, format);
     }
     else
     {
         var bounds = graph.getGraphBounds();
-        console.log('bounds', bounds)
+        
         // New image export
         var xmlDoc = mxUtils.createXmlDocument();
         var root = xmlDoc.createElement('output');
@@ -35623,12 +34304,12 @@ var EquipmentWindow = function (editorUi, eqID)
 
 //ViewMode.js start
 
-
-
 /**
  * View mode logic
  */
+
 function ViewModeHandler (editorUI)
+//export default function ViewModeHandler (editorUI)
 {
     mxEventSource.call(this);
 
@@ -35658,7 +34339,7 @@ ViewModeHandler.prototype.init = function()
     {
         const specialElements = ["poster", "dispatcher_mark"];
         const cell = me.getCell();
-
+     
         /* disable when dispatcher editing enabled */
         if (_marksService.isEnabled()) {
             const cellState = cell ? this.graph.view.getState(cell) : null;
@@ -35732,10 +34413,12 @@ ViewModeHandler.prototype.init = function()
 
 
     const cells = this.getSchemeCells();
-
+   
     for (let i = 0; i < cells.length; i++)
     {
+        
         let cell = cells[i];
+       
         if (!cell)
             continue;
 
@@ -35814,13 +34497,14 @@ ViewModeHandler.prototype.createMenubar = function ()
 
 ViewModeHandler.prototype.updateBindMapping = function (cell, value)
 {
-    // cell.bindingMap[value] = cell.bindingMap[value] || [];
-    // let bindings = cell.getBindingsByID(value);
-    // bindings.forEach(function (b)
-    // {
-    //     if (cell.bindingMap[value].indexOf(b) < 0)
-    //         cell.bindingMap[value].push(b);
-    // });
+    cell.bindingMap[value] = cell.bindingMap[value] || [];
+   
+    let bindings = cell.getBindingsByID(value);
+    bindings.forEach(function (b)
+    {
+        if (cell.bindingMap[value].indexOf(b) < 0)
+            cell.bindingMap[value].push(b);
+    });
 }
 
 ViewModeHandler.prototype.updateCellMapping = function (cell, value)
@@ -36087,593 +34771,3146 @@ ViewModeHandler.prototype.destroy = function ()
 /**
  * Scripts support
  */
-  function ScriptHandler (editorUI) {
-  mxEventSource.call(this);
-
-  this.ui = editorUI;
-  this.editor = this.ui.editor;
-  this.graph = this.editor.graph;
-  this.view = this.ui.viewHandler;
-  this.marksService = editorUI.marksService;
-  this.scriptors = new Map();
-  this.init();
-  this.menus = editorUI.createMenus();
-};
-mxUtils.extend(ScriptHandler, mxEventSource);
-
-ScriptHandler.prototype.init = function () {
-  var shapeBaseAPI = mxUtils.bind(this, function () {
-    return new ShapeAPI(this.ui);
-  });
-  var linkBaseAPI = mxUtils.bind(this, function () {
-    return new LinkScriptAPI(this.ui);
-  });
-  var switchBaseAPI = mxUtils.bind(this, function () {
-    return new SwitchScriptAPI(this.ui);
-  });
-  var busBaseAPI = mxUtils.bind(this, function () {
-    return new BusScriptAPI(this.ui);
-  });
-  var soundBaseAPI = mxUtils.bind(this, function () {
-    return new SoundScriptAPI(this.ui);
-  });
-  var tableBaseAPI = mxUtils.bind(this, function () {
-    return new TableScriptAPI(this.ui);
-  });
-  var buttonBaseAPI = mxUtils.bind(this, function () {
-    return new ButtonScriptAPI(this.ui);
-  });
-  var chartBaseAPI = mxUtils.bind(this, function () {
-    return new ChartScriptAPI(this.ui);
-  });
-  var rollSwitchBaseAPI = mxUtils.bind(this, function () {
-    return new RollSwitchScriptAPI(this.ui);
-  });
-  var rollDisconnectorBaseAPI = mxUtils.bind(this, function () {
-    return new RollDisconnectorScriptAPI(this.ui);
-  });
-  var disconnectorBaseAPI = mxUtils.bind(this, function () {
-    return new DisconnectorScriptAPI(this.ui);
-  });
-  var separatorBaseAPI = mxUtils.bind(this, function () {
-    return new SeparatorScriptAPI(this.ui);
-  });
-  var groundBaseAPI = mxUtils.bind(this, function () {
-    return new GroundScriptAPI(this.ui);
-  });
-  var rollelementBaseAPI = mxUtils.bind(this, function () {
-    return new RollElementScriptAPI(this.ui);
-  });
-  var actuatorBaseAPI = mxUtils.bind(this, function () {
-    return new ActuatorScriptAPI(this.ui);
-  });
-  var simpleSwitchBaseAPI = mxUtils.bind(this, function () {
-    return new SimpleSwitchScriptAPI(this.ui);
-  });
-  var bmrzBaseAPI = mxUtils.bind(this, function () {
-    return new BMRZScriptAPI(this.ui);
-  });
-  var posterBaseAPI = mxUtils.bind(this, function () {
-    return new PosterScriptAPI(this.ui);
-  });
-  var dispatcherMarkBaseAPI = mxUtils.bind(this, function () {
-    return new DispatcherMarkScriptAPI(this.ui);
-  });
-
-  // simple shapes
-  this.scriptors.set('label', shapeBaseAPI);
-  this.scriptors.set('text', shapeBaseAPI);
-  this.scriptors.set('rectangle', shapeBaseAPI);
-  this.scriptors.set('ellipse', shapeBaseAPI);
-  this.scriptors.set('triangle', shapeBaseAPI);
-  this.scriptors.set('rhombus', shapeBaseAPI);
-  this.scriptors.set('trapezoid', shapeBaseAPI);
-  this.scriptors.set('parallelogram', shapeBaseAPI);
-  this.scriptors.set('cylinder', shapeBaseAPI);
-  this.scriptors.set('cube', shapeBaseAPI);
-  this.scriptors.set('cloud', shapeBaseAPI);
-  this.scriptors.set('actor', shapeBaseAPI);
-  this.scriptors.set('singlearrow', shapeBaseAPI);
-  this.scriptors.set('doublearrow', shapeBaseAPI);
-  this.scriptors.set('image', shapeBaseAPI);
-  this.scriptors.set('arc', shapeBaseAPI);
-  this.scriptors.set('swimlane', shapeBaseAPI);
-
-  this.scriptors.set('custom', shapeBaseAPI); // for hrefs
-  this.scriptors.set('group', shapeBaseAPI); // for groups
-
-  // custom shapes
-  this.scriptors.set('button', buttonBaseAPI);
-  this.scriptors.set('link', linkBaseAPI);
-  this.scriptors.set('sound', soundBaseAPI);
-  this.scriptors.set('table', tableBaseAPI);
-  this.scriptors.set('chart', chartBaseAPI);
-
-  // @if WEBSCADA
-  this.scriptors.set('bus', busBaseAPI);
-  this.scriptors.set('switch', switchBaseAPI);
-  this.scriptors.set('separator', separatorBaseAPI);
-  this.scriptors.set('rollswitch', rollSwitchBaseAPI);
-  this.scriptors.set('rolldisconnector', rollDisconnectorBaseAPI);
-  this.scriptors.set('disconnector', disconnectorBaseAPI);
-  this.scriptors.set('ground', groundBaseAPI);
-  this.scriptors.set('contactor', groundBaseAPI);
-  this.scriptors.set('rollelement', rollelementBaseAPI);
-  this.scriptors.set('actuator', actuatorBaseAPI);
-  this.scriptors.set('simpleswitch', simpleSwitchBaseAPI);
-  this.scriptors.set('poster', posterBaseAPI);
-  this.scriptors.set('dispatcher_mark', dispatcherMarkBaseAPI);
-  // @endif
-
-  // @if LINKMT
-  this.scriptors.set('bmrz', bmrzBaseAPI);
-  // @endif
-
-  //----> longTouch conextMenu
-  const editor = this.ui.editor;
-  const graph = editor.graph;
-  let contextMenu = null;
-
-  graph.addListener(
-    mxEvent.TAP_AND_HOLD,
-    function (sender, evt) {
-      const cell = evt.getProperty('cell');
-
-      //pick up active point
-      graph.setSelectionCell(cell);
-      if (!cell) {
-        graph.clearSelection();
-      }
-      if (cell) {
-        //create context menu
-        contextMenu = new mxPopupMenu(document.createElement('div'));
-        contextMenu.div.className = 'mxPopupMenu';
-        this.menus.createPopupMenu(contextMenu, cell, evt);
-
-        //-------> fix bug with extra divs. case: touch by touch
-        const divs = document.querySelectorAll('.mxPopupMenu');
-        let num = divs.length;
-        for (let i = 0; i < divs.length; i++) {
-          num -= 1;
-          if (num == 0) {
-            break;
-          } else {
-            divs[i].remove();
-          }
-        }
-        //<------- fix bug with extra divs. case: touch by touch
-
-        //add position for context menu touch by touch
-        const x = evt.getProperty('event').clientX;
-        const y = evt.getProperty('event').clientY;
-        contextMenu.div.style.left = `${x}px`;
-        contextMenu.div.style.top = `${y}px`;
-        contextMenu.showMenu();
-      }
-    }.bind(this)
-  );
-
-  //-------> fix bug with empty tbody
-  graph.addListener(mxEvent.TAP_AND_HOLD, function (sender, evt) {
-    const div = document.querySelector('div.mxPopupMenu');
-    const tbody = document.querySelector('div.mxPopupMenu tbody');
-    if (tbody && tbody.innerHTML.trim() === '') {
-      div.remove();
-    }
-  });
-  //<------- fix bug with empty tbody
-
-  document.addEventListener('click', function (event) {
-    const menuContainer = document.querySelector('.mxPopupMenu');
-    if (menuContainer) {
-      contextMenu.hideMenu();
-    }
-  });
-  //-------> fix bug with extra divs. case: touch switch mouse
-  graph.addListener(mxEvent.CLICK, function (sender, evt) {
-    const cell = evt.getProperty('cell');
-    const menuContainer = document.querySelectorAll('div.mxPopupMenu');
-
-    if (menuContainer && menuContainer.length > 1) {
-      const divs = document.querySelectorAll('div.mxPopupMenu');
-      divs[0].remove();
-    }
-    if (contextMenu && !cell) {
-      contextMenu.hideMenu();
-    }
-  });
-  //<------- fix bug with extra divs. case: touch switch mouse
-
-  //<---- longTouch conextMenu
-
-  // @if WEBSCADA
-  var menusCreatePopupMenu = Menus.prototype.createPopupMenu;
-  Menus.prototype.createPopupMenu = function (menu, cell, evt) {
-    menusCreatePopupMenu.apply(this, arguments);
-
-    const isLeftClick = mxEvent.isLeftMouseButton(evt);
-    const isMiddleClick = mxEvent.isMiddleMouseButton(evt);
-    if (!cell || isLeftClick || isMiddleClick) {
-      return;
-    }
-
-    const editor = this.editorUi.editor;
-    const graph = editor.graph;
-    const marksService = this.editorUi.marksService;
-    if (cell.manual || cell.blocked || cell.service || !API.USER.hasPermission('scheme.exec_cmd')) {
-      return;
-    }
-
-    let target = cell.commands != null ? cell : cell.getParent();
-    let commands = target != null ? target.commands : null;
-    if (commands != null && commands.length > 0) {
-      for (let i = 0; i < commands.length; i++) {
-        let cmd = commands[i];
-        menu.addItem(
-          cmd.d,
-          null,
-          mxUtils.bind(cmd, function () {
-            if (target.scriptor != null) target.scriptor.execCommand(target, this);
-          }),
-          null,
-          null,
-          true
-        );
-      }
-    }
-    // Poster actions
-    if (cell.scriptor && cell.scriptor instanceof PosterScriptAPI && marksService.isEnabled()) {
-      menu.addItem('Редактировать', null, () => {
-        API.POSTERS.openPosterEditor(graph, cell, false);
-      });
-      menu.addItem('Удалить', null, () => {
-        try {
-          graph.model.beginUpdate();
-          graph.removeCells([cell]);
-        } finally {
-          graph.model.endUpdate();
-        }
-      });
-    }
-    // Dispatcher mark actions
-    if (cell.scriptor && cell.scriptor instanceof DispatcherMarkScriptAPI && marksService.isEnabled()) {
-      menu.addItem('Редактировать', null, () => {
-        API.DISPATCHER_MARKS.openMarkEditor(graph, cell, false);
-      });
-      menu.addItem('Удалить', null, () => {
-        try {
-          graph.model.beginUpdate();
-          graph.removeCells([cell]);
-        } finally {
-          graph.model.endUpdate();
-        }
-      });
-    }
+ 
+ function ScriptHandler (editorUI) {
+    mxEventSource.call(this);
+  
+    this.ui = editorUI;
+    this.editor = this.ui.editor;
+    this.graph = this.editor.graph;
+    this.view = this.ui.viewHandler;
+    this.marksService = editorUI.marksService;
+    this.scriptors = new Map();
+    this.init();
+    this.menus = editorUI.createMenus();
   };
-  // @endif
-
-  this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
-    if (this.marksService.isEnabled()) return;
-
-    const isRightClick = mxEvent.isRightMouseButton(evt.getProperty('event'));
-    const cell = evt.getProperty('cell'); // cell may be null
-
-    const onCellLeftClick = () => {
-      const styles = cell.style.split(';');
-
-      if (styles.includes('poster')) {
-        /* cell is poster */
-        API.POSTERS.openPosterViewer(cell._model, this.graph, cell);
-        evt.consume();
-      } else if (styles.includes('dispatcher_mark')) {
-        /* cell is dispatcher mark */
-        API.DISPATCHER_MARKS.openMarkViewer(cell._model, this.graph, cell);
-        evt.consume();
-      } else {
-        /* generic cell - check and execute binded action */
-        const target = cell.action != null ? cell : cell.getParent();
-        if (target != null && target.action != null) {
-          if (target.scriptor != null) {
-            target.scriptor.execAction(cell);
-          }
-          evt.consume();
+  mxUtils.extend(ScriptHandler, mxEventSource);
+  
+  ScriptHandler.prototype.init = function () {
+    var shapeBaseAPI = mxUtils.bind(this, function () {
+      return new ShapeAPI(this.ui);
+    });
+    var linkBaseAPI = mxUtils.bind(this, function () {
+      return new LinkScriptAPI(this.ui);
+    });
+    var switchBaseAPI = mxUtils.bind(this, function () {
+      return new SwitchScriptAPI(this.ui);
+    });
+    var busBaseAPI = mxUtils.bind(this, function () {
+      return new BusScriptAPI(this.ui);
+    });
+    var soundBaseAPI = mxUtils.bind(this, function () {
+      return new SoundScriptAPI(this.ui);
+    });
+    var tableBaseAPI = mxUtils.bind(this, function () {
+      return new TableScriptAPI(this.ui);
+    });
+    var buttonBaseAPI = mxUtils.bind(this, function () {
+      return new ButtonScriptAPI(this.ui);
+    });
+    var chartBaseAPI = mxUtils.bind(this, function () {
+      return new ChartScriptAPI(this.ui);
+    });
+    var rollSwitchBaseAPI = mxUtils.bind(this, function () {
+      return new RollSwitchScriptAPI(this.ui);
+    });
+    var rollDisconnectorBaseAPI = mxUtils.bind(this, function () {
+      return new RollDisconnectorScriptAPI(this.ui);
+    });
+    var disconnectorBaseAPI = mxUtils.bind(this, function () {
+      return new DisconnectorScriptAPI(this.ui);
+    });
+    var separatorBaseAPI = mxUtils.bind(this, function () {
+      return new SeparatorScriptAPI(this.ui);
+    });
+    var groundBaseAPI = mxUtils.bind(this, function () {
+      return new GroundScriptAPI(this.ui);
+    });
+    var rollelementBaseAPI = mxUtils.bind(this, function () {
+      return new RollElementScriptAPI(this.ui);
+    });
+    var actuatorBaseAPI = mxUtils.bind(this, function () {
+      return new ActuatorScriptAPI(this.ui);
+    });
+    var simpleSwitchBaseAPI = mxUtils.bind(this, function () {
+      return new SimpleSwitchScriptAPI(this.ui);
+    });
+    var bmrzBaseAPI = mxUtils.bind(this, function () {
+      return new BMRZScriptAPI(this.ui);
+    });
+    var posterBaseAPI = mxUtils.bind(this, function () {
+      return new PosterScriptAPI(this.ui);
+    });
+    var dispatcherMarkBaseAPI = mxUtils.bind(this, function () {
+      return new DispatcherMarkScriptAPI(this.ui);
+    });
+  
+    // simple shapes
+    this.scriptors.set('label', shapeBaseAPI);
+    this.scriptors.set('text', shapeBaseAPI);
+    this.scriptors.set('rectangle', shapeBaseAPI);
+    this.scriptors.set('ellipse', shapeBaseAPI);
+    this.scriptors.set('triangle', shapeBaseAPI);
+    this.scriptors.set('rhombus', shapeBaseAPI);
+    this.scriptors.set('trapezoid', shapeBaseAPI);
+    this.scriptors.set('parallelogram', shapeBaseAPI);
+    this.scriptors.set('cylinder', shapeBaseAPI);
+    this.scriptors.set('cube', shapeBaseAPI);
+    this.scriptors.set('cloud', shapeBaseAPI);
+    this.scriptors.set('actor', shapeBaseAPI);
+    this.scriptors.set('singlearrow', shapeBaseAPI);
+    this.scriptors.set('doublearrow', shapeBaseAPI);
+    this.scriptors.set('image', shapeBaseAPI);
+    this.scriptors.set('arc', shapeBaseAPI);
+    this.scriptors.set('swimlane', shapeBaseAPI);
+  
+    this.scriptors.set('custom', shapeBaseAPI); // for hrefs
+    this.scriptors.set('group', shapeBaseAPI); // for groups
+  
+    // custom shapes
+    this.scriptors.set('button', buttonBaseAPI);
+    this.scriptors.set('link', linkBaseAPI);
+    this.scriptors.set('sound', soundBaseAPI);
+    this.scriptors.set('table', tableBaseAPI);
+    this.scriptors.set('chart', chartBaseAPI);
+  
+    // @if WEBSCADA
+    this.scriptors.set('bus', busBaseAPI);
+    this.scriptors.set('switch', switchBaseAPI);
+    this.scriptors.set('separator', separatorBaseAPI);
+    this.scriptors.set('rollswitch', rollSwitchBaseAPI);
+    this.scriptors.set('rolldisconnector', rollDisconnectorBaseAPI);
+    this.scriptors.set('disconnector', disconnectorBaseAPI);
+    this.scriptors.set('ground', groundBaseAPI);
+    this.scriptors.set('contactor', groundBaseAPI);
+    this.scriptors.set('rollelement', rollelementBaseAPI);
+    this.scriptors.set('actuator', actuatorBaseAPI);
+    this.scriptors.set('simpleswitch', simpleSwitchBaseAPI);
+    this.scriptors.set('poster', posterBaseAPI);
+    this.scriptors.set('dispatcher_mark', dispatcherMarkBaseAPI);
+    // @endif
+  
+    // @if LINKMT
+    this.scriptors.set('bmrz', bmrzBaseAPI);
+    // @endif
+  
+    //----> longTouch conextMenu
+    const editor = this.ui.editor;
+    const graph = editor.graph;
+    let contextMenu = null;
+  
+    graph.addListener(
+      mxEvent.TAP_AND_HOLD,
+      function (sender, evt) {
+        const cell = evt.getProperty('cell');
+  
+        //pick up active point
+        graph.setSelectionCell(cell);
+        if (!cell) {
+          graph.clearSelection();
         }
+        if (cell) {
+          //create context menu
+          contextMenu = new mxPopupMenu(document.createElement('div'));
+          contextMenu.div.className = 'mxPopupMenu';
+          this.menus.createPopupMenu(contextMenu, cell, evt);
+  
+          //-------> fix bug with extra divs. case: touch by touch
+          const divs = document.querySelectorAll('.mxPopupMenu');
+          let num = divs.length;
+          for (let i = 0; i < divs.length; i++) {
+            num -= 1;
+            if (num == 0) {
+              break;
+            } else {
+              divs[i].remove();
+            }
+          }
+          //<------- fix bug with extra divs. case: touch by touch
+  
+          //add position for context menu touch by touch
+          const x = evt.getProperty('event').clientX;
+          const y = evt.getProperty('event').clientY;
+          contextMenu.div.style.left = `${x}px`;
+          contextMenu.div.style.top = `${y}px`;
+          contextMenu.showMenu();
+        }
+      }.bind(this)
+    );
+  
+    //-------> fix bug with empty tbody
+    graph.addListener(mxEvent.TAP_AND_HOLD, function (sender, evt) {
+      const div = document.querySelector('div.mxPopupMenu');
+      const tbody = document.querySelector('div.mxPopupMenu tbody');
+      if (tbody && tbody.innerHTML.trim() === '') {
+        div.remove();
+      }
+    });
+    //<------- fix bug with empty tbody
+  
+    document.addEventListener('click', function (event) {
+      const menuContainer = document.querySelector('.mxPopupMenu');
+      if (menuContainer) {
+        contextMenu.hideMenu();
+      }
+    });
+    //-------> fix bug with extra divs. case: touch switch mouse
+    graph.addListener(mxEvent.CLICK, function (sender, evt) {
+      const cell = evt.getProperty('cell');
+      const menuContainer = document.querySelectorAll('div.mxPopupMenu');
+  
+      if (menuContainer && menuContainer.length > 1) {
+        const divs = document.querySelectorAll('div.mxPopupMenu');
+        divs[0].remove();
+      }
+      if (contextMenu && !cell) {
+        contextMenu.hideMenu();
+      }
+    });
+    //<------- fix bug with extra divs. case: touch switch mouse
+  
+    //<---- longTouch conextMenu
+  
+    // @if WEBSCADA
+    var menusCreatePopupMenu = Menus.prototype.createPopupMenu;
+    Menus.prototype.createPopupMenu = function (menu, cell, evt) {
+      menusCreatePopupMenu.apply(this, arguments);
+  
+      const isLeftClick = mxEvent.isLeftMouseButton(evt);
+      const isMiddleClick = mxEvent.isMiddleMouseButton(evt);
+      if (!cell || isLeftClick || isMiddleClick) {
+        return;
+      }
+  
+      const editor = this.editorUi.editor;
+      const graph = editor.graph;
+      const marksService = this.editorUi.marksService;
+      if (cell.manual || cell.blocked || cell.service || !API.USER.hasPermission('scheme.exec_cmd')) {
+        return;
+      }
+  
+      let target = cell.commands != null ? cell : cell.getParent();
+      let commands = target != null ? target.commands : null;
+      if (commands != null && commands.length > 0) {
+        for (let i = 0; i < commands.length; i++) {
+          let cmd = commands[i];
+          menu.addItem(
+            cmd.d,
+            null,
+            mxUtils.bind(cmd, function () {
+              if (target.scriptor != null) target.scriptor.execCommand(target, this);
+            }),
+            null,
+            null,
+            true
+          );
+        }
+      }
+      // Poster actions
+      if (cell.scriptor && cell.scriptor instanceof PosterScriptAPI && marksService.isEnabled()) {
+        menu.addItem('Редактировать', null, () => {
+          API.POSTERS.openPosterEditor(graph, cell, false);
+        });
+        menu.addItem('Удалить', null, () => {
+          try {
+            graph.model.beginUpdate();
+            graph.removeCells([cell]);
+          } finally {
+            graph.model.endUpdate();
+          }
+        });
+      }
+      // Dispatcher mark actions
+      if (cell.scriptor && cell.scriptor instanceof DispatcherMarkScriptAPI && marksService.isEnabled()) {
+        menu.addItem('Редактировать', null, () => {
+          API.DISPATCHER_MARKS.openMarkEditor(graph, cell, false);
+        });
+        menu.addItem('Удалить', null, () => {
+          try {
+            graph.model.beginUpdate();
+            graph.removeCells([cell]);
+          } finally {
+            graph.model.endUpdate();
+          }
+        });
       }
     };
-
-    if (cell && !isRightClick) {
-      /* left click on cell */
-      onCellLeftClick();
-      // } else if (!cell && !isRightClick) {
-      //     /* left click on emty space */
-      // } else if (!cell && isRightClick) {
-      //     /* right click on emty space */
-    }
-
-    // if (cell != null && (cell.commands == null || cell.commands.length == 0))
-    // {
-    //     let target = (cell.action != null ? cell : cell.getParent());
-    //     if (target != null && target.action != null)
-    //     {
-    //         if (target.scriptor != null)
-    //             target.scriptor.execAction(cell);
-    //         evt.consume();
-    //     }
-    // }
-  });
-
-  let graphConvertValueToString = this.graph.convertValueToString;
-  this.graph.convertValueToString = function (cell) {
-    if (this.model.isVertex(cell)) {
-      let state = this.view.getState(cell);
-      if (state != null) {
-        switch (state.style[mxConstants.STYLE_SHAPE]) {
-          case 'chart': {
-            // remove image
-            if (state.shape.image != null) {
-              delete state.shape.image;
-              this.cellRenderer.doRedrawShape(state);
+    // @endif
+  
+    this.graph.addListener(mxEvent.CLICK, (sender, evt) => {
+      if (this.marksService.isEnabled()) return;
+  
+      const isRightClick = mxEvent.isRightMouseButton(evt.getProperty('event'));
+      const cell = evt.getProperty('cell'); // cell may be null
+  
+      const onCellLeftClick = () => {
+        const styles = cell.style.split(';');
+  
+        if (styles.includes('poster')) {
+          /* cell is poster */
+          API.POSTERS.openPosterViewer(cell._model, this.graph, cell);
+          evt.consume();
+        } else if (styles.includes('dispatcher_mark')) {
+          /* cell is dispatcher mark */
+          API.DISPATCHER_MARKS.openMarkViewer(cell._model, this.graph, cell);
+          evt.consume();
+        } else {
+          /* generic cell - check and execute binded action */
+          const target = cell.action != null ? cell : cell.getParent();
+          if (target != null && target.action != null) {
+            if (target.scriptor != null) {
+              target.scriptor.execAction(cell);
             }
-            return cell.canvas;
+            evt.consume();
+          }
+        }
+      };
+  
+      if (cell && !isRightClick) {
+        /* left click on cell */
+        onCellLeftClick();
+        // } else if (!cell && !isRightClick) {
+        //     /* left click on emty space */
+        // } else if (!cell && isRightClick) {
+        //     /* right click on emty space */
+      }
+  
+      // if (cell != null && (cell.commands == null || cell.commands.length == 0))
+      // {
+      //     let target = (cell.action != null ? cell : cell.getParent());
+      //     if (target != null && target.action != null)
+      //     {
+      //         if (target.scriptor != null)
+      //             target.scriptor.execAction(cell);
+      //         evt.consume();
+      //     }
+      // }
+    });
+  
+    let graphConvertValueToString = this.graph.convertValueToString;
+    this.graph.convertValueToString = function (cell) {
+      if (this.model.isVertex(cell)) {
+        let state = this.view.getState(cell);
+        if (state != null) {
+          switch (state.style[mxConstants.STYLE_SHAPE]) {
+            case 'chart': {
+              // remove image
+              if (state.shape.image != null) {
+                delete state.shape.image;
+                this.cellRenderer.doRedrawShape(state);
+              }
+              return cell.canvas;
+            }
+          }
+        }
+      }
+      return graphConvertValueToString.apply(this, arguments);
+    };
+  };
+  
+  ScriptHandler.prototype.register = function (name, script) {
+    if (isNullOrEmpty(name) || isNullOrEmpty(script)) return;
+    var scriptor = this.scriptors.get(name);
+    if (scriptor == null) {
+      let evalResult = mxUtils.eval(script);
+      if (evalResult != null && typeof evalResult == 'function')
+        this.scriptors.set(
+          name.toLowerCase(),
+          mxUtils.bind(this, function () {
+            return new evalResult(this.ui);
+          })
+        );
+    }
+  };
+  ScriptHandler.prototype.setup = function (cell) {
+    if (cell == null || !mxUtils.isNode(cell.value)) return null;
+    if (!cell.scriptor) {
+      let name = cell.value.nodeName.toLowerCase();
+      if (isNullOrEmpty(name)) return null;
+  
+      // check binding
+    
+      let scriptBinding = cell.getBinding('script');
+      if (scriptBinding != null) {
+        let scriptName = $(scriptBinding).attr('value');
+        if (!isNullOrEmpty(scriptName)) name = scriptName.toLowerCase();
+      }
+  
+      let factory = this.scriptors.get(name) || this.scriptors.get('custom');
+      if (factory == null || typeof factory != 'function') return null;
+  
+      cell.scriptor = new factory();
+    }
+    return cell.scriptor;
+  };
+  ScriptHandler.prototype.destroy = function () {};
+  
+  function ShapeAPI(editorUI) {
+    mxEventSource.call(this);
+    this.ui = editorUI;
+    this.editor = this.ui.editor;
+    this.graph = this.editor.graph;
+    this.init();
+  }
+  mxUtils.extend(ShapeAPI, mxEventSource);
+  
+  ShapeAPI.prototype.init = function () {};
+  ShapeAPI.prototype.setup = function (cell) {
+    // hide tooltip
+    cell.getTooltip = function () {};
+    // set cursor
+    if (cell.bindings != null && cell.bindings.length > 0) {
+      let cellState = this.graph.view.getState(cell);
+      if (cellState == null) return;
+  
+      if (cell.commands == null) {
+        let commandsBinding = cell.getBinding('commands');
+        if (commandsBinding != null && !isNullOrEmpty(commandsBinding.value)) cell.commands = JSON.parse(commandsBinding.value);
+      }
+      if (cell.action == null) {
+        let actionBinding = cell.getBinding('action');
+        if (actionBinding != null && !isNullOrEmpty(actionBinding.value)) {
+          cell.action = JSON.parse(actionBinding.value);
+          let argsBinding = cell.getBinding('action.args');
+          cell.action_args = argsBinding != null ? JSON.parse(argsBinding.value) : null;
+        }
+      }
+  
+      if ((cell.commands != null && cell.commands.length > 0) || cell.action != null) cellState.setCursor(mxConstants.CURSOR_CONNECT);
+    }
+  };
+  ShapeAPI.prototype.visit = function (cell, map, resolver) {
+    this.setup(cell);
+    if (cell.bindings != null && cell.bindings.length > 0) {
+      for (var i = 0; i < cell.bindings.length; i++) {
+        var item = cell.bindings[i];
+        if (item != null && !isNullOrEmpty(item.value)) {
+          let bind = JSON.parse(item.value);
+          if (bind == null) continue;
+  
+          // common bindings
+          switch (item.name) {
+            case 'state':
+            case 'link':
+            case 'visibility':
+            case 'label':
+            case 'command':
+            case 'blink':
+            case 'rotation':
+            case 'turn':
+            case 'shift':
+            case 'move':
+            case 'play':
+            case 'color.fill.$1': // colors
+            case 'color.fill.$2':
+            case 'color.fill.$3':
+            case 'color.fill.$4':
+            case 'color.fill.$5':
+            case 'color.brd.$1':
+            case 'color.brd.$2':
+            case 'color.brd.$3':
+            case 'color.brd.$4':
+            case 'color.brd.$5':
+            case 'color.font.$1':
+            case 'color.font.$2':
+            case 'color.font.$3':
+            case 'color.font.$4':
+            case 'color.font.$5':
+            case 'action.trigger':
+              {
+                if (GUID.isValid(bind.id)) map.eq.push(bind);
+                else map.tag.push(bind);
+              }
+              break;
+            default:
+              {
+                // custom resolve
+                if (resolver != null && resolver(item)) break;
+                // process as static
+                this.exec(cell, item);
+              }
+              break;
           }
         }
       }
     }
-    return graphConvertValueToString.apply(this, arguments);
   };
-};
-
-ScriptHandler.prototype.register = function (name, script) {
-  if (isNullOrEmpty(name) || isNullOrEmpty(script)) return;
-  var scriptor = this.scriptors.get(name);
-  if (scriptor == null) {
-    let evalResult = mxUtils.eval(script);
-    if (evalResult != null && typeof evalResult == 'function')
-      this.scriptors.set(
-        name.toLowerCase(),
-        mxUtils.bind(this, function () {
-          return new evalResult(this.ui);
-        })
-      );
-  }
-};
-ScriptHandler.prototype.setup = function (cell) {
-  if (cell == null || !mxUtils.isNode(cell.value)) return null;
-  if (!cell.scriptor) {
-    let name = cell.value.nodeName.toLowerCase();
-    if (isNullOrEmpty(name)) return null;
-
-    // check binding
-    // let scriptBinding = cell.getBinding('script');
-    // if (scriptBinding != null) {
-    //   let scriptName = $(scriptBinding).attr('value');
-    //   if (!isNullOrEmpty(scriptName)) name = scriptName.toLowerCase();
-    // }
-
-    let factory = this.scriptors.get(name) || this.scriptors.get('custom');
-    if (factory == null || typeof factory != 'function') return null;
-
-    cell.scriptor = new factory();
-  }
-  return cell.scriptor;
-};
-ScriptHandler.prototype.destroy = function () {};
-
-function ShapeAPI(editorUI) {
-  mxEventSource.call(this);
-  this.ui = editorUI;
-  this.editor = this.ui.editor;
-  this.graph = this.editor.graph;
-  this.init();
-}
-mxUtils.extend(ShapeAPI, mxEventSource);
-
-ShapeAPI.prototype.init = function () {};
-ShapeAPI.prototype.setup = function (cell) {
-  // hide tooltip
-  cell.getTooltip = function () {};
-  // set cursor
-  if (cell.bindings != null && cell.bindings.length > 0) {
-    let cellState = this.graph.view.getState(cell);
-    if (cellState == null) return;
-
-    if (cell.commands == null) {
-      let commandsBinding = cell.getBinding('commands');
-      if (commandsBinding != null && !isNullOrEmpty(commandsBinding.value)) cell.commands = JSON.parse(commandsBinding.value);
+  ShapeAPI.prototype.checkValue = function (value) {
+    return value != null && value.q >= API.ENUMS.QualityValue.Good;
+  };
+  ShapeAPI.prototype.processValue = function (cell, value) {
+    let result = {
+      src: value,
+      get bad() {
+        return !shapeCheckValue(this.src);
+      },
+    };
+  
+    if (result.src != null) {
+      result.isbool = result.src.vtype == API.ENUMS.TagValueType.Boolean;
+      // eq state
+      if (result.src.eq && result.src.eq == result.src.id) {
+        result.state = {
+          values: result.src.v.split('|'),
+          has: function (val) {
+            return this.values.indexOf(val) >= 0;
+          },
+          get service() {
+            return this.has('SERVICE');
+          },
+          get blocked() {
+            return this.has('BLOCK');
+          },
+          get manual() {
+            return this.has('MANUAL');
+          },
+        };
+        result.value = this.resolveState(result);
+      } else result.value = this.resolveValue(result);
     }
-    if (cell.action == null) {
-      let actionBinding = cell.getBinding('action');
-      if (actionBinding != null && !isNullOrEmpty(actionBinding.value)) {
-        cell.action = JSON.parse(actionBinding.value);
-        let argsBinding = cell.getBinding('action.args');
-        cell.action_args = argsBinding != null ? JSON.parse(argsBinding.value) : null;
+  
+    // check blocked & manual & service states
+    if (result.state != null) {
+      cell.manual = null;
+      cell.blocked = null;
+      this.graph.removeCellOverlays(cell);
+  
+      cell.service = result.state.service;
+  
+      if (result.state.blocked) {
+        cell.blocked = true;
+        this.graph.addCellOverlay(cell, new mxCellOverlay(new mxImage(mxConstants.BLOCKED_IMAGE, 16, 16), 'Оперативная блокировка', null, mxConstants.ALIGN_TOP));
+      }
+      if (result.state.manual) {
+        cell.manual = true;
+        this.graph.addCellOverlay(cell, new mxCellOverlay(new mxImage(mxConstants.MANUAL_IMAGE, 16, 16), 'Ручное управление', null, mxConstants.ALIGN_BOTTOM));
       }
     }
-
-    if ((cell.commands != null && cell.commands.length > 0) || cell.action != null) cellState.setCursor(mxConstants.CURSOR_CONNECT);
+  
+    return result;
+  };
+  ShapeAPI.prototype.resolveState = function (result) {
+    let defaultState = 'UNKNOWN';
+    if (result == null || result.bad) return defaultState;
+    else return result.state.service ? 'SERVICE' : result.state.values.length > 0 ? result.state.values[0] : defaultState;
+  };
+  ShapeAPI.prototype.resolveValue = function (result) {
+      if (result == null || result.src == null) return null;
+    return API.FORMAT.getValue(result.src);
+  };
+  ShapeAPI.prototype.stateToBit = function (state) {
+    if (isNullOrEmpty(state)) return false;
+    return ['ON', 'ROLL_IN', 'ROLL_IN_SWITCH_ON', 'OPEN'].indexOf(state) >= 0;
+  };
+  ShapeAPI.prototype.exec = function (cell, binding, item) {
+    if (cell == null || binding == null) return;
+  
+    let actionName = binding.name;
+    if (isNullOrEmpty(actionName)) return;
+  
+    let actionPath = actionName.split('.');
+    if (actionPath.length > 1) actionName = actionPath[0];
+  
+    let targetAction = this[actionName];
+    if (targetAction == null) return;
+  
+    return targetAction.apply(this, [cell, binding, item]);
+  };
+  ShapeAPI.prototype.action = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return;
+  
+    if (binding.initial) return;
+  
+    let actionPath = binding.name.split('.');
+    if (actionPath.length == 0 || actionPath[0] != 'action') return;
+  
+    switch (actionPath[1]) {
+      case 'trigger':
+        {
+          let result = this.processValue(cell, value);
+          let on = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+          if (on) this.execAction(cell);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+  ShapeAPI.prototype.execCommand = function (cell, cmd) {
+    if (cell == null || cmd == null) return;
+  
+    if (cell.manual || cell.blocked || cell.service || !API.USER.hasPermission('scheme.exec_cmd')) {
+      console.log('Управление запрещено')
+      //messageError('Управление запрещено');
+      return;
+    }
+  
+    let postCommand = function (cmd) {
+      // subscribe to execution result
+      if (template != null && template.execHubProxy != null) template.execHubProxy.invoke('subscribe', cmd);
+  
+      // exec command
+      AJAX.post(
+        API.FUNC.schemeExecCmd,
+        null,
+        { id: cmd.id, parent: cmd.parent },
+        function (xhr, resp) {
+          if (resp === true) 
+          //messageDebug(translate('common.messages.command_sent_to_server'));
+          console.log('common.messages.command_sent_to_server')
+          //else messageError(translate('common.errors.command_execution'));
+          else console.log('common.errors.command_execution');
+        },
+        function (xhr, err) {
+          console.log('common.errors.command_execution')
+          //messageError(translate('common.errors.command_execution'));
+        }
+      );
+    };
+  
+    if (cmd.confirm != false) {
+      console.log('common.execute_command' + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
+        if (result === true) postCommand(cmd);
+      })
+      // messageConfirm(translate('common.execute_command') + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
+      //   if (result === true) postCommand(cmd);
+      // });
+    } else postCommand(cmd);
+  };
+  ShapeAPI.prototype.execAction = function (cell) {
+    if (cell == null || cell.action == null || cell.action_args == null) return;
+  
+    let cellState = this.graph.view.getState(cell);
+    if (cellState == null) return null;
+  
+    switch (cell.action) {
+      case 'exec':
+        {
+          cell.action_args.confirm = false;
+          this.execCommand(cell, cell.action_args);
+        }
+        break;
+      case 'open':
+        {
+          this.graph.openLink(cell.action_args.text, '_blank');
+        }
+        break;
+      case 'goto':
+        {
+          this.graph.openLink(cell.action_args.text, '_self');
+        }
+        break;
+      case 'camera':
+        {
+          let cam = new CameraWindow(this.ui, cell.action_args.text);
+          if (cam != null) {
+            if (cam.isVisible()) cam.show();
+            else cam.show(cellState.shape.node, { x: 10, y: 10 });
+          }
+        }
+        break;
+      case 'eq':
+        {
+          window.open(`/equipments/view?id=${cell.action_args.id}&mode=subwindow`, '_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');
+        }
+        break;
+      default:
+        break;
+    }
+  };
+  
+  ShapeAPI.prototype.vclass = function (cell, binding) {
+    if (cell == null || binding == null) return;
+    // get vclass
+    if (binding.name == 'vclass' && !isNullOrEmpty(binding.value)) cell.vclass = JSON.parse(binding.value);
+    // apply vclass
+    if (!VCLASS.isDefaultValue(cell.vclass)) {
+      let targetColor = VCLASS.getColor(cell.vclass);
+      // apply color
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, targetColor, [cell]);
+    }
+  };
+  ShapeAPI.prototype.visibility = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let visible = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    this.graph.cellsToggled([cell], visible || false);
+  
+    //let originOpacity     = cell.origin.style.opacity     || 100;
+    //let originTextOpacity = cell.origin.style.textOpacity || 100;
+  
+    //// remove opacity
+    //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, originOpacity, [cell]);
+    //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, originTextOpacity, [cell]);
+  
+    //let cellState = this.graph.view.getState(cell);
+    //if (cellState != null)
+    //{
+    //    let opacity     = visible ? (cell.origin.style.opacity     || 100) : 0;
+    //    let textopacity = visible ? (cell.origin.style.textOpacity || 100) : 0;
+    //    this.graph.setCellStyles(mxConstants.STYLE_OPACITY, opacity, [cell]);
+    //    this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, textopacity, [cell]);
+    //}
+  };
+  ShapeAPI.prototype.blink = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let blinking = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    if (cell.blinkingID) {
+      window.clearInterval(cell.blinkingID);
+      delete cell.blinkingID;
+    }
+  
+    //let originOpacity     = cell.origin.style.opacity     || 100;
+    //let originTextOpacity = cell.origin.style.textOpacity || 100;
+  
+    // reset visibility
+    this.graph.cellsToggled([cell], true);
+    //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, originOpacity, [cell]);
+    //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, originTextOpacity, [cell]);
+  
+    // run
+    if (blinking) {
+      if (cell.blinkSpeed == null) {
+        cell.blinkSpeed = 500;
+        let speedBinding = cell.getBinding('blink.speed');
+        if (speedBinding != null) cell.blinkSpeed = parseInt(JSON.parse(speedBinding.value));
+      }
+  
+      cell.blinkingID = window.setInterval(
+        mxUtils.bind(this, function (cell) {
+          //this.graph.toggleCells(!cell.isVisible(), [cell], false);
+          this.graph.cellsToggled([cell], !cell.isVisible());
+          //let style   = this.graph.getCellStyle(cell);
+          //let opValue = style.opacity == 100 ? 0 : 100;
+          //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, opValue, [cell]);
+          //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, opValue, [cell]);
+        }),
+        cell.blinkSpeed,
+        cell
+      );
+    }
+  };
+  ShapeAPI.prototype.label = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+    let result = this.processValue(cell, value);
+    this.graph.setAttributeForCell(cell, 'label', result.value);
+  };
+  ShapeAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let stateON = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let targetColor = cell.origin.style.fillColor || 'none';
+  
+    // если задан класс напряжения
+    if (!VCLASS.isDefaultValue(cell.vclass)) {
+      if (stateON) targetColor = VCLASS.getColor(cell.vclass);
+    }
+  
+    // проверяем динамические цвета заливки
+    if (cell.fill_colors && Object.keys(cell.fill_colors).length > 0) {
+      let firstIndex = Object.keys(cell.fill_colors).sort()[0];
+      targetColor = cell.fill_colors[firstIndex];
+    }
+  
+    // apply color
+    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
+  };
+  ShapeAPI.prototype.rotation = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let rotate = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    if (cell.rotationID) {
+      window.clearInterval(cell.rotationID);
+      delete cell.rotationID;
+    }
+  
+    // reset rotation
+    this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.origin.style.rotation || 0, [cell]);
+  
+    // run
+    if (rotate) {
+      if (cell.rotationSpeed == null) {
+        cell.rotationSpeed = 100;
+        let speedBinding = cell.getBinding('rotation.speed');
+        if (speedBinding != null) cell.rotationSpeed = parseInt(JSON.parse(speedBinding.value));
+      }
+  
+      cell.rotationID = window.setInterval(
+        mxUtils.bind(this, function (cell) {
+          let style = this.graph.getCellStyle(cell);
+          let rValue = (style.rotation || 0) + 10; // 10 град.
+          this.graph.setCellStyles(mxConstants.STYLE_ROTATION, rValue, [cell]);
+        }),
+        cell.rotationSpeed,
+        cell
+      );
+    }
+  };
+  ShapeAPI.prototype.turn = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let turning = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    // reset rotation
+    this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.origin.style.rotation || 0, [cell]);
+  
+    // run
+    if (turning) {
+      if (cell.turnAngle == null) {
+        cell.turnAngle = 90;
+        let angleBinding = cell.getBinding('turn.angle');
+        if (angleBinding != null) cell.turnAngle = parseInt(JSON.parse(angleBinding.value));
+      }
+      // apply
+      this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.turnAngle, [cell]);
+    }
+  };
+  ShapeAPI.prototype.shift = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let shifting = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let geo = this.graph.getCellGeometry(cell).clone();
+  
+    // reset cell position
+    geo.x = cell.origin.geometry.x;
+    geo.y = cell.origin.geometry.y;
+    this.graph.getModel().setGeometry(cell, geo);
+  
+    // run
+    if (shifting) {
+      if (cell.dx == null) {
+        let dxBinding = cell.getBinding('shift.dx');
+        cell.dx = dxBinding != null ? parseInt(JSON.parse(dxBinding.value)) : 0;
+      }
+      if (cell.dy == null) {
+        let dyBinding = cell.getBinding('shift.dy');
+        cell.dy = dyBinding != null ? parseInt(JSON.parse(dyBinding.value)) : 0;
+      }
+      // apply
+      geo.x += cell.dx;
+      geo.y += cell.dy;
+      this.graph.getModel().setGeometry(cell, geo);
+    }
+  };
+  ShapeAPI.prototype.move = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+    let moving = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let geo = this.graph.getCellGeometry(cell).clone();
+  
+    // reset cell position
+    geo.x = cell.origin.geometry.x;
+    geo.y = cell.origin.geometry.y;
+    this.graph.getModel().setGeometry(cell, geo);
+  
+    // run
+    if (moving) {
+      if (cell.x == null) {
+        let xBinding = cell.getBinding('move.x');
+        cell.x = xBinding != null ? parseInt(JSON.parse(xBinding.value)) : geo.x;
+      }
+      if (cell.y == null) {
+        let yBinding = cell.getBinding('move.y');
+        cell.y = yBinding != null ? parseInt(JSON.parse(yBinding.value)) : geo.y;
+      }
+      // apply
+      geo.x = cell.x;
+      geo.y = cell.y;
+      this.graph.getModel().setGeometry(cell, geo);
+    }
+  };
+  
+  ShapeAPI.prototype.color = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return null;
+  
+    let actionName = binding.name.split('.');
+    if (actionName.length == 0 || actionName[0] != 'color') return null;
+  
+    let color = null;
+    switch (actionName[1]) {
+      case 'fill':
+        color = this.color_fill(cell, binding, value);
+        break;
+      case 'brd':
+        color = this.color_border(cell, binding, value);
+        break;
+      case 'font':
+        color = this.color_font(cell, binding, value);
+        break;
+    }
+  
+    return color;
+  };
+  ShapeAPI.prototype.color_fill = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return null;
+  
+    // check vclass
+    if (!VCLASS.isDefaultValue(cell.vclass)) return null;
+  
+    let result = this.processValue(cell, value);
+    let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let color = null;
+  
+    // for dynamic colors
+    if (cell.fill_colors == null) cell.fill_colors = {};
+  
+    let actionName = binding.name;
+    let match = actionName.split('.')[2].match(/\d+$/);
+    let index = match != null && match.length > 0 ? match[0] : 0;
+  
+    let colorValueBinding = cell.getBinding(actionName + '.val');
+    if (index == 0 || colorValueBinding == null) delete cell.fill_colors[index];
+    else {
+      color = JSON.parse(colorValueBinding.value);
+      // get value
+      if (coloring) cell.fill_colors[index] = color;
+      else {
+        // bad quality
+        if (result.bad) cell.fill_colors[index] = VCLASS.UNRELIABLE_INFO;
+        else delete cell.fill_colors[index];
+      }
+    }
+  
+    // get first color or reset
+    if (Object.keys(cell.fill_colors).length > 0) {
+      let firstIndex = Object.keys(cell.fill_colors).sort()[0];
+      color = cell.fill_colors[firstIndex];
+    } else {
+      // for reset
+      color = null;
+    }
+  
+    // apply
+    cell.color_fill = color || cell.origin.style.fillColor || 'none';
+    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, cell.color_fill, [cell]);
+  
+    return cell.color_fill;
+  };
+  ShapeAPI.prototype.color_border = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return null;
+  
+    if (!VCLASS.isDefaultValue(cell.vclass)) return null;
+  
+    let result = this.processValue(cell, value);
+    let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let color = null;
+  
+    // for dynamic colors
+    if (cell.brd_colors == null) cell.brd_colors = {};
+  
+    let actionName = binding.name;
+    let match = actionName.split('.')[2].match(/\d+$/);
+    let index = match != null && match.length > 0 ? match[0] : 0;
+  
+    let colorValueBinding = cell.getBinding(actionName + '.val');
+    if (index == 0 || colorValueBinding == null) delete cell.brd_colors[index];
+    else {
+      color = JSON.parse(colorValueBinding.value);
+      // check value
+      if (coloring) cell.brd_colors[index] = color;
+      else delete cell.brd_colors[index];
+    }
+  
+    // get first color or reset
+    if (Object.keys(cell.brd_colors).length > 0) {
+      let firstIndex = Object.keys(cell.brd_colors).sort()[0];
+      color = cell.brd_colors[firstIndex];
+    } else {
+      // for reset
+      color = null;
+    }
+  
+    // apply
+    if (color != null) {
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, color, [cell]);
+    } else {
+      // reset to defaults
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, cell.origin.style.strokeColor || 'none', [cell]);
+    }
+  
+    return color;
+  };
+  ShapeAPI.prototype.color_font = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return null;
+  
+    let result = this.processValue(cell, value);
+    let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let color = null;
+  
+    // for dynamic colors
+    if (cell.font_colors == null) cell.font_colors = {};
+  
+    let actionName = binding.name;
+    let match = actionName.split('.')[2].match(/\d+$/);
+    let index = match != null && match.length > 0 ? match[0] : 0;
+  
+    let colorValueBinding = cell.getBinding(actionName + '.val');
+    if (index == 0 || colorValueBinding == null) delete cell.font_colors[index];
+    else {
+      color = JSON.parse(colorValueBinding.value);
+      // check value
+      if (coloring) cell.font_colors[index] = color;
+      else delete cell.font_colors[index];
+    }
+  
+    // get first color or reset
+    if (Object.keys(cell.font_colors).length > 0) {
+      let firstIndex = Object.keys(cell.font_colors).sort()[0];
+      color = cell.font_colors[firstIndex];
+    } else {
+      // for reset
+      color = null;
+    }
+  
+    // apply
+    if (color != null) {
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, color, [cell]);
+    } else {
+      // reset to defaults
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, cell.origin.style.fontColor || 'none', [cell]);
+    }
+  
+    return color;
+  };
+  
+  // save base implementation
+  var shapeInit = ShapeAPI.prototype.init;
+  var shapeSetup = ShapeAPI.prototype.setup;
+  var shapeVisit = ShapeAPI.prototype.visit;
+  var shapeCheckValue = ShapeAPI.prototype.checkValue;
+  var shapeProcessValue = ShapeAPI.prototype.processValue;
+  var shapeResolveState = ShapeAPI.prototype.resolveState;
+  var shapeResolveValue = ShapeAPI.prototype.resolveValue;
+  var shapeStateToBit = ShapeAPI.prototype.stateToBit;
+  var shapeExec = ShapeAPI.prototype.exec;
+  
+  var shapeVisibility = ShapeAPI.prototype.visibility;
+  var shapeBlink = ShapeAPI.prototype.blink;
+  var shapeLabel = ShapeAPI.prototype.label;
+  var shapeState = ShapeAPI.prototype.state;
+  var shapeRotation = ShapeAPI.prototype.rotation;
+  var shapeTurn = ShapeAPI.prototype.turn;
+  var shapeShift = ShapeAPI.prototype.shift;
+  var shapeMove = ShapeAPI.prototype.move;
+  var shapeColor = ShapeAPI.prototype.color;
+  var shapeColorFill = ShapeAPI.prototype.color_fill;
+  var shapeColorBorder = ShapeAPI.prototype.color_border;
+  var shapeColorFont = ShapeAPI.prototype.color_font;
+  
+  function LinkScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
   }
-};
-ShapeAPI.prototype.visit = function (cell, map, resolver) {
-  this.setup(cell);
-  if (cell.bindings != null && cell.bindings.length > 0) {
-    for (var i = 0; i < cell.bindings.length; i++) {
-      var item = cell.bindings[i];
+  mxUtils.extend(LinkScriptAPI, ShapeAPI);
+  LinkScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    let borderColor = cell.origin.style.strokeColor || 'none';
+  
+    // если задан класс напряжения
+    switch (current) {
+      case 'ON':
+        borderColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+        break;
+      case 'OFF':
+        borderColor = VCLASS.UOFF;
+        break;
+      case 'SERVICE':
+        borderColor = VCLASS.SERVICE;
+        break;
+      default:
+        borderColor = VCLASS.UNRELIABLE_INFO;
+        break;
+    }
+  
+    // apply color
+    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  };
+  
+  function BusScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(BusScriptAPI, ShapeAPI);
+  BusScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    let fillColor = cell.origin.style.fillColor || 'none';
+  
+    switch (current) {
+      case 'ON':
+        fillColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : fillColor;
+        break;
+      case 'OFF':
+        fillColor = VCLASS.UOFF;
+        break;
+      case 'SERVICE':
+        fillColor = VCLASS.SERVICE;
+        break;
+      default:
+        fillColor = VCLASS.UNRELIABLE_INFO;
+        break;
+    }
+  
+    // apply color
+    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+  };
+  
+  function SwitchScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(SwitchScriptAPI, ShapeAPI);
+  SwitchScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0, 0, geo.width, geo.height, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  SwitchScriptAPI.prototype.position = function (cell, binding) {
+    let pos = binding != null ? JSON.parse(binding.value) : mxCellRenderer.defaultShapes['switch'].prototype.position == true ? '1' : '0';
+    let state = this.graph.view.getState(cell);
+    if (state != null && state.shape != null) cell.position = state.shape.position = pos == '1';
+  };
+  SwitchScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+      // check position
+      if (cell.position == null) cell.position = mxCellRenderer.defaultShapes['switch'].prototype.position;
+      shape.position = cell.position;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let fillColor = cell.origin.style.fillColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // если задан класс напряжения
+      if (!VCLASS.isDefaultValue(cell.vclass)) {
+        let vclassColor = VCLASS.getColor(cell.vclass);
+        switch (current) {
+          case 'ON':
+            shape.on = true;
+            fillColor = vclassColor;
+            break;
+          case 'OFF':
+            shape.on = false;
+            fillColor = 'none';
+            borderColor = vclassColor;
+            break;
+          case 'DAMAGE':
+            fillColor = 'none';
+            borderColor = vclassColor;
+            cell.damage.setVisible(true);
+            // update cell.damage
+            let damageCellState = this.graph.view.getState(cell.damage);
+            if (damageCellState != null) damageCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            break;
+          case 'SERVICE':
+            // hide position if exists
+            shape.position = false;
+            fillColor = 'none';
+            borderColor = VCLASS.SERVICE;
+            break;
+          default:
+            // hide position if exists
+            shape.position = false;
+            // apply colors
+            fillColor = VCLASS.UNRELIABLE_INFO;
+            borderColor = vclassColor;
+            // show question mark
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
+            // update cell.question
+            let questionCellState = this.graph.view.getState(cell.question, true);
+            if (questionCellState != null) questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            break;
+        }
+      } else {
+        switch (current) {
+          case 'ON':
+            shape.on = true;
+            break;
+          case 'OFF':
+            shape.on = false;
+            break;
+          case 'DAMAGE':
+            shape.on = false;
+            cell.damage.setVisible(true);
+            // update cell.damage
+            let damageCellState = this.graph.view.getState(cell.damage);
+            if (damageCellState != null) damageCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            break;
+          case 'SERVICE':
+            // hide position if exists
+            shape.position = false;
+            fillColor = 'none';
+            borderColor = VCLASS.SERVICE;
+            break;
+          default:
+            // hide position if exists
+            shape.position = false;
+            // apply colors
+            fillColor = VCLASS.UNRELIABLE_INFO;
+            // show question mark
+            cell.question.setVisible(true);
+            // update cell.question
+            let questionCellState = this.graph.view.getState(cell.question);
+            if (questionCellState != null) questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            break;
+        }
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function SoundScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(SoundScriptAPI, ShapeAPI);
+  SoundScriptAPI.prototype.setup = function (cell) {
+    if (cell.audio == null) {
+      let dataBinding = cell.getBinding('play.data');
+      let data = dataBinding != null ? JSON.parse(dataBinding.value) : null;
+      if (data != null) {
+        let cycleBinding = cell.getBinding('play.cycle');
+        let loop = (cycleBinding != null ? JSON.parse(cycleBinding.value) : '0') == '1';
+        cell.audio = new Howl({
+          src: [data],
+          autoplay: false,
+          preload: true,
+          mute: false,
+          loop: loop,
+          volume: 1,
+        });
+      }
+    }
+  };
+  SoundScriptAPI.prototype.playSound = function () {
+    if (this.audio != null) this.audio.play();
+  };
+  SoundScriptAPI.prototype.stopSound = function () {
+    if (this.audio != null) this.audio.stop();
+  };
+  SoundScriptAPI.prototype.play = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    if (binding.initial) return;
+  
+    let result = this.processValue(cell, value);
+    let playing = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    if (playing) this.playSound.call(cell);
+    else this.stopSound.call(cell);
+  };
+  
+  function TableScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+    this.ui = editorUI;
+  }
+  mxUtils.extend(TableScriptAPI, ShapeAPI);
+  TableScriptAPI.prototype.visit = function (cell, map) {
+    let args = Array.prototype.slice.call(arguments);
+    // add custom resolver
+    args.push(function (item) {
       if (item != null && !isNullOrEmpty(item.value)) {
         let bind = JSON.parse(item.value);
-        if (bind == null) continue;
-
-        // common bindings
+        if (bind == null) return;
+  
         switch (item.name) {
-          case 'state':
-          case 'link':
-          case 'visibility':
-          case 'label':
-          case 'command':
-          case 'blink':
-          case 'rotation':
-          case 'turn':
-          case 'shift':
-          case 'move':
-          case 'play':
-          case 'color.fill.$1': // colors
-          case 'color.fill.$2':
-          case 'color.fill.$3':
-          case 'color.fill.$4':
-          case 'color.fill.$5':
-          case 'color.brd.$1':
-          case 'color.brd.$2':
-          case 'color.brd.$3':
-          case 'color.brd.$4':
-          case 'color.brd.$5':
-          case 'color.font.$1':
-          case 'color.font.$2':
-          case 'color.font.$3':
-          case 'color.font.$4':
-          case 'color.font.$5':
-          case 'action.trigger':
+          case 'color.font.name':
+          case 'color.font.name.bad':
+          case 'color.fill.name':
+          case 'color.fill.name.bad':
+          case 'color.font.value':
+          case 'color.font.value.bad':
+          case 'color.fill.value':
+          case 'color.fill.value.bad':
+          case 'color.font.measure':
+          case 'color.font.measure.bad':
+          case 'color.fill.measure':
+          case 'color.fill.measure.bad':
+            {
+              cell[item.name] = bind;
+            }
+            break;
+  
+          case 'color.font.name.$1':
+          case 'color.font.name.$2':
+          case 'color.font.name.$3':
+          case 'color.fill.name.$1':
+          case 'color.fill.name.$2':
+          case 'color.fill.name.$3':
+          case 'color.font.value.$1':
+          case 'color.font.value.$2':
+          case 'color.font.value.$3':
+          case 'color.fill.value.$1':
+          case 'color.fill.value.$2':
+          case 'color.fill.value.$3':
+          case 'color.font.measure.$1':
+          case 'color.font.measure.$2':
+          case 'color.font.measure.$3':
+          case 'color.fill.measure.$1':
+          case 'color.fill.measure.$2':
+          case 'color.fill.measure.$3':
             {
               if (GUID.isValid(bind.id)) map.eq.push(bind);
               else map.tag.push(bind);
             }
             break;
+        }
+      }
+    });
+  
+    shapeVisit.apply(this, args);
+  
+    let itemsBinding = cell.getBinding('items');
+    if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
+      let bind = JSON.parse(itemsBinding.value);
+      if (bind != null && bind.length > 0) {
+        for (let j = 0; j < bind.length; j++) {
+          let id = bind[j].id;
+          if (GUID.isValid(id)) map.eq.push(bind[j]);
+          else map.tag.push(bind[j]);
+        }
+      }
+    }
+  };
+  TableScriptAPI.prototype.setup = function (cell) {
+    // find tables
+    if (cell.tables == null) {
+      cell.tables = $('table.tbl' + cell.id);
+      cell.container = cell.children[0];
+    }
+  };
+  TableScriptAPI.prototype.color = function (cell, binding, value) {
+    if (cell == null || binding == null || value == null) return null;
+  
+    let actionName = binding.name.split('.');
+    if (actionName.length < 2 || actionName[0] != 'color') return null;
+  
+    let color = null;
+    switch (actionName[1]) {
+      case 'font':
+        color = this.color_font(cell, binding, value, actionName[2]);
+        break;
+      case 'fill':
+        color = this.color_fill(cell, binding, value, actionName[2]);
+        break;
+    }
+  
+    return color;
+  };
+  TableScriptAPI.prototype.color_font = function (cell, binding, value, target) {
+    if (cell == null || binding == null || value == null || isNullOrEmpty(target)) return null;
+  
+    let result = this.processValue(cell, value);
+    let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let color = null;
+    let key = 'font_colors_' + target;
+  
+    // for dynamic colors
+    cell[key] = cell[key] || {};
+  
+    let actionName = binding.name;
+    let match = actionName.split('.')[3].match(/\d+$/);
+    let index = match != null && match.length > 0 ? match[0] : 0;
+  
+    let colorValueBinding = cell.getBinding(actionName + '.val');
+    if (index == 0 || colorValueBinding == null || !coloring) delete cell[key][index];
+    else {
+      color = JSON.parse(colorValueBinding.value);
+      // set value
+      if (coloring) cell[key][index] = color;
+    }
+  
+    // get first color or reset
+    if (Object.keys(cell[key]).length > 0) {
+      let firstIndex = Object.keys(cell[key]).sort()[0];
+      color = cell[key][firstIndex];
+    } else {
+      // for reset
+      color = null;
+    }
+  
+    // apply
+    cell['current.color.font.' + target] = color;
+  
+    return color;
+  };
+  TableScriptAPI.prototype.color_fill = function (cell, binding, value, target) {
+    if (cell == null || binding == null || value == null || isNullOrEmpty(target)) return null;
+  
+    let result = this.processValue(cell, value);
+    let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
+  
+    let color = null;
+    let key = 'fill_colors_' + target;
+  
+    // for dynamic colors
+    cell[key] = cell[key] || {};
+  
+    let actionName = binding.name;
+    let match = actionName.split('.')[3].match(/\d+$/);
+    let index = match != null && match.length > 0 ? match[0] : 0;
+  
+    let colorValueBinding = cell.getBinding(actionName + '.val');
+    if (index == 0 || colorValueBinding == null || !coloring) delete cell[key][index];
+    else {
+      color = JSON.parse(colorValueBinding.value);
+      // set value
+      if (coloring) cell[key][index] = color;
+    }
+  
+    // get first color or reset
+    if (Object.keys(cell[key]).length > 0) {
+      let firstIndex = Object.keys(cell[key]).sort()[0];
+      color = cell[key][firstIndex];
+    } else {
+      // for reset
+      color = null;
+    }
+  
+    // apply
+    cell['current.color.fill.' + target] = color;
+  
+    return color;
+  };
+  TableScriptAPI.prototype.resolveColor = function () {
+    let args = Array.prototype.slice.call(arguments);
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] != null) return args[i];
+    }
+    return null;
+  };
+  
+  TableScriptAPI.prototype.items = function (cell, binding, value) {
+      if (cell == null || value == null) return;
+      const fractionLengthBinding = cell.getBinding('fractionLength')
+      let fractionLength = fractionLengthBinding != null ? JSON.parse($(fractionLengthBinding).attr('value')) : null;
+      
+    if (cell.tables != null) {
+      let result = this.processValue(cell, value);
+      for (var i = 0; i < cell.tables.length; i++) {
+        let table = cell.tables[i];
+  
+        if (result.src != null) {
+          let row = document.querySelector(`#${CSS.escape(result.src.id)}`);
+          if (row != null) {
+            let cname = $(row).find('td.c-name');
+            let cvalue = $(row).find('td.c-value');
+            let cmeasure = $(row).find('td.c-measure');
+            if (cname == null || cvalue == null || cmeasure == null) return;
+  
+            ////////// resolve colors (dynamic || fixed || default) & check for bad //////////
+  
+            // font name
+            let target_font_color_name = this.resolveColor(cell['current.color.font.name'], cell['color.font.name'], '#000000');
+            if (result.bad) target_font_color_name = this.resolveColor(cell['color.font.name.bad'], target_font_color_name);
+  
+            // font value
+            let target_font_color_value = this.resolveColor(cell['current.color.font.value'], cell['color.font.value'], '#90EE90');
+            if (result.bad) target_font_color_value = this.resolveColor(cell['color.font.value.bad'], VCLASS.UNRELIABLE_INFO);
+  
+            // font measure
+            let target_font_color_measure = this.resolveColor(cell['current.color.font.measure'], cell['color.font.measure'], '#000000');
+            if (result.bad) target_font_color_measure = this.resolveColor(cell['color.font.measure.bad'], target_font_color_measure);
+  
+            // fill name
+            let target_fill_color_name = this.resolveColor(cell['current.color.fill.name'], cell['color.fill.name'], 'transparent');
+            if (result.bad) target_fill_color_name = this.resolveColor(cell['color.fill.name.bad'], target_fill_color_name);
+  
+            // fill value
+            let target_fill_color_value = this.resolveColor(cell['current.color.fill.value'], cell['color.fill.value'], '#000000');
+            if (result.bad) target_fill_color_value = this.resolveColor(cell['color.fill.value.bad'], '#808080');
+  
+            // fill measure
+            let target_fill_color_measure = this.resolveColor(cell['current.color.fill.measure'], cell['color.fill.measure'], 'transparent');
+            if (result.bad) target_fill_color_measure = this.resolveColor(cell['color.fill.measure.bad'], target_fill_color_measure);
+  
+            // value
+              if (result.isbool) {
+                  if (row.box == null) {
+                      let chBox = $(document.createElement('input'));
+                      chBox.attr('type', 'checkbox');
+                      chBox.attr('readOnly', true);
+                      row.box = chBox;
+                  }
+                  row.box.attr('checked', result.value == true);
+                  row.box.attr('disabled', result.bad);
+                  cvalue.html(row.box[0].outerHTML);
+              } else fractionLength
+                  ?
+                  cvalue.html(API.FORMAT.getValue(value).toFixed(Number(fractionLength)))
+                  :
+                  cvalue.html(API.FORMAT.getValue(value));
+                
+  
+            // measure
+            if (!row.measure) {
+              cmeasure.html(result.src.m);
+              row.measure = true;
+            }
+  
+            // apply colors
+            cname.css('color', target_font_color_name || 'transparent');
+            cname.css('background-color', target_fill_color_name || 'transparent');
+  
+            cvalue.css('color', target_font_color_value || 'transparent');
+            cvalue.css('background-color', target_fill_color_value || 'transparent');
+  
+            cmeasure.css('color', target_font_color_measure || 'transparent');
+            cmeasure.css('background-color', target_fill_color_measure || 'transparent');
+          }
+        }
+        // update cell HTML value for printing !!!
+        if (cell.container != null) cell.container.setValue(table.outerHTML);
+      }
+    }
+  };
+  
+  function ButtonScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(ButtonScriptAPI, ShapeAPI);
+  ButtonScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  };
+  
+  function ChartScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(ChartScriptAPI, ShapeAPI);
+  ChartScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+    // setup chart
+    if (cell.canvas == null) {
+      let chartColors = {
+        red: 'rgb(255, 99, 132)',
+        blue: 'rgb(54, 162, 235)',
+        max: 'rgb(255, 0, 255)',
+        min: 'rgb(0, 255, 000)',
+      };
+      let randomData = function (unit, add, min, max) {
+        if (min == null) min = -100;
+        if (max == null) max = +100;
+        if (unit == null) unit = 'second';
+  
+        let randomTime = function () {
+          switch (unit) {
+            case 'millisecond':
+              return new Date().addMilliseconds(add || 0);
+            case 'second':
+              return new Date().addSeconds(add || 0);
+            case 'minute':
+              return new Date().addMinutes(add || 0);
+            case 'hour':
+              return new Date().addHours(add || 0);
+            case 'day':
+              return new Date().addDays(add || 0);
+            case 'week':
+              return new Date().addWeeks(add || 0);
+            case 'month':
+              return new Date().addMonths(add || 0);
+            case 'year':
+              return new Date().addWeeks(add || 0);
+            default:
+              return new Date().addSeconds(add || 0);
+          }
+        };
+  
+        return {
+          x: randomTime(),
+          y: Math.random() * (max - min) + min,
+        };
+      };
+      var createMaxAnnotation = function (value) {
+        return {
+          id: 'y-max',
+          type: 'line',
+          mode: 'horizontal',
+          scaleID: 'y-axis-1',
+          value: value,
+          borderColor: 'rgba(255, 0, 0, 1)',
+          borderWidth: 1.5,
+          borderDash: [5, 5],
+          label: {
+            enabled: true,
+            backgroundColor: 'transparent',
+            fontColor: '#ff0000',
+            content: 'Макс.',
+            position: 'left',
+            fontSize: 10,
+            yAdjust: +8,
+            cornerRadius: 3,
+          },
+        };
+      };
+      var createMinAnnotation = function (value) {
+        return {
+          id: 'y-min',
+          type: 'line',
+          mode: 'horizontal',
+          scaleID: 'y-axis-1',
+          value: value,
+          borderColor: 'rgba(0, 0, 255, 1)',
+          borderWidth: 1.5,
+          borderDash: [5, 5],
+          label: {
+            enabled: true,
+            backgroundColor: 'transparent',
+            fontColor: '#0000ff',
+            content: 'Мин.',
+            position: 'left',
+            fontSize: 10,
+            yAdjust: -8,
+            cornerRadius: 3,
+          },
+        };
+      };
+      let getChartConfig = function () {
+        return {
+          type: 'scatter',
+          data: {
+            datasets: [
+              {
+                label: 'Тренд 1',
+                fill: false,
+                showLine: true,
+                lineTension: 0,
+                backgroundColor: chartColors.red,
+                borderColor: chartColors.red,
+                data: [],
+              },
+              {
+                label: 'Тренд 2',
+                fill: false,
+                showLine: true,
+                lineTension: 0,
+                backgroundColor: chartColors.blue,
+                borderColor: chartColors.blue,
+                data: [],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            //{
+            //    duration: 300
+            //},
+            title: {
+              display: true,
+              text: 'График',
+            },
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                boxWidth: 15,
+                fontFamily: 'Arial',
+                fontSize: 8,
+                padding: 5,
+                usePointStyle: false,
+              },
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: true,
+                  type: 'time',
+                  autoSkip: false,
+                  position: 'bottom',
+                  distribution: 'linear',
+                  bounds: 'ticks',
+                  time: {
+                    isoWeekday: true,
+                    unit: 'second',
+                    //unitStepSize: 10,
+                    //stepSize: 1,
+                    //precision: 1,
+                    //round: true,
+                    //minUnit: 'hour',
+                    displayFormats: {
+                      millisecond: 'ss.SSS',
+                      second: 'mm:ss.SSS',
+                      minute: 'HH:mm:ss',
+                      hour: 'DD.MM HH:mm',
+                      day: 'DD.MM',
+                      week: 'WW.YYYY',
+                      month: 'DD.MM.YYYY',
+                      quarter: 'Q YYYY',
+                      year: 'YYYY',
+                    },
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Время',
+                    lineHeight: 1,
+                    fontFamily: 'Arial',
+                    fontSize: 10,
+                    padding: { bootom: 5 },
+                  },
+                  //ticks:
+                  //{
+                  //    source: "auto",
+                  //    //maxTicksLimit: 10,
+                  //    //autoSkip: true,
+                  //    stepSize: 5,
+                  //    //precision: 1,
+  
+                  //    lineHeight: 1,
+                  //    fontFamily: 'Arial',
+                  //    fontSize: 10,
+                  //    padding: 0,
+                  //    maxRotation: 45,
+                  //    //callback: function (value, index, values)
+                  //    //{
+                  //    //    //return API.FORMAT.getDateTimeString(value);
+                  //    //    return moment(value).format('HH:mm:ss');
+                  //    //}
+                  //}
+                },
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Значение',
+                    lineHeight: 1,
+                    fontFamily: 'Arial',
+                    fontSize: 10,
+                    padding: { top: 5 },
+                  },
+                  ticks: {
+                    source: 'data',
+                    maxTicksLimit: 10,
+                    //stepSize: 1.1,
+                    precision: 3,
+                    lineHeight: 1,
+                    fontFamily: 'Arial',
+                    fontSize: 10,
+                  },
+                },
+              ],
+            },
+            layout: {
+              padding: 0,
+            },
+            annotation: {
+              drawTime: 'afterDraw',
+              annotations: [createMaxAnnotation(90), createMinAnnotation(-90)],
+            },
+          },
+        };
+      };
+  
+      let geom = this.graph.getCellGeometry(cell);
+      // build chart
+      var node = document.createElement('canvas');
+      node.setAttribute('id', cell.mxObjectId);
+      node.setAttribute('class', 'chart');
+      node.setAttribute('width', geom.width);
+      node.setAttribute('height', geom.height);
+      // Document for empty output if not in DOM
+      document.body.appendChild(node);
+      cell.canvas = node;
+      cell.chart = new Chart.Scatter(node.getContext('2d'), getChartConfig());
+  
+      (function () {
+        if (this.chart != null) {
+          // header
+          this.chart.options.title.display = false;
+          let hdrBinding = this.getBinding('header');
+          if (hdrBinding != null) {
+            let hdr = JSON.parse(hdrBinding.value);
+            if (hdr != null && hdr.text != null) {
+              this.chart.options.title.text = hdr.text;
+              this.chart.options.title.display = true;
+            }
+          }
+          // legend
+          let legendBinding = this.getBinding('legend');
+          this.chart.options.legend.display = legendBinding == null || JSON.parse(legendBinding.value) != '0';
+  
+          // axisX.label
+          this.chart.options.scales.xAxes[0].scaleLabel.display = false;
+          let axisXLabelBinding = this.getBinding('axisX.label');
+          if (axisXLabelBinding != null) {
+            let axisXLabel = JSON.parse(axisXLabelBinding.value);
+            if (axisXLabel != null && axisXLabel.text != null) {
+              this.chart.options.scales.xAxes[0].scaleLabel.labelString = axisXLabel.text;
+              this.chart.options.scales.xAxes[0].scaleLabel.display = true;
+            }
+          }
+  
+          // axisX.measure
+          let xUnit = 'second';
+          let axisXMeasureBinding = this.getBinding('axisX.measure');
+          if (axisXMeasureBinding != null) {
+            let axisXMeasure = JSON.parse(axisXMeasureBinding.value);
+            switch (axisXMeasure) {
+              case 'ms':
+                xUnit = 'millisecond';
+                break;
+              case 's':
+                xUnit = 'second';
+                break;
+              case 'mn':
+                xUnit = 'minute';
+                break;
+              case 'h':
+                xUnit = 'hour';
+                break;
+              case 'd':
+                xUnit = 'day';
+                break;
+              case 'w':
+                xUnit = 'week';
+                break;
+              case 'm':
+                xUnit = 'month';
+                break;
+              case 'y':
+                xUnit = 'year';
+                break;
+              default:
+                xUnit = 'second';
+                break;
+            }
+          }
+          this.chart.options.scales.xAxes[0].time.unit = xUnit;
+  
+          // axisX.step
+          let xStep = 1;
+          this.chart.options.scales.xAxes[0].time.stepSize = xStep;
+          let axisXStepBinding = this.getBinding('axisX.step');
+          if (axisXStepBinding != null) {
+            let axisXStep = JSON.parse(axisXStepBinding.value);
+            xStep = parseNumber(axisXStep) || 1;
+            this.chart.options.scales.xAxes[0].time.stepSize = xStep;
+          }
+  
+          // axisX.scale
+          let xScale = 30;
+          let axisXScaleBinding = this.getBinding('axisX.scale');
+          if (axisXScaleBinding != null) {
+            let axisXScale = JSON.parse(axisXScaleBinding.value);
+            xScale = parseNumber(axisXScale) || 30;
+          }
+  
+          // axisY.label
+          this.chart.options.scales.yAxes[0].scaleLabel.display = false;
+          let axisYLabelBinding = this.getBinding('axisY.label');
+          if (axisYLabelBinding != null) {
+            let axisYLabel = JSON.parse(axisYLabelBinding.value);
+            if (axisYLabel != null && axisYLabel.text != null) {
+              this.chart.options.scales.yAxes[0].scaleLabel.labelString = axisYLabel.text;
+              this.chart.options.scales.yAxes[0].scaleLabel.display = true;
+            }
+          }
+  
+          // clear axisY annotations
+          this.chart.options.annotation.annotations.length = 0;
+          this.chart.annotation.elements = {};
+          this.chart.annotation.options.annotations.length = 0;
+  
+          // axisY.max
+          let maxValue = null;
+          let axisYMaxBinding = this.getBinding('axisY.max.show');
+          if (axisYMaxBinding != null) {
+            let axisYMaxShow = JSON.parse(axisYMaxBinding.value);
+            if (axisYMaxShow != null && axisYMaxShow != '0') {
+              let axisYMaxValueBinding = this.getBinding('axisY.max.value');
+              if (axisYMaxValueBinding != null) {
+                let axisYMaxValue = JSON.parse(axisYMaxValueBinding.value);
+                if (axisYMaxValue != null) maxValue = parseNumber(axisYMaxValue, 0, 3);
+              }
+              let annotation = createMaxAnnotation(maxValue);
+              this.chart.options.annotation.annotations.push(annotation); // show
+            }
+          }
+          // axisY.min
+          let minValue = null;
+          let axisYMinBinding = this.getBinding('axisY.min.show');
+          if (axisYMinBinding != null) {
+            let axisYMinShow = JSON.parse(axisYMinBinding.value);
+            if (axisYMinShow != null && axisYMinShow != '0') {
+              let axisYMinValueBinding = this.getBinding('axisY.min.value');
+              if (axisYMinValueBinding != null) {
+                let axisYMinValue = JSON.parse(axisYMinValueBinding.value);
+                if (axisYMinValue != null) minValue = parseNumber(axisYMinValue, 0, 3);
+              }
+              let annotation = createMinAnnotation(minValue);
+              this.chart.options.annotation.annotations.push(annotation); // show
+            }
+          }
+  
+          // items
+          this.chart.data.datasets = [];
+          let itemsBinding = this.getBinding('items');
+          if (itemsBinding != null) {
+            let getType = function (item) {
+              switch (item.view) {
+                case '4': // bars
+                  return 'bar';
+                default:
+                  return 'scatter';
+              }
+            };
+            let getShowLine = function (item) {
+              switch (item.view) {
+                case '1': // points
+                  return false;
+                default:
+                  return true;
+              }
+            };
+  
+            let items = JSON.parse(itemsBinding.value);
+            if (items != null && items.length > 0) {
+              for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                if (item != null) {
+                  this.chart.data.datasets.push({
+                    id: item.id,
+                    label: item.d,
+                    fill: false,
+                    showLine: getShowLine(item),
+                    lineTension: 0,
+                    backgroundColor: item.color,
+                    borderColor: item.color,
+                    type: getType(item),
+                    steppedLine: item.view == '3' ? 'before' : false, // stepped line
+                    data: [
+                      //randomData(xUnit, 0, minValue, maxValue),
+                      //randomData(xUnit, 1, minValue, maxValue),
+                      //randomData(xUnit, 2, minValue, maxValue),
+                      //randomData(xUnit, 3, minValue, maxValue),
+                      //randomData(xUnit, 4, minValue, maxValue)
+                    ],
+                  });
+                }
+              }
+            }
+          }
+  
+          this.chart.update();
+  
+          this.chart.validateRange = mxUtils.bind(cell, function () {
+            // update x-axis width
+            if (xScale > 0 && xStep > 0) {
+              let xAxis = this.chart.scales['x-axis-1'];
+              let minDate = moment(xAxis.min).toDate();
+              let maxDate = moment(xAxis.max).toDate();
+  
+              switch (xUnit) {
+                case 'millisecond':
+                  minDate = maxDate.addMilliseconds(-xScale || 0);
+                  break;
+                case 'second':
+                  minDate = maxDate.addSeconds(-xScale || 0);
+                  break;
+                case 'minute':
+                  minDate = maxDate.addMinutes(-xScale || 0);
+                  break;
+                case 'hour':
+                  minDate = maxDate.addHours(-xScale || 0);
+                  break;
+                case 'day':
+                  minDate = maxDate.addDays(-xScale || 0);
+                  break;
+                case 'week':
+                  minDate = maxDate.addWeeks(-xScale || 0);
+                  break;
+                case 'month':
+                  minDate = maxDate.addMonths(-xScale || 0);
+                  break;
+                case 'year':
+                  minDate = maxDate.addWeeks(-xScale || 0);
+                  break;
+                default:
+                  break;
+              }
+  
+              if (minDate != null) this.chart.options.scales.xAxes[0].ticks.min = minDate.getTime(); //moment(minDate);
+  
+              this.chart.update();
+            }
+          });
+          this.chart.validateRange();
+        }
+      }).apply(cell);
+    }
+  };
+  ChartScriptAPI.prototype.visit = function (cell, map) {
+    shapeVisit.apply(this, arguments);
+    let itemsBinding = cell.getBinding('items');
+    if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
+      let bind = JSON.parse(itemsBinding.value);
+      if (bind == null) return;
+      if (bind.length) {
+        for (let j = 0; j < bind.length; j++) {
+          let id = bind[j].id;
+          if (GUID.isValid(id)) map.eq.push(bind[j]);
+          else map.tag.push(bind[j]);
+        }
+      }
+    }
+  };
+  ChartScriptAPI.prototype.items = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let ds = cell.chart.data.datasets.find(function (x) {
+      return x.id == value.id;
+    });
+    if (ds != null) {
+      if (ds.data.length > 100) ds.data.shift();
+  
+      ds.data.push({
+        x: API.FORMAT.getDate(value.ts).getTime(),
+        y: value.v,
+      });
+    }
+  
+    cell.chart.validateRange();
+  };
+  
+  function RollSwitchScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(RollSwitchScriptAPI, ShapeAPI);
+  RollSwitchScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 3, geo.width, geo.height / 3, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 3 / 10) * 7, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+    if (cell.roll_damage == null) {
+      cell.roll_damage = this.graph.insertVertex(cell, null, '', -1, 0, geo.width * 3, geo.height, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.roll_damage.getTooltip = function () {};
+    }
+  };
+  RollSwitchScriptAPI.prototype.position = function (cell, binding) {
+    let pos = binding != null ? JSON.parse(binding.value) : mxCellRenderer.defaultShapes['rollswitch'].prototype.position == true ? '1' : '0';
+    let state = this.graph.view.getState(cell);
+    if (state != null && state.shape != null) cell.position = state.shape.position = pos == '1';
+  };
+  RollSwitchScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN_SWITCH_ON' : 'ROLL_IN_SWITCH_OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+    // hide roll_damage
+    cell.roll_damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+      // check position
+      if (cell.position == null) cell.position = mxCellRenderer.defaultShapes['rollswitch'].prototype.position;
+      shape.position = cell.position;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let fillColor = cell.origin.style.fillColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // если задан класс напряжения
+      if (!VCLASS.isDefaultValue(cell.vclass)) {
+        let vclassColor = VCLASS.getColor(cell.vclass);
+        switch (current) {
+          case 'ROLL_IN_SWITCH_ON':
+            {
+              shape.on = true;
+              shape.roll = 'IN';
+              fillColor = vclassColor;
+              borderColor = vclassColor;
+            }
+            break;
+          case 'ROLL_IN_SWITCH_OFF':
+            {
+              shape.on = false;
+              shape.roll = 'IN';
+              fillColor = 'none';
+              borderColor = vclassColor;
+            }
+            break;
+          case 'ROLL_IN_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'IN';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              borderColor = vclassColor;
+              // show question mark
+              cell.question.setVisible(true);
+              this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
+              // update cell.question
+              //let questionCellState = this.graph.view.getState(cell.question, true);
+              //if (questionCellState != null)
+              //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            }
+            break;
+          case 'ROLL_IN_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'IN';
+              // apply colors
+              fillColor = 'none';
+              borderColor = vclassColor;
+              cell.damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_ON':
+            {
+              shape.on = true;
+              shape.roll = 'CONTROL';
+              fillColor = vclassColor;
+              borderColor = vclassColor;
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_OFF':
+            {
+              shape.on = false;
+              shape.roll = 'CONTROL';
+              fillColor = 'none';
+              borderColor = vclassColor;
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'CONTROL';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              borderColor = vclassColor;
+              // show question mark
+              cell.question.setVisible(true);
+              this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
+              // update cell.question
+              //let questionCellState = this.graph.view.getState(cell.question, true);
+              //if (questionCellState != null)
+              //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'CONTROL';
+              // apply colors
+              fillColor = 'none';
+              borderColor = vclassColor;
+              cell.damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_ON':
+            {
+              // hide position if exists
+              shape.on = true;
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              borderColor = vclassColor;
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_OFF':
+            {
+              // hide position if exists
+              shape.on = false;
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              borderColor = vclassColor;
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              borderColor = vclassColor;
+              // show question mark
+              cell.question.setVisible(true);
+              this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'DAMAGE|DAMAGE';
+              // apply colors
+              fillColor = 'none';
+              borderColor = vclassColor;
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'SERVICE':
+            // hide position if exists
+            shape.position = false;
+            fillColor = 'none';
+            borderColor = VCLASS.SERVICE;
+            break;
           default:
             {
-              // custom resolve
-              if (resolver != null && resolver(item)) break;
-              // process as static
-              this.exec(cell, item);
+              // hide position if exists
+              shape.position = false;
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              borderColor = vclassColor;
+              // show question mark
+              cell.question.setVisible(true);
+              this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
+              // update cell.question
+              //let questionCellState = this.graph.view.getState(cell.question, true);
+              //if (questionCellState != null)
+              //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
+            }
+            break;
+        }
+      } else {
+        switch (current) {
+          case 'ROLL_IN_SWITCH_ON':
+            {
+              shape.on = true;
+              shape.roll = 'IN';
+            }
+            break;
+          case 'ROLL_IN_SWITCH_OFF':
+            {
+              shape.on = false;
+              shape.roll = 'IN';
+              fillColor = 'none';
+            }
+            break;
+          case 'ROLL_IN_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'IN';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              // show question mark
+              cell.question.setVisible(true);
+            }
+            break;
+          case 'ROLL_IN_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'IN';
+              // apply colors
+              fillColor = 'none';
+              cell.damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_ON':
+            {
+              shape.on = true;
+              shape.roll = 'CONTROL';
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_OFF':
+            {
+              shape.on = false;
+              shape.roll = 'CONTROL';
+              fillColor = 'none';
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'CONTROL';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              // show question mark
+              cell.question.setVisible(true);
+            }
+            break;
+          case 'ROLL_CONTROL_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'CONTROL';
+              // apply colors
+              fillColor = 'none';
+              cell.damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_ON':
+            {
+              // hide position if exists
+              shape.on = true;
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_OFF':
+            {
+              // hide position if exists
+              shape.on = false;
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_ERROR':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'DAMAGE';
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              // show question mark
+              cell.question.setVisible(true);
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'ROLL_DAMAGE_SWITCH_DAMAGE':
+            {
+              // hide position if exists
+              shape.position = false;
+              shape.roll = 'DAMAGE|DAMAGE';
+              // apply colors
+              fillColor = 'none';
+              cell.roll_damage.setVisible(true);
+            }
+            break;
+          case 'SERVICE':
+            // hide position if exists
+            shape.position = false;
+            fillColor = 'none';
+            borderColor = VCLASS.SERVICE;
+            break;
+          default:
+            {
+              // hide position if exists
+              shape.position = false;
+              // apply colors
+              fillColor = VCLASS.UNRELIABLE_INFO;
+              // show question mark
+              cell.question.setVisible(true);
             }
             break;
         }
       }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
     }
-  }
-};
-ShapeAPI.prototype.checkValue = function (value) {
-  return value != null && value.q >= API.ENUMS.QualityValue.Good;
-};
-ShapeAPI.prototype.processValue = function (cell, value) {
-  let result = {
-    src: value,
-    get bad() {
-      return !shapeCheckValue(this.src);
-    },
   };
-
-  if (result.src != null) {
-    result.isbool = result.src.vtype == API.ENUMS.TagValueType.Boolean;
-    // eq state
-    if (result.src.eq && result.src.eq == result.src.id) {
-      result.state = {
-        values: result.src.v.split('|'),
-        has: function (val) {
-          return this.values.indexOf(val) >= 0;
-        },
-        get service() {
-          return this.has('SERVICE');
-        },
-        get blocked() {
-          return this.has('BLOCK');
-        },
-        get manual() {
-          return this.has('MANUAL');
-        },
-      };
-      result.value = this.resolveState(result);
-    } else result.value = this.resolveValue(result);
+  
+  function RollDisconnectorScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
   }
-
-  // check blocked & manual & service states
-  if (result.state != null) {
-    cell.manual = null;
-    cell.blocked = null;
-    this.graph.removeCellOverlays(cell);
-
-    cell.service = result.state.service;
-
-    if (result.state.blocked) {
-      cell.blocked = true;
-      this.graph.addCellOverlay(cell, new mxCellOverlay(new mxImage(mxConstants.BLOCKED_IMAGE, 16, 16), 'Оперативная блокировка', null, mxConstants.ALIGN_TOP));
+  mxUtils.extend(RollDisconnectorScriptAPI, ShapeAPI);
+  RollDisconnectorScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, '', -1, 0, geo.width * 3, geo.height, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
     }
-    if (result.state.manual) {
-      cell.manual = true;
-      this.graph.addCellOverlay(cell, new mxCellOverlay(new mxImage(mxConstants.MANUAL_IMAGE, 16, 16), 'Ручное управление', null, mxConstants.ALIGN_BOTTOM));
-    }
-  }
-
-  return result;
-};
-ShapeAPI.prototype.resolveState = function (result) {
-  let defaultState = 'UNKNOWN';
-  if (result == null || result.bad) return defaultState;
-  else return result.state.service ? 'SERVICE' : result.state.values.length > 0 ? result.state.values[0] : defaultState;
-};
-ShapeAPI.prototype.resolveValue = function (result) {
-    if (result == null || result.src == null) return null;
-  return API.FORMAT.getValue(result.src);
-};
-ShapeAPI.prototype.stateToBit = function (state) {
-  if (isNullOrEmpty(state)) return false;
-  return ['ON', 'ROLL_IN', 'ROLL_IN_SWITCH_ON', 'OPEN'].indexOf(state) >= 0;
-};
-ShapeAPI.prototype.exec = function (cell, binding, item) {
-  if (cell == null || binding == null) return;
-
-  let actionName = binding.name;
-  if (isNullOrEmpty(actionName)) return;
-
-  let actionPath = actionName.split('.');
-  if (actionPath.length > 1) actionName = actionPath[0];
-
-  let targetAction = this[actionName];
-  if (targetAction == null) return;
-
-  return targetAction.apply(this, [cell, binding, item]);
-};
-ShapeAPI.prototype.action = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return;
-
-  if (binding.initial) return;
-
-  let actionPath = binding.name.split('.');
-  if (actionPath.length == 0 || actionPath[0] != 'action') return;
-
-  switch (actionPath[1]) {
-    case 'trigger':
-      {
-        let result = this.processValue(cell, value);
-        let on = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-        if (on) this.execAction(cell);
+  };
+  RollDisconnectorScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN' : 'ROLL_CONTROL';
+  
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ROLL_IN':
+          {
+            shape.roll = 'IN';
+            borderColor = targetColor;
+          }
+          break;
+        case 'ROLL_CONTROL':
+          {
+            shape.roll = 'CONTROL';
+            borderColor = targetColor;
+          }
+          break;
+        case 'ROLL_DAMAGE':
+          {
+            shape.roll = 'DAMAGE';
+            borderColor = targetColor;
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        default:
+          {
+            borderColor = targetColor;
+          }
+          break;
       }
-      break;
-    default:
-      break;
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function DisconnectorScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
   }
-};
-ShapeAPI.prototype.execCommand = function (cell, cmd) {
-  if (cell == null || cmd == null) return;
-
-  if (cell.manual || cell.blocked || cell.service || !API.USER.hasPermission('scheme.exec_cmd')) {
-    console.log('Управление запрещено')
-    //messageError('Управление запрещено');
-    return;
+  mxUtils.extend(DisconnectorScriptAPI, ShapeAPI);
+  DisconnectorScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0 + geo.width / 5, geo.height / 8, geo.width - geo.width / 2.5, geo.height - geo.height / 4, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  DisconnectorScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ON':
+          {
+            shape._state = 'ON';
+            borderColor = targetColor;
+          }
+          break;
+        case 'OFF':
+          {
+            shape._state = 'OFF';
+            borderColor = targetColor;
+          }
+          break;
+        case 'MIDDLE':
+          {
+            shape._state = 'MIDDLE';
+            borderColor = targetColor;
+          }
+          break;
+        case 'DAMAGE':
+          {
+            shape._state = 'DAMAGE';
+            borderColor = targetColor;
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'OFF';
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        case 'ERROR':
+        default:
+          {
+            shape._state = 'ERROR';
+            borderColor = targetColor;
+            // show question mark
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function SeparatorScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
   }
-
-  let postCommand = function (cmd) {
-    // subscribe to execution result
-    if (template != null && template.execHubProxy != null) template.execHubProxy.invoke('subscribe', cmd);
-
+  mxUtils.extend(SeparatorScriptAPI, ShapeAPI);
+  SeparatorScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0 + geo.width / 5, geo.height / 8, geo.width - geo.width / 2.5, geo.height - geo.height / 4, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  SeparatorScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ON':
+          {
+            shape._state = 'ON';
+            borderColor = targetColor;
+          }
+          break;
+        case 'OFF':
+          {
+            shape._state = 'OFF';
+            borderColor = targetColor;
+          }
+          break;
+        case 'MIDDLE':
+          {
+            shape._state = 'MIDDLE';
+            borderColor = targetColor;
+          }
+          break;
+        case 'DAMAGE':
+          {
+            shape._state = 'DAMAGE';
+            borderColor = targetColor;
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'OFF';
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        case 'ERROR':
+        default:
+          {
+            shape._state = 'ERROR';
+            borderColor = targetColor;
+            // show question mark
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function GroundScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(GroundScriptAPI, ShapeAPI);
+  GroundScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 10, geo.width, geo.height - geo.height / 5, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  GroundScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ON':
+          {
+            shape._state = 'ON';
+            borderColor = targetColor;
+          }
+          break;
+        case 'OFF':
+          {
+            shape._state = 'OFF';
+            borderColor = targetColor;
+          }
+          break;
+        case 'MIDDLE':
+          {
+            shape._state = 'MIDDLE';
+            borderColor = targetColor;
+          }
+          break;
+        case 'DAMAGE':
+          {
+            shape._state = 'DAMAGE';
+            borderColor = targetColor;
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'OFF';
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        case 'ERROR':
+        default:
+          {
+            shape._state = 'ERROR';
+            borderColor = targetColor;
+            // show question mark
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function RollElementScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(RollElementScriptAPI, ShapeAPI);
+  RollElementScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  RollElementScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN' : 'ROLL_CONTROL';
+  
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ROLL_IN':
+          {
+            shape._state = 'IN';
+            borderColor = targetColor;
+          }
+          break;
+        case 'ROLL_CONTROL':
+          {
+            shape._state = 'CONTROL';
+            borderColor = targetColor;
+          }
+          break;
+        case 'ROLL_DAMAGE':
+          {
+            shape._state = 'DAMAGE';
+            borderColor = targetColor;
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'SERVICE';
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        default:
+          {
+            shape._state = 'UNKNOWN';
+            borderColor = VCLASS.UNRELIABLE_INFO;
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function ActuatorScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(ActuatorScriptAPI, ShapeAPI);
+  ActuatorScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0, 0.5, geo.width, geo.height, 'text;pointerEvents=0;fontSize=' + (geo.height / 10) * 8, true);
+      cell.question.getTooltip = function () {};
+    }
+  };
+  ActuatorScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'OPEN' : 'CLOSE';
+  
+    // hide question
+    cell.question.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let fillColor = cell.origin.style.fillColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      shape.fill_1 = null;
+      shape.fill_2 = null;
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : fillColor;
+      switch (current) {
+        case 'OPEN':
+          {
+            shape._state = 'OPEN';
+            fillColor = targetColor;
+          }
+          break;
+        case 'CLOSE':
+          {
+            shape._state = 'CLOSE';
+            fillColor = 'none';
+            borderColor = targetColor;
+          }
+          break;
+        case 'MIDDLE':
+          {
+            shape._state = 'MIDDLE';
+            fillColor = 'none';
+            shape.fill_1 = targetColor;
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'SERVICE';
+            fillColor = 'none';
+            borderColor = VCLASS.SERVICE;
+          }
+          break;
+        case 'ERROR':
+        default:
+          {
+            shape._state = 'ERROR';
+            fillColor = '#FFFFFF';
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function SimpleSwitchScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(SimpleSwitchScriptAPI, ShapeAPI);
+  SimpleSwitchScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    let geo = this.graph.getCellGeometry(cell);
+    //let angle = mxUtils.getValue(this.graph.view.getState(cell).style, mxConstants.STYLE_ROTATION, 0);
+    if (cell.question == null) {
+      cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 20, geo.width, geo.height - geo.height / 10, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
+      cell.question.getTooltip = function () {};
+    }
+    if (cell.damage == null) {
+      cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
+      cell.damage.getTooltip = function () {};
+    }
+  };
+  SimpleSwitchScriptAPI.prototype.state = function (cell, binding, value) {
+    if (cell == null || value == null) return;
+  
+    let result = this.processValue(cell, value);
+  
+    let current = result.bad ? 'UNKNOWN' : result.value;
+    if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
+  
+    // hide question
+    cell.question.setVisible(false);
+    // hide damage
+    cell.damage.setVisible(false);
+  
+    var cellState = this.graph.view.getState(cell);
+    if (cellState != null && cellState.shape != null) {
+      let shape = cellState.shape;
+  
+      let fontColor = cell.origin.style.fontColor || 'none';
+      let borderColor = cell.origin.style.strokeColor || 'none';
+  
+      // reset colors
+      this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
+  
+      let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
+      switch (current) {
+        case 'ON':
+          {
+            shape._state = 'ON';
+          }
+          break;
+        case 'OFF':
+          {
+            shape._state = 'OFF';
+          }
+          break;
+        case 'DAMAGE':
+          {
+            shape._state = 'DAMAGE';
+            cell.damage.setVisible(true);
+          }
+          break;
+        case 'SERVICE':
+          {
+            shape._state = 'OFF';
+            targetColor = VCLASS.SERVICE;
+          }
+          break;
+        case 'ERROR':
+        default:
+          {
+            shape._state = 'ERROR';
+            // show question mark
+            cell.question.setVisible(true);
+            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
+          }
+          break;
+      }
+  
+      // apply colors
+      this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
+      this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, targetColor, [cell]);
+  
+      // update cell
+      this.graph.cellRenderer.redrawShape(cellState, true);
+    }
+  };
+  
+  function BMRZScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(BMRZScriptAPI, ShapeAPI);
+  BMRZScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+    // fake action
+    cell.action = function () {};
+    cell.getTooltip = function () {
+      return 'Подключиться';
+    };
+  };
+  BMRZScriptAPI.prototype.buildConfig = function (cell) {
+    let config = { type: 'usb' };
+    let type = cell.getBinding('connection.type');
+    if (type != null && type.value != null) config.type = JSON.parse(type.value);
+  
+    switch (config.type) {
+      case 'usb':
+        break;
+      case 'com':
+        {
+          config.com = {};
+          // port
+          config.com.port = 'COM1';
+          let port = cell.getBinding('com.port');
+          if (port != null && port.value != null) config.com.port = JSON.parse(port.value).trim();
+          // address
+          config.com.address = '55';
+          let address = cell.getBinding('com.address');
+          if (address != null && address.value != null) config.com.address = JSON.parse(address.value).trim();
+          // speed
+          config.com.speed = '19200';
+          let speed = cell.getBinding('com.speed');
+          if (speed != null && speed.value != null) config.com.speed = JSON.parse(speed.value).trim();
+          // parity
+          config.com.parity = '0';
+          let parity = cell.getBinding('com.parity');
+          if (parity != null && parity.value != null) config.com.parity = JSON.parse(parity.value).trim();
+          // stop_bits
+          config.com.stop_bits = '1';
+          let stop_bits = cell.getBinding('com.stop_bits');
+          if (stop_bits != null && stop_bits.value != null) config.com.stop_bits = JSON.parse(stop_bits.value).trim();
+          // period
+          config.com.period = '0';
+          let period = cell.getBinding('com.period');
+          if (period != null && period.value != null) config.com.period = JSON.parse(period.value).trim();
+          // echo
+          config.com.echo = false;
+          let echo = cell.getBinding('com.echo');
+          if (echo != null && echo.value != null) config.com.echo = JSON.parse(echo.value) == '1';
+        }
+        break;
+      case 'eth':
+        {
+          config.eth = {};
+          // ip
+          config.eth.ip = '1.1.1.1';
+          let ip = cell.getBinding('eth.ip');
+          if (ip != null && ip.value != null) config.eth.ip = JSON.parse(ip.value).trim();
+          // port
+          config.eth.port = '503';
+          let port = cell.getBinding('eth.port');
+          if (port != null && port.value != null) config.eth.port = JSON.parse(port.value).trim();
+        }
+        break;
+      default:
+        return;
+    }
+  
+    // pmk
+    config.pmk = '';
+    let pmk = cell.getBinding('path.pmk');
+    if (pmk != null && pmk.value != null) config.pmk = JSON.parse(pmk.value).text.trim();
+    // bfpo
+    config.bfpo = '';
+    let bfpo = cell.getBinding('path.bfpo');
+    if (bfpo != null && bfpo.value != null) config.bfpo = JSON.parse(bfpo.value).text.trim();
+  
+    // connect
+    config.connect = false;
+    let connect = cell.getBinding('options.connect');
+    if (connect != null && connect.value != null) config.connect = JSON.parse(connect.value) == '1';
+    // read_pmk
+    config.readpmk = false;
+    let read_pmk = cell.getBinding('options.read_pmk');
+    if (read_pmk != null && read_pmk.value != null) config.readpmk = JSON.parse(read_pmk.value) == '1';
+  
+    return config;
+  };
+  BMRZScriptAPI.prototype.execAction = function (cell) {
+    if (cell == null) return;
+  
+    cell.config = cell.config || this.buildConfig(cell);
+    if (cell.config == null) {
+      console.log('Ошибка параметризации')
+      //messageError('Ошибка параметризации');
+      return;
+    }
+  
     // exec command
     AJAX.post(
-      API.FUNC.schemeExecCmd,
+      '/linkmt/cfgmt/exec',
       null,
-      { id: cmd.id, parent: cmd.parent },
+      cell.config,
       function (xhr, resp) {
-        if (resp === true) 
-        //messageDebug(translate('common.messages.command_sent_to_server'));
         console.log('common.messages.command_sent_to_server')
-        //else messageError(translate('common.errors.command_execution'));
-        else console.log('common.errors.command_execution');
+        //messageDebug(translate('common.messages.command_sent_to_server'));
       },
       function (xhr, err) {
         console.log('common.errors.command_execution')
@@ -36681,3442 +37918,913 @@ ShapeAPI.prototype.execCommand = function (cell, cmd) {
       }
     );
   };
-
-  if (cmd.confirm != false) {
-    console.log('common.execute_command' + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
-      if (result === true) postCommand(cmd);
-    })
-    // messageConfirm(translate('common.execute_command') + " '" + (isNullOrEmpty(cmd.d) ? cmd.val : cmd.d) + "'", function (result) {
-    //   if (result === true) postCommand(cmd);
-    // });
-  } else postCommand(cmd);
-};
-ShapeAPI.prototype.execAction = function (cell) {
-  if (cell == null || cell.action == null || cell.action_args == null) return;
-
-  let cellState = this.graph.view.getState(cell);
-  if (cellState == null) return null;
-
-  switch (cell.action) {
-    case 'exec':
-      {
-        cell.action_args.confirm = false;
-        this.execCommand(cell, cell.action_args);
-      }
-      break;
-    case 'open':
-      {
-        this.graph.openLink(cell.action_args.text, '_blank');
-      }
-      break;
-    case 'goto':
-      {
-        this.graph.openLink(cell.action_args.text, '_self');
-      }
-      break;
-    case 'camera':
-      {
-        let cam = new CameraWindow(this.ui, cell.action_args.text);
-        if (cam != null) {
-          if (cam.isVisible()) cam.show();
-          else cam.show(cellState.shape.node, { x: 10, y: 10 });
-        }
-      }
-      break;
-    case 'eq':
-      {
-        window.open(`/equipments/view?id=${cell.action_args.id}&mode=subwindow`, '_blank', 'location=yes,height=600,width=800,scrollbars=yes,status=yes');
-      }
-      break;
-    default:
-      break;
+  
+  function PosterScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
   }
-};
-
-ShapeAPI.prototype.vclass = function (cell, binding) {
-  if (cell == null || binding == null) return;
-  // get vclass
-  if (binding.name == 'vclass' && !isNullOrEmpty(binding.value)) cell.vclass = JSON.parse(binding.value);
-  // apply vclass
-  if (!VCLASS.isDefaultValue(cell.vclass)) {
-    let targetColor = VCLASS.getColor(cell.vclass);
-    // apply color
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, targetColor, [cell]);
-  }
-};
-ShapeAPI.prototype.visibility = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let visible = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  this.graph.cellsToggled([cell], visible || false);
-
-  //let originOpacity     = cell.origin.style.opacity     || 100;
-  //let originTextOpacity = cell.origin.style.textOpacity || 100;
-
-  //// remove opacity
-  //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, originOpacity, [cell]);
-  //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, originTextOpacity, [cell]);
-
-  //let cellState = this.graph.view.getState(cell);
-  //if (cellState != null)
-  //{
-  //    let opacity     = visible ? (cell.origin.style.opacity     || 100) : 0;
-  //    let textopacity = visible ? (cell.origin.style.textOpacity || 100) : 0;
-  //    this.graph.setCellStyles(mxConstants.STYLE_OPACITY, opacity, [cell]);
-  //    this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, textopacity, [cell]);
-  //}
-};
-ShapeAPI.prototype.blink = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let blinking = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  if (cell.blinkingID) {
-    window.clearInterval(cell.blinkingID);
-    delete cell.blinkingID;
-  }
-
-  //let originOpacity     = cell.origin.style.opacity     || 100;
-  //let originTextOpacity = cell.origin.style.textOpacity || 100;
-
-  // reset visibility
-  this.graph.cellsToggled([cell], true);
-  //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, originOpacity, [cell]);
-  //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, originTextOpacity, [cell]);
-
-  // run
-  if (blinking) {
-    if (cell.blinkSpeed == null) {
-      cell.blinkSpeed = 500;
-      let speedBinding = cell.getBinding('blink.speed');
-      if (speedBinding != null) cell.blinkSpeed = parseInt(JSON.parse(speedBinding.value));
+  mxUtils.extend(PosterScriptAPI, ShapeAPI);
+  PosterScriptAPI.prototype.setup = function (cell) {
+   
+    shapeSetup.apply(this, arguments);
+  
+    var bindingsHandler = new BindingsHandler(this.ui);
+    // init bindings
+  
+    if (typeof BindingsHandler == 'function') {
+      bindingsHandler.graph.view.validatePosterState(cell);
     }
-
-    cell.blinkingID = window.setInterval(
-      mxUtils.bind(this, function (cell) {
-        //this.graph.toggleCells(!cell.isVisible(), [cell], false);
-        this.graph.cellsToggled([cell], !cell.isVisible());
-        //let style   = this.graph.getCellStyle(cell);
-        //let opValue = style.opacity == 100 ? 0 : 100;
-        //this.graph.setCellStyles(mxConstants.STYLE_TEXT_OPACITY, opValue, [cell]);
-        //this.graph.setCellStyles(mxConstants.STYLE_OPACITY, opValue, [cell]);
-      }),
-      cell.blinkSpeed,
-      cell
-    );
-  }
-};
-ShapeAPI.prototype.label = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-  let result = this.processValue(cell, value);
-  this.graph.setAttributeForCell(cell, 'label', result.value);
-};
-ShapeAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let stateON = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let targetColor = cell.origin.style.fillColor || 'none';
-
-  // если задан класс напряжения
-  if (!VCLASS.isDefaultValue(cell.vclass)) {
-    if (stateON) targetColor = VCLASS.getColor(cell.vclass);
-  }
-
-  // проверяем динамические цвета заливки
-  if (cell.fill_colors && Object.keys(cell.fill_colors).length > 0) {
-    let firstIndex = Object.keys(cell.fill_colors).sort()[0];
-    targetColor = cell.fill_colors[firstIndex];
-  }
-
-  // apply color
-  this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
-};
-ShapeAPI.prototype.rotation = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let rotate = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  if (cell.rotationID) {
-    window.clearInterval(cell.rotationID);
-    delete cell.rotationID;
-  }
-
-  // reset rotation
-  this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.origin.style.rotation || 0, [cell]);
-
-  // run
-  if (rotate) {
-    if (cell.rotationSpeed == null) {
-      cell.rotationSpeed = 100;
-      let speedBinding = cell.getBinding('rotation.speed');
-      if (speedBinding != null) cell.rotationSpeed = parseInt(JSON.parse(speedBinding.value));
-    }
-
-    cell.rotationID = window.setInterval(
-      mxUtils.bind(this, function (cell) {
-        let style = this.graph.getCellStyle(cell);
-        let rValue = (style.rotation || 0) + 10; // 10 град.
-        this.graph.setCellStyles(mxConstants.STYLE_ROTATION, rValue, [cell]);
-      }),
-      cell.rotationSpeed,
-      cell
-    );
-  }
-};
-ShapeAPI.prototype.turn = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let turning = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  // reset rotation
-  this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.origin.style.rotation || 0, [cell]);
-
-  // run
-  if (turning) {
-    if (cell.turnAngle == null) {
-      cell.turnAngle = 90;
-      let angleBinding = cell.getBinding('turn.angle');
-      if (angleBinding != null) cell.turnAngle = parseInt(JSON.parse(angleBinding.value));
-    }
-    // apply
-    this.graph.setCellStyles(mxConstants.STYLE_ROTATION, cell.turnAngle, [cell]);
-  }
-};
-ShapeAPI.prototype.shift = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let shifting = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let geo = this.graph.getCellGeometry(cell).clone();
-
-  // reset cell position
-  geo.x = cell.origin.geometry.x;
-  geo.y = cell.origin.geometry.y;
-  this.graph.getModel().setGeometry(cell, geo);
-
-  // run
-  if (shifting) {
-    if (cell.dx == null) {
-      let dxBinding = cell.getBinding('shift.dx');
-      cell.dx = dxBinding != null ? parseInt(JSON.parse(dxBinding.value)) : 0;
-    }
-    if (cell.dy == null) {
-      let dyBinding = cell.getBinding('shift.dy');
-      cell.dy = dyBinding != null ? parseInt(JSON.parse(dyBinding.value)) : 0;
-    }
-    // apply
-    geo.x += cell.dx;
-    geo.y += cell.dy;
-    this.graph.getModel().setGeometry(cell, geo);
-  }
-};
-ShapeAPI.prototype.move = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-  let moving = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let geo = this.graph.getCellGeometry(cell).clone();
-
-  // reset cell position
-  geo.x = cell.origin.geometry.x;
-  geo.y = cell.origin.geometry.y;
-  this.graph.getModel().setGeometry(cell, geo);
-
-  // run
-  if (moving) {
-    if (cell.x == null) {
-      let xBinding = cell.getBinding('move.x');
-      cell.x = xBinding != null ? parseInt(JSON.parse(xBinding.value)) : geo.x;
-    }
-    if (cell.y == null) {
-      let yBinding = cell.getBinding('move.y');
-      cell.y = yBinding != null ? parseInt(JSON.parse(yBinding.value)) : geo.y;
-    }
-    // apply
-    geo.x = cell.x;
-    geo.y = cell.y;
-    this.graph.getModel().setGeometry(cell, geo);
-  }
-};
-
-ShapeAPI.prototype.color = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return null;
-
-  let actionName = binding.name.split('.');
-  if (actionName.length == 0 || actionName[0] != 'color') return null;
-
-  let color = null;
-  switch (actionName[1]) {
-    case 'fill':
-      color = this.color_fill(cell, binding, value);
-      break;
-    case 'brd':
-      color = this.color_border(cell, binding, value);
-      break;
-    case 'font':
-      color = this.color_font(cell, binding, value);
-      break;
-  }
-
-  return color;
-};
-ShapeAPI.prototype.color_fill = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return null;
-
-  // check vclass
-  if (!VCLASS.isDefaultValue(cell.vclass)) return null;
-
-  let result = this.processValue(cell, value);
-  let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let color = null;
-
-  // for dynamic colors
-  if (cell.fill_colors == null) cell.fill_colors = {};
-
-  let actionName = binding.name;
-  let match = actionName.split('.')[2].match(/\d+$/);
-  let index = match != null && match.length > 0 ? match[0] : 0;
-
-  let colorValueBinding = cell.getBinding(actionName + '.val');
-  if (index == 0 || colorValueBinding == null) delete cell.fill_colors[index];
-  else {
-    color = JSON.parse(colorValueBinding.value);
-    // get value
-    if (coloring) cell.fill_colors[index] = color;
-    else {
-      // bad quality
-      if (result.bad) cell.fill_colors[index] = VCLASS.UNRELIABLE_INFO;
-      else delete cell.fill_colors[index];
-    }
-  }
-
-  // get first color or reset
-  if (Object.keys(cell.fill_colors).length > 0) {
-    let firstIndex = Object.keys(cell.fill_colors).sort()[0];
-    color = cell.fill_colors[firstIndex];
-  } else {
-    // for reset
-    color = null;
-  }
-
-  // apply
-  cell.color_fill = color || cell.origin.style.fillColor || 'none';
-  this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, cell.color_fill, [cell]);
-
-  return cell.color_fill;
-};
-ShapeAPI.prototype.color_border = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return null;
-
-  if (!VCLASS.isDefaultValue(cell.vclass)) return null;
-
-  let result = this.processValue(cell, value);
-  let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let color = null;
-
-  // for dynamic colors
-  if (cell.brd_colors == null) cell.brd_colors = {};
-
-  let actionName = binding.name;
-  let match = actionName.split('.')[2].match(/\d+$/);
-  let index = match != null && match.length > 0 ? match[0] : 0;
-
-  let colorValueBinding = cell.getBinding(actionName + '.val');
-  if (index == 0 || colorValueBinding == null) delete cell.brd_colors[index];
-  else {
-    color = JSON.parse(colorValueBinding.value);
-    // check value
-    if (coloring) cell.brd_colors[index] = color;
-    else delete cell.brd_colors[index];
-  }
-
-  // get first color or reset
-  if (Object.keys(cell.brd_colors).length > 0) {
-    let firstIndex = Object.keys(cell.brd_colors).sort()[0];
-    color = cell.brd_colors[firstIndex];
-  } else {
-    // for reset
-    color = null;
-  }
-
-  // apply
-  if (color != null) {
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, color, [cell]);
-  } else {
-    // reset to defaults
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, cell.origin.style.strokeColor || 'none', [cell]);
-  }
-
-  return color;
-};
-ShapeAPI.prototype.color_font = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return null;
-
-  let result = this.processValue(cell, value);
-  let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let color = null;
-
-  // for dynamic colors
-  if (cell.font_colors == null) cell.font_colors = {};
-
-  let actionName = binding.name;
-  let match = actionName.split('.')[2].match(/\d+$/);
-  let index = match != null && match.length > 0 ? match[0] : 0;
-
-  let colorValueBinding = cell.getBinding(actionName + '.val');
-  if (index == 0 || colorValueBinding == null) delete cell.font_colors[index];
-  else {
-    color = JSON.parse(colorValueBinding.value);
-    // check value
-    if (coloring) cell.font_colors[index] = color;
-    else delete cell.font_colors[index];
-  }
-
-  // get first color or reset
-  if (Object.keys(cell.font_colors).length > 0) {
-    let firstIndex = Object.keys(cell.font_colors).sort()[0];
-    color = cell.font_colors[firstIndex];
-  } else {
-    // for reset
-    color = null;
-  }
-
-  // apply
-  if (color != null) {
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, color, [cell]);
-  } else {
-    // reset to defaults
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, cell.origin.style.fontColor || 'none', [cell]);
-  }
-
-  return color;
-};
-
-// save base implementation
-var shapeInit = ShapeAPI.prototype.init;
-var shapeSetup = ShapeAPI.prototype.setup;
-var shapeVisit = ShapeAPI.prototype.visit;
-var shapeCheckValue = ShapeAPI.prototype.checkValue;
-var shapeProcessValue = ShapeAPI.prototype.processValue;
-var shapeResolveState = ShapeAPI.prototype.resolveState;
-var shapeResolveValue = ShapeAPI.prototype.resolveValue;
-var shapeStateToBit = ShapeAPI.prototype.stateToBit;
-var shapeExec = ShapeAPI.prototype.exec;
-
-var shapeVisibility = ShapeAPI.prototype.visibility;
-var shapeBlink = ShapeAPI.prototype.blink;
-var shapeLabel = ShapeAPI.prototype.label;
-var shapeState = ShapeAPI.prototype.state;
-var shapeRotation = ShapeAPI.prototype.rotation;
-var shapeTurn = ShapeAPI.prototype.turn;
-var shapeShift = ShapeAPI.prototype.shift;
-var shapeMove = ShapeAPI.prototype.move;
-var shapeColor = ShapeAPI.prototype.color;
-var shapeColorFill = ShapeAPI.prototype.color_fill;
-var shapeColorBorder = ShapeAPI.prototype.color_border;
-var shapeColorFont = ShapeAPI.prototype.color_font;
-
-function LinkScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(LinkScriptAPI, ShapeAPI);
-LinkScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  let borderColor = cell.origin.style.strokeColor || 'none';
-
-  // если задан класс напряжения
-  switch (current) {
-    case 'ON':
-      borderColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-      break;
-    case 'OFF':
-      borderColor = VCLASS.UOFF;
-      break;
-    case 'SERVICE':
-      borderColor = VCLASS.SERVICE;
-      break;
-    default:
-      borderColor = VCLASS.UNRELIABLE_INFO;
-      break;
-  }
-
-  // apply color
-  this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-};
-
-function BusScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(BusScriptAPI, ShapeAPI);
-BusScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  let fillColor = cell.origin.style.fillColor || 'none';
-
-  switch (current) {
-    case 'ON':
-      fillColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : fillColor;
-      break;
-    case 'OFF':
-      fillColor = VCLASS.UOFF;
-      break;
-    case 'SERVICE':
-      fillColor = VCLASS.SERVICE;
-      break;
-    default:
-      fillColor = VCLASS.UNRELIABLE_INFO;
-      break;
-  }
-
-  // apply color
-  this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-};
-
-function SwitchScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(SwitchScriptAPI, ShapeAPI);
-SwitchScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0, 0, geo.width, geo.height, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-SwitchScriptAPI.prototype.position = function (cell, binding) {
-  let pos = binding != null ? JSON.parse(binding.value) : mxCellRenderer.defaultShapes['switch'].prototype.position == true ? '1' : '0';
-  let state = this.graph.view.getState(cell);
-  if (state != null && state.shape != null) cell.position = state.shape.position = pos == '1';
-};
-SwitchScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-    // check position
-    if (cell.position == null) cell.position = mxCellRenderer.defaultShapes['switch'].prototype.position;
-    shape.position = cell.position;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let fillColor = cell.origin.style.fillColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // если задан класс напряжения
-    if (!VCLASS.isDefaultValue(cell.vclass)) {
-      let vclassColor = VCLASS.getColor(cell.vclass);
-      switch (current) {
-        case 'ON':
-          shape.on = true;
-          fillColor = vclassColor;
-          break;
-        case 'OFF':
-          shape.on = false;
-          fillColor = 'none';
-          borderColor = vclassColor;
-          break;
-        case 'DAMAGE':
-          fillColor = 'none';
-          borderColor = vclassColor;
-          cell.damage.setVisible(true);
-          // update cell.damage
-          let damageCellState = this.graph.view.getState(cell.damage);
-          if (damageCellState != null) damageCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          break;
-        case 'SERVICE':
-          // hide position if exists
-          shape.position = false;
-          fillColor = 'none';
-          borderColor = VCLASS.SERVICE;
-          break;
-        default:
-          // hide position if exists
-          shape.position = false;
-          // apply colors
-          fillColor = VCLASS.UNRELIABLE_INFO;
-          borderColor = vclassColor;
-          // show question mark
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
-          // update cell.question
-          let questionCellState = this.graph.view.getState(cell.question, true);
-          if (questionCellState != null) questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          break;
-      }
-    } else {
-      switch (current) {
-        case 'ON':
-          shape.on = true;
-          break;
-        case 'OFF':
-          shape.on = false;
-          break;
-        case 'DAMAGE':
-          shape.on = false;
-          cell.damage.setVisible(true);
-          // update cell.damage
-          let damageCellState = this.graph.view.getState(cell.damage);
-          if (damageCellState != null) damageCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          break;
-        case 'SERVICE':
-          // hide position if exists
-          shape.position = false;
-          fillColor = 'none';
-          borderColor = VCLASS.SERVICE;
-          break;
-        default:
-          // hide position if exists
-          shape.position = false;
-          // apply colors
-          fillColor = VCLASS.UNRELIABLE_INFO;
-          // show question mark
-          cell.question.setVisible(true);
-          // update cell.question
-          let questionCellState = this.graph.view.getState(cell.question);
-          if (questionCellState != null) questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          break;
-      }
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function SoundScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(SoundScriptAPI, ShapeAPI);
-SoundScriptAPI.prototype.setup = function (cell) {
-  if (cell.audio == null) {
-    let dataBinding = cell.getBinding('play.data');
-    let data = dataBinding != null ? JSON.parse(dataBinding.value) : null;
-    if (data != null) {
-      let cycleBinding = cell.getBinding('play.cycle');
-      let loop = (cycleBinding != null ? JSON.parse(cycleBinding.value) : '0') == '1';
-      cell.audio = new Howl({
-        src: [data],
-        autoplay: false,
-        preload: true,
-        mute: false,
-        loop: loop,
-        volume: 1,
-      });
-    }
-  }
-};
-SoundScriptAPI.prototype.playSound = function () {
-  if (this.audio != null) this.audio.play();
-};
-SoundScriptAPI.prototype.stopSound = function () {
-  if (this.audio != null) this.audio.stop();
-};
-SoundScriptAPI.prototype.play = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  if (binding.initial) return;
-
-  let result = this.processValue(cell, value);
-  let playing = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  if (playing) this.playSound.call(cell);
-  else this.stopSound.call(cell);
-};
-
-function TableScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-  this.ui = editorUI;
-}
-mxUtils.extend(TableScriptAPI, ShapeAPI);
-TableScriptAPI.prototype.visit = function (cell, map) {
-  let args = Array.prototype.slice.call(arguments);
-  // add custom resolver
-  args.push(function (item) {
-    if (item != null && !isNullOrEmpty(item.value)) {
-      let bind = JSON.parse(item.value);
-      if (bind == null) return;
-
-      switch (item.name) {
-        case 'color.font.name':
-        case 'color.font.name.bad':
-        case 'color.fill.name':
-        case 'color.fill.name.bad':
-        case 'color.font.value':
-        case 'color.font.value.bad':
-        case 'color.fill.value':
-        case 'color.fill.value.bad':
-        case 'color.font.measure':
-        case 'color.font.measure.bad':
-        case 'color.fill.measure':
-        case 'color.fill.measure.bad':
-          {
-            cell[item.name] = bind;
-          }
-          break;
-
-        case 'color.font.name.$1':
-        case 'color.font.name.$2':
-        case 'color.font.name.$3':
-        case 'color.fill.name.$1':
-        case 'color.fill.name.$2':
-        case 'color.fill.name.$3':
-        case 'color.font.value.$1':
-        case 'color.font.value.$2':
-        case 'color.font.value.$3':
-        case 'color.fill.value.$1':
-        case 'color.fill.value.$2':
-        case 'color.fill.value.$3':
-        case 'color.font.measure.$1':
-        case 'color.font.measure.$2':
-        case 'color.font.measure.$3':
-        case 'color.fill.measure.$1':
-        case 'color.fill.measure.$2':
-        case 'color.fill.measure.$3':
-          {
-            if (GUID.isValid(bind.id)) map.eq.push(bind);
-            else map.tag.push(bind);
-          }
-          break;
-      }
-    }
-  });
-  shapeVisit.apply(this, args);
-
-  // let itemsBinding = cell.getBinding('items');
-  // if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
-  //   let bind = JSON.parse(itemsBinding.value);
-  //   if (bind != null && bind.length > 0) {
-  //     for (let j = 0; j < bind.length; j++) {
-  //       let id = bind[j].id;
-  //       if (GUID.isValid(id)) map.eq.push(bind[j]);
-  //       else map.tag.push(bind[j]);
-  //     }
-  //   }
-  // }
-};
-TableScriptAPI.prototype.setup = function (cell) {
-  // find tables
-  // if (cell.tables == null) {
-  //   cell.tables = $('table.tbl' + cell.id);
-  //   cell.container = cell.children[0];
-  // }
-};
-TableScriptAPI.prototype.color = function (cell, binding, value) {
-  if (cell == null || binding == null || value == null) return null;
-
-  let actionName = binding.name.split('.');
-  if (actionName.length < 2 || actionName[0] != 'color') return null;
-
-  let color = null;
-  switch (actionName[1]) {
-    case 'font':
-      color = this.color_font(cell, binding, value, actionName[2]);
-      break;
-    case 'fill':
-      color = this.color_fill(cell, binding, value, actionName[2]);
-      break;
-  }
-
-  return color;
-};
-TableScriptAPI.prototype.color_font = function (cell, binding, value, target) {
-  if (cell == null || binding == null || value == null || isNullOrEmpty(target)) return null;
-
-  let result = this.processValue(cell, value);
-  let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let color = null;
-  let key = 'font_colors_' + target;
-
-  // for dynamic colors
-  cell[key] = cell[key] || {};
-
-  let actionName = binding.name;
-  let match = actionName.split('.')[3].match(/\d+$/);
-  let index = match != null && match.length > 0 ? match[0] : 0;
-
-  let colorValueBinding = cell.getBinding(actionName + '.val');
-  if (index == 0 || colorValueBinding == null || !coloring) delete cell[key][index];
-  else {
-    color = JSON.parse(colorValueBinding.value);
-    // set value
-    if (coloring) cell[key][index] = color;
-  }
-
-  // get first color or reset
-  if (Object.keys(cell[key]).length > 0) {
-    let firstIndex = Object.keys(cell[key]).sort()[0];
-    color = cell[key][firstIndex];
-  } else {
-    // for reset
-    color = null;
-  }
-
-  // apply
-  cell['current.color.font.' + target] = color;
-
-  return color;
-};
-TableScriptAPI.prototype.color_fill = function (cell, binding, value, target) {
-  if (cell == null || binding == null || value == null || isNullOrEmpty(target)) return null;
-
-  let result = this.processValue(cell, value);
-  let coloring = !result.bad && (result.state ? this.stateToBit(result.value) : result.value);
-
-  let color = null;
-  let key = 'fill_colors_' + target;
-
-  // for dynamic colors
-  cell[key] = cell[key] || {};
-
-  let actionName = binding.name;
-  let match = actionName.split('.')[3].match(/\d+$/);
-  let index = match != null && match.length > 0 ? match[0] : 0;
-
-  let colorValueBinding = cell.getBinding(actionName + '.val');
-  if (index == 0 || colorValueBinding == null || !coloring) delete cell[key][index];
-  else {
-    color = JSON.parse(colorValueBinding.value);
-    // set value
-    if (coloring) cell[key][index] = color;
-  }
-
-  // get first color or reset
-  if (Object.keys(cell[key]).length > 0) {
-    let firstIndex = Object.keys(cell[key]).sort()[0];
-    color = cell[key][firstIndex];
-  } else {
-    // for reset
-    color = null;
-  }
-
-  // apply
-  cell['current.color.fill.' + target] = color;
-
-  return color;
-};
-TableScriptAPI.prototype.resolveColor = function () {
-  let args = Array.prototype.slice.call(arguments);
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] != null) return args[i];
-  }
-  return null;
-};
-
-TableScriptAPI.prototype.items = function (cell, binding, value) {
-    if (cell == null || value == null) return;
-    const fractionLengthBinding = cell.getBinding('fractionLength')
-    let fractionLength = fractionLengthBinding != null ? JSON.parse($(fractionLengthBinding).attr('value')) : null;
-    
-  if (cell.tables != null) {
-    let result = this.processValue(cell, value);
-    for (var i = 0; i < cell.tables.length; i++) {
-      let table = cell.tables[i];
-
-      if (result.src != null) {
-        let row = document.querySelector(`#${CSS.escape(result.src.id)}`);
-        if (row != null) {
-          let cname = $(row).find('td.c-name');
-          let cvalue = $(row).find('td.c-value');
-          let cmeasure = $(row).find('td.c-measure');
-          if (cname == null || cvalue == null || cmeasure == null) return;
-
-          ////////// resolve colors (dynamic || fixed || default) & check for bad //////////
-
-          // font name
-          let target_font_color_name = this.resolveColor(cell['current.color.font.name'], cell['color.font.name'], '#000000');
-          if (result.bad) target_font_color_name = this.resolveColor(cell['color.font.name.bad'], target_font_color_name);
-
-          // font value
-          let target_font_color_value = this.resolveColor(cell['current.color.font.value'], cell['color.font.value'], '#90EE90');
-          if (result.bad) target_font_color_value = this.resolveColor(cell['color.font.value.bad'], VCLASS.UNRELIABLE_INFO);
-
-          // font measure
-          let target_font_color_measure = this.resolveColor(cell['current.color.font.measure'], cell['color.font.measure'], '#000000');
-          if (result.bad) target_font_color_measure = this.resolveColor(cell['color.font.measure.bad'], target_font_color_measure);
-
-          // fill name
-          let target_fill_color_name = this.resolveColor(cell['current.color.fill.name'], cell['color.fill.name'], 'transparent');
-          if (result.bad) target_fill_color_name = this.resolveColor(cell['color.fill.name.bad'], target_fill_color_name);
-
-          // fill value
-          let target_fill_color_value = this.resolveColor(cell['current.color.fill.value'], cell['color.fill.value'], '#000000');
-          if (result.bad) target_fill_color_value = this.resolveColor(cell['color.fill.value.bad'], '#808080');
-
-          // fill measure
-          let target_fill_color_measure = this.resolveColor(cell['current.color.fill.measure'], cell['color.fill.measure'], 'transparent');
-          if (result.bad) target_fill_color_measure = this.resolveColor(cell['color.fill.measure.bad'], target_fill_color_measure);
-
-          // value
-            if (result.isbool) {
-                if (row.box == null) {
-                    let chBox = $(document.createElement('input'));
-                    chBox.attr('type', 'checkbox');
-                    chBox.attr('readOnly', true);
-                    row.box = chBox;
-                }
-                row.box.attr('checked', result.value == true);
-                row.box.attr('disabled', result.bad);
-                cvalue.html(row.box[0].outerHTML);
-            } else fractionLength
-                ?
-                cvalue.html(API.FORMAT.getValue(value).toFixed(Number(fractionLength)))
-                :
-                cvalue.html(API.FORMAT.getValue(value));
-              
-
-          // measure
-          if (!row.measure) {
-            cmeasure.html(result.src.m);
-            row.measure = true;
-          }
-
-          // apply colors
-          cname.css('color', target_font_color_name || 'transparent');
-          cname.css('background-color', target_fill_color_name || 'transparent');
-
-          cvalue.css('color', target_font_color_value || 'transparent');
-          cvalue.css('background-color', target_fill_color_value || 'transparent');
-
-          cmeasure.css('color', target_font_color_measure || 'transparent');
-          cmeasure.css('background-color', target_fill_color_measure || 'transparent');
-        }
-      }
-      // update cell HTML value for printing !!!
-      if (cell.container != null) cell.container.setValue(table.outerHTML);
-    }
-  }
-};
-
-function ButtonScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(ButtonScriptAPI, ShapeAPI);
-ButtonScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-};
-
-function ChartScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(ChartScriptAPI, ShapeAPI);
-ChartScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-  // setup chart
-  if (cell.canvas == null) {
-    let chartColors = {
-      red: 'rgb(255, 99, 132)',
-      blue: 'rgb(54, 162, 235)',
-      max: 'rgb(255, 0, 255)',
-      min: 'rgb(0, 255, 000)',
+    //unstick cells
+    mxGraph.prototype.isValidDropTarget = function (target, cells, evt) {
+      return target._type == 'phase' && cells.every((c) => c._type != 'phase');
     };
-    let randomData = function (unit, add, min, max) {
-      if (min == null) min = -100;
-      if (max == null) max = +100;
-      if (unit == null) unit = 'second';
-
-      let randomTime = function () {
-        switch (unit) {
-          case 'millisecond':
-            return new Date().addMilliseconds(add || 0);
-          case 'second':
-            return new Date().addSeconds(add || 0);
-          case 'minute':
-            return new Date().addMinutes(add || 0);
-          case 'hour':
-            return new Date().addHours(add || 0);
-          case 'day':
-            return new Date().addDays(add || 0);
-          case 'week':
-            return new Date().addWeeks(add || 0);
-          case 'month':
-            return new Date().addMonths(add || 0);
-          case 'year':
-            return new Date().addWeeks(add || 0);
-          default:
-            return new Date().addSeconds(add || 0);
-        }
-      };
-
-      return {
-        x: randomTime(),
-        y: Math.random() * (max - min) + min,
-      };
+  
+    cell.getTooltip = function () {
+      return this._model ? `[${API.FORMAT.getDateString(this._model.ts)}]: ${this._model.modifiedBy}.\n${this._model.data.title}` : null;
     };
-    var createMaxAnnotation = function (value) {
-      return {
-        id: 'y-max',
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-1',
-        value: value,
-        borderColor: 'rgba(255, 0, 0, 1)',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        label: {
-          enabled: true,
-          backgroundColor: 'transparent',
-          fontColor: '#ff0000',
-          content: 'Макс.',
-          position: 'left',
-          fontSize: 10,
-          yAdjust: +8,
-          cornerRadius: 3,
-        },
-      };
-    };
-    var createMinAnnotation = function (value) {
-      return {
-        id: 'y-min',
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-1',
-        value: value,
-        borderColor: 'rgba(0, 0, 255, 1)',
-        borderWidth: 1.5,
-        borderDash: [5, 5],
-        label: {
-          enabled: true,
-          backgroundColor: 'transparent',
-          fontColor: '#0000ff',
-          content: 'Мин.',
-          position: 'left',
-          fontSize: 10,
-          yAdjust: -8,
-          cornerRadius: 3,
-        },
-      };
-    };
-    let getChartConfig = function () {
-      return {
-        type: 'scatter',
-        data: {
-          datasets: [
-            {
-              label: 'Тренд 1',
-              fill: false,
-              showLine: true,
-              lineTension: 0,
-              backgroundColor: chartColors.red,
-              borderColor: chartColors.red,
-              data: [],
-            },
-            {
-              label: 'Тренд 2',
-              fill: false,
-              showLine: true,
-              lineTension: 0,
-              backgroundColor: chartColors.blue,
-              borderColor: chartColors.blue,
-              data: [],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false,
-          //{
-          //    duration: 300
-          //},
-          title: {
-            display: true,
-            text: 'График',
-          },
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              boxWidth: 15,
-              fontFamily: 'Arial',
-              fontSize: 8,
-              padding: 5,
-              usePointStyle: false,
-            },
-          },
-          scales: {
-            xAxes: [
-              {
-                display: true,
-                type: 'time',
-                autoSkip: false,
-                position: 'bottom',
-                distribution: 'linear',
-                bounds: 'ticks',
-                time: {
-                  isoWeekday: true,
-                  unit: 'second',
-                  //unitStepSize: 10,
-                  //stepSize: 1,
-                  //precision: 1,
-                  //round: true,
-                  //minUnit: 'hour',
-                  displayFormats: {
-                    millisecond: 'ss.SSS',
-                    second: 'mm:ss.SSS',
-                    minute: 'HH:mm:ss',
-                    hour: 'DD.MM HH:mm',
-                    day: 'DD.MM',
-                    week: 'WW.YYYY',
-                    month: 'DD.MM.YYYY',
-                    quarter: 'Q YYYY',
-                    year: 'YYYY',
-                  },
-                },
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Время',
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                  padding: { bootom: 5 },
-                },
-                //ticks:
-                //{
-                //    source: "auto",
-                //    //maxTicksLimit: 10,
-                //    //autoSkip: true,
-                //    stepSize: 5,
-                //    //precision: 1,
-
-                //    lineHeight: 1,
-                //    fontFamily: 'Arial',
-                //    fontSize: 10,
-                //    padding: 0,
-                //    maxRotation: 45,
-                //    //callback: function (value, index, values)
-                //    //{
-                //    //    //return API.FORMAT.getDateTimeString(value);
-                //    //    return moment(value).format('HH:mm:ss');
-                //    //}
-                //}
-              },
-            ],
-            yAxes: [
-              {
-                display: true,
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Значение',
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                  padding: { top: 5 },
-                },
-                ticks: {
-                  source: 'data',
-                  maxTicksLimit: 10,
-                  //stepSize: 1.1,
-                  precision: 3,
-                  lineHeight: 1,
-                  fontFamily: 'Arial',
-                  fontSize: 10,
-                },
-              },
-            ],
-          },
-          layout: {
-            padding: 0,
-          },
-          annotation: {
-            drawTime: 'afterDraw',
-            annotations: [createMaxAnnotation(90), createMinAnnotation(-90)],
-          },
-        },
-      };
-    };
-
-    let geom = this.graph.getCellGeometry(cell);
-    // build chart
-    var node = document.createElement('canvas');
-    node.setAttribute('id', cell.mxObjectId);
-    node.setAttribute('class', 'chart');
-    node.setAttribute('width', geom.width);
-    node.setAttribute('height', geom.height);
-    // Document for empty output if not in DOM
-    document.body.appendChild(node);
-    cell.canvas = node;
-    cell.chart = new Chart.Scatter(node.getContext('2d'), getChartConfig());
-
-    (function () {
-      if (this.chart != null) {
-        // header
-        this.chart.options.title.display = false;
-        let hdrBinding = this.getBinding('header');
-        if (hdrBinding != null) {
-          let hdr = JSON.parse(hdrBinding.value);
-          if (hdr != null && hdr.text != null) {
-            this.chart.options.title.text = hdr.text;
-            this.chart.options.title.display = true;
-          }
-        }
-        // legend
-        let legendBinding = this.getBinding('legend');
-        this.chart.options.legend.display = legendBinding == null || JSON.parse(legendBinding.value) != '0';
-
-        // axisX.label
-        this.chart.options.scales.xAxes[0].scaleLabel.display = false;
-        let axisXLabelBinding = this.getBinding('axisX.label');
-        if (axisXLabelBinding != null) {
-          let axisXLabel = JSON.parse(axisXLabelBinding.value);
-          if (axisXLabel != null && axisXLabel.text != null) {
-            this.chart.options.scales.xAxes[0].scaleLabel.labelString = axisXLabel.text;
-            this.chart.options.scales.xAxes[0].scaleLabel.display = true;
-          }
-        }
-
-        // axisX.measure
-        let xUnit = 'second';
-        let axisXMeasureBinding = this.getBinding('axisX.measure');
-        if (axisXMeasureBinding != null) {
-          let axisXMeasure = JSON.parse(axisXMeasureBinding.value);
-          switch (axisXMeasure) {
-            case 'ms':
-              xUnit = 'millisecond';
-              break;
-            case 's':
-              xUnit = 'second';
-              break;
-            case 'mn':
-              xUnit = 'minute';
-              break;
-            case 'h':
-              xUnit = 'hour';
-              break;
-            case 'd':
-              xUnit = 'day';
-              break;
-            case 'w':
-              xUnit = 'week';
-              break;
-            case 'm':
-              xUnit = 'month';
-              break;
-            case 'y':
-              xUnit = 'year';
-              break;
-            default:
-              xUnit = 'second';
-              break;
-          }
-        }
-        this.chart.options.scales.xAxes[0].time.unit = xUnit;
-
-        // axisX.step
-        let xStep = 1;
-        this.chart.options.scales.xAxes[0].time.stepSize = xStep;
-        let axisXStepBinding = this.getBinding('axisX.step');
-        if (axisXStepBinding != null) {
-          let axisXStep = JSON.parse(axisXStepBinding.value);
-          xStep = parseNumber(axisXStep) || 1;
-          this.chart.options.scales.xAxes[0].time.stepSize = xStep;
-        }
-
-        // axisX.scale
-        let xScale = 30;
-        let axisXScaleBinding = this.getBinding('axisX.scale');
-        if (axisXScaleBinding != null) {
-          let axisXScale = JSON.parse(axisXScaleBinding.value);
-          xScale = parseNumber(axisXScale) || 30;
-        }
-
-        // axisY.label
-        this.chart.options.scales.yAxes[0].scaleLabel.display = false;
-        let axisYLabelBinding = this.getBinding('axisY.label');
-        if (axisYLabelBinding != null) {
-          let axisYLabel = JSON.parse(axisYLabelBinding.value);
-          if (axisYLabel != null && axisYLabel.text != null) {
-            this.chart.options.scales.yAxes[0].scaleLabel.labelString = axisYLabel.text;
-            this.chart.options.scales.yAxes[0].scaleLabel.display = true;
-          }
-        }
-
-        // clear axisY annotations
-        this.chart.options.annotation.annotations.length = 0;
-        this.chart.annotation.elements = {};
-        this.chart.annotation.options.annotations.length = 0;
-
-        // axisY.max
-        let maxValue = null;
-        let axisYMaxBinding = this.getBinding('axisY.max.show');
-        if (axisYMaxBinding != null) {
-          let axisYMaxShow = JSON.parse(axisYMaxBinding.value);
-          if (axisYMaxShow != null && axisYMaxShow != '0') {
-            let axisYMaxValueBinding = this.getBinding('axisY.max.value');
-            if (axisYMaxValueBinding != null) {
-              let axisYMaxValue = JSON.parse(axisYMaxValueBinding.value);
-              if (axisYMaxValue != null) maxValue = parseNumber(axisYMaxValue, 0, 3);
-            }
-            let annotation = createMaxAnnotation(maxValue);
-            this.chart.options.annotation.annotations.push(annotation); // show
-          }
-        }
-        // axisY.min
-        let minValue = null;
-        let axisYMinBinding = this.getBinding('axisY.min.show');
-        if (axisYMinBinding != null) {
-          let axisYMinShow = JSON.parse(axisYMinBinding.value);
-          if (axisYMinShow != null && axisYMinShow != '0') {
-            let axisYMinValueBinding = this.getBinding('axisY.min.value');
-            if (axisYMinValueBinding != null) {
-              let axisYMinValue = JSON.parse(axisYMinValueBinding.value);
-              if (axisYMinValue != null) minValue = parseNumber(axisYMinValue, 0, 3);
-            }
-            let annotation = createMinAnnotation(minValue);
-            this.chart.options.annotation.annotations.push(annotation); // show
-          }
-        }
-
-        // items
-        this.chart.data.datasets = [];
-        let itemsBinding = this.getBinding('items');
-        if (itemsBinding != null) {
-          let getType = function (item) {
-            switch (item.view) {
-              case '4': // bars
-                return 'bar';
-              default:
-                return 'scatter';
-            }
-          };
-          let getShowLine = function (item) {
-            switch (item.view) {
-              case '1': // points
-                return false;
-              default:
-                return true;
-            }
-          };
-
-          let items = JSON.parse(itemsBinding.value);
-          if (items != null && items.length > 0) {
-            for (let i = 0; i < items.length; i++) {
-              let item = items[i];
-              if (item != null) {
-                this.chart.data.datasets.push({
-                  id: item.id,
-                  label: item.d,
-                  fill: false,
-                  showLine: getShowLine(item),
-                  lineTension: 0,
-                  backgroundColor: item.color,
-                  borderColor: item.color,
-                  type: getType(item),
-                  steppedLine: item.view == '3' ? 'before' : false, // stepped line
-                  data: [
-                    //randomData(xUnit, 0, minValue, maxValue),
-                    //randomData(xUnit, 1, minValue, maxValue),
-                    //randomData(xUnit, 2, minValue, maxValue),
-                    //randomData(xUnit, 3, minValue, maxValue),
-                    //randomData(xUnit, 4, minValue, maxValue)
-                  ],
-                });
-              }
-            }
-          }
-        }
-
-        this.chart.update();
-
-        this.chart.validateRange = mxUtils.bind(cell, function () {
-          // update x-axis width
-          if (xScale > 0 && xStep > 0) {
-            let xAxis = this.chart.scales['x-axis-1'];
-            let minDate = moment(xAxis.min).toDate();
-            let maxDate = moment(xAxis.max).toDate();
-
-            switch (xUnit) {
-              case 'millisecond':
-                minDate = maxDate.addMilliseconds(-xScale || 0);
-                break;
-              case 'second':
-                minDate = maxDate.addSeconds(-xScale || 0);
-                break;
-              case 'minute':
-                minDate = maxDate.addMinutes(-xScale || 0);
-                break;
-              case 'hour':
-                minDate = maxDate.addHours(-xScale || 0);
-                break;
-              case 'day':
-                minDate = maxDate.addDays(-xScale || 0);
-                break;
-              case 'week':
-                minDate = maxDate.addWeeks(-xScale || 0);
-                break;
-              case 'month':
-                minDate = maxDate.addMonths(-xScale || 0);
-                break;
-              case 'year':
-                minDate = maxDate.addWeeks(-xScale || 0);
-                break;
-              default:
-                break;
-            }
-
-            if (minDate != null) this.chart.options.scales.xAxes[0].ticks.min = minDate.getTime(); //moment(minDate);
-
-            this.chart.update();
-          }
-        });
-        this.chart.validateRange();
-      }
-    }).apply(cell);
-  }
-};
-ChartScriptAPI.prototype.visit = function (cell, map) {
-  shapeVisit.apply(this, arguments);
-  let itemsBinding = cell.getBinding('items');
-  if (itemsBinding != null && !isNullOrEmpty(itemsBinding.value)) {
-    let bind = JSON.parse(itemsBinding.value);
-    if (bind == null) return;
-    if (bind.length) {
-      for (let j = 0; j < bind.length; j++) {
-        let id = bind[j].id;
-        if (GUID.isValid(id)) map.eq.push(bind[j]);
-        else map.tag.push(bind[j]);
-      }
-    }
-  }
-};
-ChartScriptAPI.prototype.items = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let ds = cell.chart.data.datasets.find(function (x) {
-    return x.id == value.id;
-  });
-  if (ds != null) {
-    if (ds.data.length > 100) ds.data.shift();
-
-    ds.data.push({
-      x: API.FORMAT.getDate(value.ts).getTime(),
-      y: value.v,
-    });
-  }
-
-  cell.chart.validateRange();
-};
-
-function RollSwitchScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(RollSwitchScriptAPI, ShapeAPI);
-RollSwitchScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 3, geo.width, geo.height / 3, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 3 / 10) * 7, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-  if (cell.roll_damage == null) {
-    cell.roll_damage = this.graph.insertVertex(cell, null, '', -1, 0, geo.width * 3, geo.height, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.roll_damage.getTooltip = function () {};
-  }
-};
-RollSwitchScriptAPI.prototype.position = function (cell, binding) {
-  let pos = binding != null ? JSON.parse(binding.value) : mxCellRenderer.defaultShapes['rollswitch'].prototype.position == true ? '1' : '0';
-  let state = this.graph.view.getState(cell);
-  if (state != null && state.shape != null) cell.position = state.shape.position = pos == '1';
-};
-RollSwitchScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN_SWITCH_ON' : 'ROLL_IN_SWITCH_OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-  // hide roll_damage
-  cell.roll_damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-    // check position
-    if (cell.position == null) cell.position = mxCellRenderer.defaultShapes['rollswitch'].prototype.position;
-    shape.position = cell.position;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let fillColor = cell.origin.style.fillColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // если задан класс напряжения
-    if (!VCLASS.isDefaultValue(cell.vclass)) {
-      let vclassColor = VCLASS.getColor(cell.vclass);
-      switch (current) {
-        case 'ROLL_IN_SWITCH_ON':
-          {
-            shape.on = true;
-            shape.roll = 'IN';
-            fillColor = vclassColor;
-            borderColor = vclassColor;
-          }
-          break;
-        case 'ROLL_IN_SWITCH_OFF':
-          {
-            shape.on = false;
-            shape.roll = 'IN';
-            fillColor = 'none';
-            borderColor = vclassColor;
-          }
-          break;
-        case 'ROLL_IN_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'IN';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            borderColor = vclassColor;
-            // show question mark
-            cell.question.setVisible(true);
-            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
-            // update cell.question
-            //let questionCellState = this.graph.view.getState(cell.question, true);
-            //if (questionCellState != null)
-            //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          }
-          break;
-        case 'ROLL_IN_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'IN';
-            // apply colors
-            fillColor = 'none';
-            borderColor = vclassColor;
-            cell.damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_ON':
-          {
-            shape.on = true;
-            shape.roll = 'CONTROL';
-            fillColor = vclassColor;
-            borderColor = vclassColor;
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_OFF':
-          {
-            shape.on = false;
-            shape.roll = 'CONTROL';
-            fillColor = 'none';
-            borderColor = vclassColor;
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'CONTROL';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            borderColor = vclassColor;
-            // show question mark
-            cell.question.setVisible(true);
-            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
-            // update cell.question
-            //let questionCellState = this.graph.view.getState(cell.question, true);
-            //if (questionCellState != null)
-            //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'CONTROL';
-            // apply colors
-            fillColor = 'none';
-            borderColor = vclassColor;
-            cell.damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_ON':
-          {
-            // hide position if exists
-            shape.on = true;
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            borderColor = vclassColor;
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_OFF':
-          {
-            // hide position if exists
-            shape.on = false;
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            borderColor = vclassColor;
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            borderColor = vclassColor;
-            // show question mark
-            cell.question.setVisible(true);
-            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'DAMAGE|DAMAGE';
-            // apply colors
-            fillColor = 'none';
-            borderColor = vclassColor;
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'SERVICE':
-          // hide position if exists
-          shape.position = false;
-          fillColor = 'none';
-          borderColor = VCLASS.SERVICE;
-          break;
-        default:
-          {
-            // hide position if exists
-            shape.position = false;
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            borderColor = vclassColor;
-            // show question mark
-            cell.question.setVisible(true);
-            this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, vclassColor, [cell.question]);
-            // update cell.question
-            //let questionCellState = this.graph.view.getState(cell.question, true);
-            //if (questionCellState != null)
-            //    questionCellState.setCursor(mxConstants.CURSOR_CONNECT);
-          }
-          break;
-      }
-    } else {
-      switch (current) {
-        case 'ROLL_IN_SWITCH_ON':
-          {
-            shape.on = true;
-            shape.roll = 'IN';
-          }
-          break;
-        case 'ROLL_IN_SWITCH_OFF':
-          {
-            shape.on = false;
-            shape.roll = 'IN';
-            fillColor = 'none';
-          }
-          break;
-        case 'ROLL_IN_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'IN';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            // show question mark
-            cell.question.setVisible(true);
-          }
-          break;
-        case 'ROLL_IN_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'IN';
-            // apply colors
-            fillColor = 'none';
-            cell.damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_ON':
-          {
-            shape.on = true;
-            shape.roll = 'CONTROL';
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_OFF':
-          {
-            shape.on = false;
-            shape.roll = 'CONTROL';
-            fillColor = 'none';
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'CONTROL';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            // show question mark
-            cell.question.setVisible(true);
-          }
-          break;
-        case 'ROLL_CONTROL_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'CONTROL';
-            // apply colors
-            fillColor = 'none';
-            cell.damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_ON':
-          {
-            // hide position if exists
-            shape.on = true;
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_OFF':
-          {
-            // hide position if exists
-            shape.on = false;
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_ERROR':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'DAMAGE';
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            // show question mark
-            cell.question.setVisible(true);
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'ROLL_DAMAGE_SWITCH_DAMAGE':
-          {
-            // hide position if exists
-            shape.position = false;
-            shape.roll = 'DAMAGE|DAMAGE';
-            // apply colors
-            fillColor = 'none';
-            cell.roll_damage.setVisible(true);
-          }
-          break;
-        case 'SERVICE':
-          // hide position if exists
-          shape.position = false;
-          fillColor = 'none';
-          borderColor = VCLASS.SERVICE;
-          break;
-        default:
-          {
-            // hide position if exists
-            shape.position = false;
-            // apply colors
-            fillColor = VCLASS.UNRELIABLE_INFO;
-            // show question mark
-            cell.question.setVisible(true);
-          }
-          break;
-      }
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function RollDisconnectorScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(RollDisconnectorScriptAPI, ShapeAPI);
-RollDisconnectorScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, '', -1, 0, geo.width * 3, geo.height, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-RollDisconnectorScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN' : 'ROLL_CONTROL';
-
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ROLL_IN':
-        {
-          shape.roll = 'IN';
-          borderColor = targetColor;
-        }
-        break;
-      case 'ROLL_CONTROL':
-        {
-          shape.roll = 'CONTROL';
-          borderColor = targetColor;
-        }
-        break;
-      case 'ROLL_DAMAGE':
-        {
-          shape.roll = 'DAMAGE';
-          borderColor = targetColor;
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      default:
-        {
-          borderColor = targetColor;
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function DisconnectorScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(DisconnectorScriptAPI, ShapeAPI);
-DisconnectorScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0 + geo.width / 5, geo.height / 8, geo.width - geo.width / 2.5, geo.height - geo.height / 4, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-DisconnectorScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ON':
-        {
-          shape._state = 'ON';
-          borderColor = targetColor;
-        }
-        break;
-      case 'OFF':
-        {
-          shape._state = 'OFF';
-          borderColor = targetColor;
-        }
-        break;
-      case 'MIDDLE':
-        {
-          shape._state = 'MIDDLE';
-          borderColor = targetColor;
-        }
-        break;
-      case 'DAMAGE':
-        {
-          shape._state = 'DAMAGE';
-          borderColor = targetColor;
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'OFF';
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      case 'ERROR':
-      default:
-        {
-          shape._state = 'ERROR';
-          borderColor = targetColor;
-          // show question mark
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function SeparatorScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(SeparatorScriptAPI, ShapeAPI);
-SeparatorScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0 + geo.width / 5, geo.height / 8, geo.width - geo.width / 2.5, geo.height - geo.height / 4, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-SeparatorScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ON':
-        {
-          shape._state = 'ON';
-          borderColor = targetColor;
-        }
-        break;
-      case 'OFF':
-        {
-          shape._state = 'OFF';
-          borderColor = targetColor;
-        }
-        break;
-      case 'MIDDLE':
-        {
-          shape._state = 'MIDDLE';
-          borderColor = targetColor;
-        }
-        break;
-      case 'DAMAGE':
-        {
-          shape._state = 'DAMAGE';
-          borderColor = targetColor;
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'OFF';
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      case 'ERROR':
-      default:
-        {
-          shape._state = 'ERROR';
-          borderColor = targetColor;
-          // show question mark
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function GroundScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(GroundScriptAPI, ShapeAPI);
-GroundScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 10, geo.width, geo.height - geo.height / 5, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-GroundScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ON':
-        {
-          shape._state = 'ON';
-          borderColor = targetColor;
-        }
-        break;
-      case 'OFF':
-        {
-          shape._state = 'OFF';
-          borderColor = targetColor;
-        }
-        break;
-      case 'MIDDLE':
-        {
-          shape._state = 'MIDDLE';
-          borderColor = targetColor;
-        }
-        break;
-      case 'DAMAGE':
-        {
-          shape._state = 'DAMAGE';
-          borderColor = targetColor;
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'OFF';
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      case 'ERROR':
-      default:
-        {
-          shape._state = 'ERROR';
-          borderColor = targetColor;
-          // show question mark
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function RollElementScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(RollElementScriptAPI, ShapeAPI);
-RollElementScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, '', -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-RollElementScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ROLL_IN' : 'ROLL_CONTROL';
-
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ROLL_IN':
-        {
-          shape._state = 'IN';
-          borderColor = targetColor;
-        }
-        break;
-      case 'ROLL_CONTROL':
-        {
-          shape._state = 'CONTROL';
-          borderColor = targetColor;
-        }
-        break;
-      case 'ROLL_DAMAGE':
-        {
-          shape._state = 'DAMAGE';
-          borderColor = targetColor;
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'SERVICE';
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      default:
-        {
-          shape._state = 'UNKNOWN';
-          borderColor = VCLASS.UNRELIABLE_INFO;
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function ActuatorScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(ActuatorScriptAPI, ShapeAPI);
-ActuatorScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0, 0.5, geo.width, geo.height, 'text;pointerEvents=0;fontSize=' + (geo.height / 10) * 8, true);
-    cell.question.getTooltip = function () {};
-  }
-};
-ActuatorScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'OPEN' : 'CLOSE';
-
-  // hide question
-  cell.question.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let fillColor = cell.origin.style.fillColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    shape.fill_1 = null;
-    shape.fill_2 = null;
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : fillColor;
-    switch (current) {
-      case 'OPEN':
-        {
-          shape._state = 'OPEN';
-          fillColor = targetColor;
-        }
-        break;
-      case 'CLOSE':
-        {
-          shape._state = 'CLOSE';
-          fillColor = 'none';
-          borderColor = targetColor;
-        }
-        break;
-      case 'MIDDLE':
-        {
-          shape._state = 'MIDDLE';
-          fillColor = 'none';
-          shape.fill_1 = targetColor;
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'SERVICE';
-          fillColor = 'none';
-          borderColor = VCLASS.SERVICE;
-        }
-        break;
-      case 'ERROR':
-      default:
-        {
-          shape._state = 'ERROR';
-          fillColor = '#FFFFFF';
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, fillColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function SimpleSwitchScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(SimpleSwitchScriptAPI, ShapeAPI);
-SimpleSwitchScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  let geo = this.graph.getCellGeometry(cell);
-  //let angle = mxUtils.getValue(this.graph.view.getState(cell).style, mxConstants.STYLE_ROTATION, 0);
-  if (cell.question == null) {
-    cell.question = this.graph.insertVertex(cell, null, '?', 0, geo.height / 20, geo.width, geo.height - geo.height / 10, 'text;align=center;verticalAlign=middle;pointerEvents=0;fontSize=' + (geo.height / 10) * 7 + ';fillColor=' + VCLASS.UNRELIABLE_INFO, false);
-    cell.question.getTooltip = function () {};
-  }
-  if (cell.damage == null) {
-    cell.damage = this.graph.insertVertex(cell, null, null, -0.5, -0.5, geo.width * 2, geo.height * 2, 'line;strokeColor=#FF0000;strokeWidth=2;fillColor=none;pointerEvents=0;rotation=-45;', true);
-    cell.damage.getTooltip = function () {};
-  }
-};
-SimpleSwitchScriptAPI.prototype.state = function (cell, binding, value) {
-  if (cell == null || value == null) return;
-
-  let result = this.processValue(cell, value);
-
-  let current = result.bad ? 'UNKNOWN' : result.value;
-  if (result.state == null && current != 'UNKNOWN') current = result.value != null && result.value ? 'ON' : 'OFF';
-
-  // hide question
-  cell.question.setVisible(false);
-  // hide damage
-  cell.damage.setVisible(false);
-
-  var cellState = this.graph.view.getState(cell);
-  if (cellState != null && cellState.shape != null) {
-    let shape = cellState.shape;
-
-    let fontColor = cell.origin.style.fontColor || 'none';
-    let borderColor = cell.origin.style.strokeColor || 'none';
-
-    // reset colors
-    this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, fontColor, [cell.question]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, borderColor, [cell]);
-
-    let targetColor = !VCLASS.isDefaultValue(cell.vclass) ? VCLASS.getColor(cell.vclass) : borderColor;
-    switch (current) {
-      case 'ON':
-        {
-          shape._state = 'ON';
-        }
-        break;
-      case 'OFF':
-        {
-          shape._state = 'OFF';
-        }
-        break;
-      case 'DAMAGE':
-        {
-          shape._state = 'DAMAGE';
-          cell.damage.setVisible(true);
-        }
-        break;
-      case 'SERVICE':
-        {
-          shape._state = 'OFF';
-          targetColor = VCLASS.SERVICE;
-        }
-        break;
-      case 'ERROR':
-      default:
-        {
-          shape._state = 'ERROR';
-          // show question mark
-          cell.question.setVisible(true);
-          this.graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, targetColor, [cell.question]);
-        }
-        break;
-    }
-
-    // apply colors
-    this.graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, targetColor, [cell]);
-    this.graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, targetColor, [cell]);
-
-    // update cell
-    this.graph.cellRenderer.redrawShape(cellState, true);
-  }
-};
-
-function BMRZScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(BMRZScriptAPI, ShapeAPI);
-BMRZScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-  // fake action
-  cell.action = function () {};
-  cell.getTooltip = function () {
-    return 'Подключиться';
   };
-};
-BMRZScriptAPI.prototype.buildConfig = function (cell) {
-  let config = { type: 'usb' };
-  let type = cell.getBinding('connection.type');
-  if (type != null && type.value != null) config.type = JSON.parse(type.value);
-
-  switch (config.type) {
-    case 'usb':
-      break;
-    case 'com':
-      {
-        config.com = {};
-        // port
-        config.com.port = 'COM1';
-        let port = cell.getBinding('com.port');
-        if (port != null && port.value != null) config.com.port = JSON.parse(port.value).trim();
-        // address
-        config.com.address = '55';
-        let address = cell.getBinding('com.address');
-        if (address != null && address.value != null) config.com.address = JSON.parse(address.value).trim();
-        // speed
-        config.com.speed = '19200';
-        let speed = cell.getBinding('com.speed');
-        if (speed != null && speed.value != null) config.com.speed = JSON.parse(speed.value).trim();
-        // parity
-        config.com.parity = '0';
-        let parity = cell.getBinding('com.parity');
-        if (parity != null && parity.value != null) config.com.parity = JSON.parse(parity.value).trim();
-        // stop_bits
-        config.com.stop_bits = '1';
-        let stop_bits = cell.getBinding('com.stop_bits');
-        if (stop_bits != null && stop_bits.value != null) config.com.stop_bits = JSON.parse(stop_bits.value).trim();
-        // period
-        config.com.period = '0';
-        let period = cell.getBinding('com.period');
-        if (period != null && period.value != null) config.com.period = JSON.parse(period.value).trim();
-        // echo
-        config.com.echo = false;
-        let echo = cell.getBinding('com.echo');
-        if (echo != null && echo.value != null) config.com.echo = JSON.parse(echo.value) == '1';
-      }
-      break;
-    case 'eth':
-      {
-        config.eth = {};
-        // ip
-        config.eth.ip = '1.1.1.1';
-        let ip = cell.getBinding('eth.ip');
-        if (ip != null && ip.value != null) config.eth.ip = JSON.parse(ip.value).trim();
-        // port
-        config.eth.port = '503';
-        let port = cell.getBinding('eth.port');
-        if (port != null && port.value != null) config.eth.port = JSON.parse(port.value).trim();
-      }
-      break;
-    default:
-      return;
-  }
-
-  // pmk
-  config.pmk = '';
-  let pmk = cell.getBinding('path.pmk');
-  if (pmk != null && pmk.value != null) config.pmk = JSON.parse(pmk.value).text.trim();
-  // bfpo
-  config.bfpo = '';
-  let bfpo = cell.getBinding('path.bfpo');
-  if (bfpo != null && bfpo.value != null) config.bfpo = JSON.parse(bfpo.value).text.trim();
-
-  // connect
-  config.connect = false;
-  let connect = cell.getBinding('options.connect');
-  if (connect != null && connect.value != null) config.connect = JSON.parse(connect.value) == '1';
-  // read_pmk
-  config.readpmk = false;
-  let read_pmk = cell.getBinding('options.read_pmk');
-  if (read_pmk != null && read_pmk.value != null) config.readpmk = JSON.parse(read_pmk.value) == '1';
-
-  return config;
-};
-BMRZScriptAPI.prototype.execAction = function (cell) {
-  if (cell == null) return;
-
-  cell.config = cell.config || this.buildConfig(cell);
-  if (cell.config == null) {
-    console.log('Ошибка параметризации')
-    //messageError('Ошибка параметризации');
-    return;
-  }
-
-  // exec command
-  AJAX.post(
-    '/linkmt/cfgmt/exec',
-    null,
-    cell.config,
-    function (xhr, resp) {
-      console.log('common.messages.command_sent_to_server')
-      //messageDebug(translate('common.messages.command_sent_to_server'));
-    },
-    function (xhr, err) {
-      console.log('common.errors.command_execution')
-      //messageError(translate('common.errors.command_execution'));
-    }
-  );
-};
-
-function PosterScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(PosterScriptAPI, ShapeAPI);
-PosterScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  var bindingsHandler = new BindingsHandler(this.ui);
-  // init bindings
-  if (typeof BindingsHandler == 'function') {
-    bindingsHandler.graph.view.validatePosterState(cell);
-  }
-  //unstick cells
-  mxGraph.prototype.isValidDropTarget = function (target, cells, evt) {
-    return target._type == 'phase' && cells.every((c) => c._type != 'phase');
+  PosterScriptAPI.prototype.state = function (cell, binding, value) {
+    cell._model = value;
+    this.graph.cellRenderer.redrawShape(this.graph.view.getState(cell), true);
   };
-
-  cell.getTooltip = function () {
-    return this._model ? `[${API.FORMAT.getDateString(this._model.ts)}]: ${this._model.modifiedBy}.\n${this._model.data.title}` : null;
+  
+  function DispatcherMarkScriptAPI(editorUI) {
+    ShapeAPI.call(this, editorUI);
+  }
+  mxUtils.extend(DispatcherMarkScriptAPI, ShapeAPI);
+  DispatcherMarkScriptAPI.prototype.setup = function (cell) {
+    shapeSetup.apply(this, arguments);
+  
+    cell.getTooltip = function () {
+      return this._model ? `[${API.FORMAT.getDateString(this._model.ts)}]: ${this._model.modifiedBy}.\n${this._model.data.title}` : null;
+    };
   };
-};
-PosterScriptAPI.prototype.state = function (cell, binding, value) {
-  cell._model = value;
-  this.graph.cellRenderer.redrawShape(this.graph.view.getState(cell), true);
-};
-
-function DispatcherMarkScriptAPI(editorUI) {
-  ShapeAPI.call(this, editorUI);
-}
-mxUtils.extend(DispatcherMarkScriptAPI, ShapeAPI);
-DispatcherMarkScriptAPI.prototype.setup = function (cell) {
-  shapeSetup.apply(this, arguments);
-
-  cell.getTooltip = function () {
-    return this._model ? `[${API.FORMAT.getDateString(this._model.ts)}]: ${this._model.modifiedBy}.\n${this._model.data.title}` : null;
+  DispatcherMarkScriptAPI.prototype.state = function (cell, binding, value) {
+    cell._model = value;
+    this.graph.cellRenderer.redrawShape(this.graph.view.getState(cell), true);
   };
-};
-DispatcherMarkScriptAPI.prototype.state = function (cell, binding, value) {
-  cell._model = value;
-  this.graph.cellRenderer.redrawShape(this.graph.view.getState(cell), true);
-};
-
 //Scripts.js end
 
 //Markservice.js start
 
- function MarksService(editorUI) {
-  this.ui = editorUI;
-  this.editor = editorUI.editor;
-  this.graph = editorUI.editor.graph;
+// import * as mxgraph from 'mxgraph';
+// import { API } from './scada'
+// import { HELP, AJAX } from './client'
+// import * as webix from 'webix/webix.js';
+// import 'webix/webix.css';
+// import { SidebarWindow } from './Dialogs'
+// const {
+//   $$
+//   } = webix
 
-  this.editedCells = new Map();
-  this.insertedCells = new Map();
-  this.deletedCells = new Map();
 
-  this.modeEnabled = false;
+// let { 
+//     mxRectangle,
+//     mxEvent,
+//     mxCell,
+//     mxGeometry,
+// } = mxgraph();
 
-  this.setupGraph();
-  this.setupListeners();
-};
 
-MarksService.prototype.TYPES = {
-  POSTER: 0,
-  MARK: 1,
-};
-MarksService.prototype.TYPE_FROM_NAME = {
-  ['poster']: 0,
-  ['dispatcher_mark']: 1,
-};
-MarksService.prototype.NAME_FROM_TYPE = {
-  0: 'poster',
-  1: 'dispatcher_mark',
-};
-MarksService.prototype.DEFAULT_MODELS = {
-  0: function () {
-    return {
-      createdAt: '',
-      createdBy: '',
-      data: {
-        message: '',
-        title: '',
-        type: '',
-        width: 200,
-        height: 100,
-        x: 20,
-        y: 20,
-      },
-      id: '',
-      modifiedBy: '',
-      schemeId: '',
-      ts: '',
-    };
-  },
-  1: function () {
-    return {
-      createdAt: '',
-      createdBy: '',
-      data: {
-        message: '',
-        title: '',
-        type: 'info',
-        width: 100,
-        height: 100,
-        x: 20,
-        y: 20,
-      },
-      id: '',
-      modifiedBy: '',
-      schemeId: '',
-      ts: '',
-    };
-  },
-};
+//export default function MarksService(editorUI) {
 
-MarksService.prototype.getCellType = function (cell) {
-  const type = this.TYPE_FROM_NAME[cell.value.tagName];
-  return type > -1 ? type : -1;
-};
-
-MarksService.prototype.getCellStyle = function (type) {
-  return this.NAME_FROM_TYPE[type];
-};
-
-MarksService.prototype.getCellDefaultModel = function (cell) {
-  const type = this.getCellType(cell);
-  const model = this.DEFAULT_MODELS[type]();
-  model.id = '_' + cell.id;
-  return model;
-};
-
-MarksService.prototype.setupGraph = function () {
-  this.graph.isEnabled = () => this.isEnabled();
-
-  this.graph.panningHandler.usePopupTrigger = false;
-
-  /* disable connection */
-  this.graph.connectionHandler.mouseMove = function () {
-    return;
+function MarksService(editorUI) {
+    this.ui = editorUI;
+    this.editor = editorUI.editor;
+    this.graph = editorUI.editor.graph;
+  
+    this.editedCells = new Map();
+    this.insertedCells = new Map();
+    this.deletedCells = new Map();
+  
+    this.modeEnabled = false;
+  
+    this.setupGraph();
+    this.setupListeners();
   };
-
-  /* disable rotation */
-  this.graph.isCellRotatable = function (cell) {
-    return false;
+  
+  MarksService.prototype.TYPES = {
+    POSTER: 0,
+    MARK: 1,
   };
-
-  /* disable inserting text action on double click */
-  this.graph.dblClick = function () {
-    return;
+  MarksService.prototype.TYPE_FROM_NAME = {
+    ['poster']: 0,
+    ['dispatcher_mark']: 1,
   };
-
-  /* disable connection arrows */
-  this.graph.connectionArrowsEnabled = false;
-
-  /* bind the delete key */
-  this.ui.keyHandler.bindAction(46, false, 'delete'); // Delete
-
-  /* create new layer ontop for posters and marks */
-  this.marksLayer = this.graph.model.getRoot().insert(new mxCell('Плакаты / пометки'));
-  this.graph.setDefaultParent(this.marksLayer);
-};
-
-MarksService.prototype.setupListeners = function () {
-  this.graph.addListener('cellsInserted', (sender, evt) => {
-    const cells = evt.getProperty('cells');
-    if (Array.isArray(cells)) {
-      this.onCellInserted(cells[0]);
-    }
-  });
-
-  this.graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) => {
-    const cells = evt.getProperty('cells');
-    if (Array.isArray(cells)) {
-      this.onCellsChanged(cells.filter((cell) => cell.value !== ''));
-    }
-  });
-
-  this.graph.addListener(mxEvent.CELLS_RESIZED, (sender, evt) => {
-    const cells = evt.getProperty('cells');
-    if (Array.isArray(cells)) {
-      this.onCellsChanged(cells.filter((cell) => cell.value !== ''));
-    }
-  });
-
-  this.graph.addListener(mxEvent.CELLS_REMOVED, (sender, evt) => {
-    const cells = evt.getProperty('cells');
-    if (Array.isArray(cells)) {
-      this.onCellsDeleted(cells);
-    }
-  });
-};
-
-MarksService.prototype.isEnabled = function () {
-  // @if !LINKMT
-  return this.modeEnabled;
-  // @endif
-  // @if LINKMT
-  return false;
-  // @endif
-};
-
-MarksService.prototype.resetAndUpdate = function () {
-  /* refresh page to clear changes */
-  HELP.pageRedirect(HELP.buildUrl('scheme/view', 'id=' + HELP.queryStringParam('id')));
-};
-
-MarksService.prototype.onConflict = function () {
-  webix
-    .modalbox({
-      title: 'Возможный конфликт',
-      buttons: ['Ок'],
-      width: 500,
-      text: 'Плакаты и пометки на данной схеме были изменены другим пользователем.\nЧтобы избежать конфликтов, текущие изменения будут отменены.',
-    })
-    .then(() => {
-      this.resetAndUpdate();
-    });
-};
-
-MarksService.prototype.createSnackBar = function () {
-  this.snackBar = webix.ui({
-    view: 'toolbar',
-    id: 'dispatcher-mode-snackbar',
-    css: 'poster-snackbar',
-    height: 40,
-    paddingX: 8,
-    width: 400,
-    cols: [
-      {
-        view: 'label',
-        label: 'Режим установки плакатов, пометок',
-      },
-      {
-        view: 'button',
-        value: 'common.exit',
-        align: 'center',
-        css: 'webix_danger',
-        width: 100,
-        click: () => {
-          this.onModeButtonClick();
+  MarksService.prototype.NAME_FROM_TYPE = {
+    0: 'poster',
+    1: 'dispatcher_mark',
+  };
+  MarksService.prototype.DEFAULT_MODELS = {
+    0: function () {
+      return {
+        createdAt: '',
+        createdBy: '',
+        data: {
+          message: '',
+          title: '',
+          type: '',
+          width: 200,
+          height: 100,
+          x: 20,
+          y: 20,
         },
-      },
-    ],
-  });
-};
-
-MarksService.prototype.showSnackbar = function (isVisible) {
-  if (!this.snackBar) {
-    return;
-  }
-  const snackNode = this.snackBar.getNode();
-  snackNode.style.top = $$('toolbar').$height + 4 + 'px';
-  if (isVisible) {
-    this.snackBar.show();
-  } else {
-    this.snackBar.hide();
-  }
-};
-
-MarksService.prototype.setSnackbarTitle = function () {
-  if (!this.snackBar) {
-    return;
-  }
-  const isEdited = this.insertedCells.size + this.editedCells.size + this.deletedCells.size > 0;
-  const label = this.snackBar.getChildViews()[0];
-  const currentString = label.getValue().length > 0 ? label.getValue() : label.config.label;
-  const originString = currentString.charAt(currentString.length - 1) === '*' ? currentString.slice(0, -1) : currentString;
-  if (isEdited) {
-    label.setValue(originString + ' *');
-  } else {
-    label.setValue(originString);
-  }
-};
-
-MarksService.prototype.onCellInserted = function (cell) {
-  /* return if cell inserted from hub */
-  if (cell._fromHub) {
-    delete cell._fromHub;
-    return;
-  }
-  /* add model for new cell */
-  cell._model = this.getCellDefaultModel(cell);
-  this.ui.viewHandler.scripts.setup(cell);
-  cell._tempInsert = true;
-  /* add cell to temp list */
-  this.insertedCells.set(cell._model.id, cell);
-  /* open properties window */
-  const type = this.getCellType(cell);
-  if (type === this.TYPES.POSTER) {
-    API.POSTERS.openPosterEditor(this.graph, cell, true);
-  } else if (type === this.TYPES.MARK) {
-    API.DISPATCHER_MARKS.openMarkEditor(this.graph, cell, true);
-  }
-  /* update snack bar title */
-  this.setSnackbarTitle();
-};
-
-MarksService.prototype.onCellsChanged = function (cells) {
-  cells.forEach((cell) => {
-    /* return if cell updated from hub */
+        id: '',
+        modifiedBy: '',
+        schemeId: '',
+        ts: '',
+      };
+    },
+    1: function () {
+      return {
+        createdAt: '',
+        createdBy: '',
+        data: {
+          message: '',
+          title: '',
+          type: 'info',
+          width: 100,
+          height: 100,
+          x: 20,
+          y: 20,
+        },
+        id: '',
+        modifiedBy: '',
+        schemeId: '',
+        ts: '',
+      };
+    },
+  };
+  
+  MarksService.prototype.getCellType = function (cell) {
+    const type = this.TYPE_FROM_NAME[cell.value.tagName];
+    return type > -1 ? type : -1;
+  };
+  
+  MarksService.prototype.getCellStyle = function (type) {
+    return this.NAME_FROM_TYPE[type];
+  };
+  
+  MarksService.prototype.getCellDefaultModel = function (cell) {
+    const type = this.getCellType(cell);
+    const model = this.DEFAULT_MODELS[type]();
+    model.id = '_' + cell.id;
+    return model;
+  };
+  
+  MarksService.prototype.setupGraph = function () {
+    this.graph.isEnabled = () => this.isEnabled();
+  
+    this.graph.panningHandler.usePopupTrigger = false;
+  
+    /* disable connection */
+    this.graph.connectionHandler.mouseMove = function () {
+      return;
+    };
+  
+    /* disable rotation */
+    this.graph.isCellRotatable = function (cell) {
+      return false;
+    };
+  
+    /* disable inserting text action on double click */
+    this.graph.dblClick = function () {
+      return;
+    };
+  
+    /* disable connection arrows */
+    this.graph.connectionArrowsEnabled = false;
+  
+    /* bind the delete key */
+    this.ui.keyHandler.bindAction(46, false, 'delete'); // Delete
+  
+    /* create new layer ontop for posters and marks */
+    this.marksLayer = this.graph.model.getRoot().insert(new mxCell('Плакаты / пометки'));
+    this.graph.setDefaultParent(this.marksLayer);
+  };
+  
+  MarksService.prototype.setupListeners = function () {
+    this.graph.addListener('cellsInserted', (sender, evt) => {
+      const cells = evt.getProperty('cells');
+      if (Array.isArray(cells)) {
+        this.onCellInserted(cells[0]);
+      }
+    });
+  
+    this.graph.addListener(mxEvent.CELLS_MOVED, (sender, evt) => {
+      const cells = evt.getProperty('cells');
+      if (Array.isArray(cells)) {
+        this.onCellsChanged(cells.filter((cell) => cell.value !== ''));
+      }
+    });
+  
+    this.graph.addListener(mxEvent.CELLS_RESIZED, (sender, evt) => {
+      const cells = evt.getProperty('cells');
+      if (Array.isArray(cells)) {
+        this.onCellsChanged(cells.filter((cell) => cell.value !== ''));
+      }
+    });
+  
+    this.graph.addListener(mxEvent.CELLS_REMOVED, (sender, evt) => {
+      const cells = evt.getProperty('cells');
+      if (Array.isArray(cells)) {
+        this.onCellsDeleted(cells);
+      }
+    });
+  };
+  
+  MarksService.prototype.isEnabled = function () {
+    // @if !LINKMT
+    return this.modeEnabled;
+    // @endif
+    // @if LINKMT
+    return false;
+    // @endif
+  };
+  
+  MarksService.prototype.resetAndUpdate = function () {
+    /* refresh page to clear changes */
+    HELP.pageRedirect(HELP.buildUrl('scheme/view', 'id=' + HELP.queryStringParam('id')));
+  };
+  
+  MarksService.prototype.onConflict = function () {
+    webix
+      .modalbox({
+        title: 'Возможный конфликт',
+        buttons: ['Ок'],
+        width: 500,
+        text: 'Плакаты и пометки на данной схеме были изменены другим пользователем.\nЧтобы избежать конфликтов, текущие изменения будут отменены.',
+      })
+      .then(() => {
+        this.resetAndUpdate();
+      });
+  };
+  
+  MarksService.prototype.createSnackBar = function () {
+    this.snackBar = webix.ui({
+      view: 'toolbar',
+      id: 'dispatcher-mode-snackbar',
+      css: 'poster-snackbar',
+      height: 40,
+      paddingX: 8,
+      width: 400,
+      cols: [
+        {
+          view: 'label',
+          label: 'Режим установки плакатов, пометок',
+        },
+        {
+          view: 'button',
+          value: 'common.exit',
+          align: 'center',
+          css: 'webix_danger',
+          width: 100,
+          click: () => {
+            this.onModeButtonClick();
+          },
+        },
+      ],
+    });
+  };
+  
+  MarksService.prototype.showSnackbar = function (isVisible) {
+    if (!this.snackBar) {
+      return;
+    }
+    const snackNode = this.snackBar.getNode();
+    snackNode.style.top = $$('toolbar').$height + 4 + 'px';
+    if (isVisible) {
+      this.snackBar.show();
+    } else {
+      this.snackBar.hide();
+    }
+  };
+  
+  MarksService.prototype.setSnackbarTitle = function () {
+    if (!this.snackBar) {
+      return;
+    }
+    const isEdited = this.insertedCells.size + this.editedCells.size + this.deletedCells.size > 0;
+    const label = this.snackBar.getChildViews()[0];
+    const currentString = label.getValue().length > 0 ? label.getValue() : label.config.label;
+    const originString = currentString.charAt(currentString.length - 1) === '*' ? currentString.slice(0, -1) : currentString;
+    if (isEdited) {
+      label.setValue(originString + ' *');
+    } else {
+      label.setValue(originString);
+    }
+  };
+  
+  MarksService.prototype.onCellInserted = function (cell) {
+    /* return if cell inserted from hub */
     if (cell._fromHub) {
       delete cell._fromHub;
       return;
     }
-    /* update geometry in poster model */
-    const geometry = cell.getGeometry();
-    cell._model.data.x = geometry.x;
-    cell._model.data.y = geometry.y;
-    cell._model.data.width = geometry.width;
-    cell._model.data.height = geometry.height;
-    /* manage temp lists */
-    if (this.insertedCells.has(cell._model.id)) {
-      this.insertedCells.set(cell._model.id, cell);
-    } else {
-      this.editedCells.set(cell._model.id, cell);
+    /* add model for new cell */
+    cell._model = this.getCellDefaultModel(cell);
+    this.ui.viewHandler.scripts.setup(cell);
+    cell._tempInsert = true;
+    /* add cell to temp list */
+    this.insertedCells.set(cell._model.id, cell);
+    /* open properties window */
+    const type = this.getCellType(cell);
+    if (type === this.TYPES.POSTER) {
+      API.POSTERS.openPosterEditor(this.graph, cell, true);
+    } else if (type === this.TYPES.MARK) {
+      API.DISPATCHER_MARKS.openMarkEditor(this.graph, cell, true);
     }
-    /* update children cell geometry */
-    if (cell.children) {
-      const childCell = cell.children[0];
-      const childGeometry = new mxGeometry(0, 0, geometry.width, geometry.height);
-      this.graph.getModel().setGeometry(childCell, childGeometry);
-    }
-  });
-
-  /* update snack bar title */
-  this.setSnackbarTitle();
-};
-
-MarksService.prototype.onCellsDeleted = function (cells) {
-  cells.forEach((cell) => {
-    /* manage temp lists */
-    this.insertedCells.delete(cell._model.id);
-    this.editedCells.delete(cell._model.id);
-    /* check if cell was not temporary for inserting process or deleted from hub */
-    if (!cell._tempInsert && !cell._fromHub) {
-      this.deletedCells.set(cell._model.id, cell);
-      this.ui.viewHandler.cellMap.delete(cell._model.id);
-    } else {
-      delete cell._tempInsert;
-      delete cell._fromHub;
-    }
-  });
-  /* update snack bar title */
-  this.setSnackbarTitle();
-};
-
-MarksService.prototype.updatePosterLayer = function () {
-  /* lock or unlock other layers */
-  const layerCount = this.graph.model.getChildCount(this.graph.model.root);
-  for (let i = 0; i < layerCount; i++) {
-    /* get the layer */
-    const layer = this.graph.model.getChildAt(this.graph.model.root, i);
-    /* check if this layer is not the marks layer */
-    if (layer.mxObjectId === this.marksLayer.mxObjectId) continue;
-    /* set locked style */
-    this.graph.model.beginUpdate();
-    try {
-      this.graph.setCellStyles('locked', null, [layer]);
-      this.graph.setCellStyles('locked', '1', [layer]);
-    } finally {
-      this.graph.model.endUpdate();
-    }
-  }
-};
-
-MarksService.prototype.toggleMode = function () {
-  if (!this.modeEnabled) {
-    this.insertedCells.clear();
-    this.editedCells.clear();
-    this.deletedCells.clear();
-  }
-  /* CREATE */
-  if (this.modeEnabled && this.insertedCells.size > 0) {
-    const postersData = [];
-    const dispatcherMarksData = [];
-    const tempCells = []; // need this because insertedCells is a map
-
-    /* fill data arrays */
-    this.insertedCells.forEach((cell) => {
-      const type = this.getCellType(cell);
-      if (type === this.TYPES.POSTER) {
-        postersData.push(cell._model.data);
-      } else if (type === this.TYPES.MARK) {
-        dispatcherMarksData.push(cell._model.data);
+    /* update snack bar title */
+    this.setSnackbarTitle();
+  };
+  
+  MarksService.prototype.onCellsChanged = function (cells) {
+    cells.forEach((cell) => {
+      /* return if cell updated from hub */
+      if (cell._fromHub) {
+        delete cell._fromHub;
+        return;
       }
-      tempCells.push(cell);
+      /* update geometry in poster model */
+      const geometry = cell.getGeometry();
+      cell._model.data.x = geometry.x;
+      cell._model.data.y = geometry.y;
+      cell._model.data.width = geometry.width;
+      cell._model.data.height = geometry.height;
+      /* manage temp lists */
+      if (this.insertedCells.has(cell._model.id)) {
+        this.insertedCells.set(cell._model.id, cell);
+      } else {
+        this.editedCells.set(cell._model.id, cell);
+      }
+      /* update children cell geometry */
+      if (cell.children) {
+        const childCell = cell.children[0];
+        const childGeometry = new mxGeometry(0, 0, geometry.width, geometry.height);
+        this.graph.getModel().setGeometry(childCell, childGeometry);
+      }
     });
-
-    /* POST to server */
-    if (postersData.length > 0) {
-      AJAX.post(
-        'api/scheme/posters',
-        //--->fix---//
+  
+    /* update snack bar title */
+    this.setSnackbarTitle();
+  };
+  
+  MarksService.prototype.onCellsDeleted = function (cells) {
+    cells.forEach((cell) => {
+      /* manage temp lists */
+      this.insertedCells.delete(cell._model.id);
+      this.editedCells.delete(cell._model.id);
+      /* check if cell was not temporary for inserting process or deleted from hub */
+      if (!cell._tempInsert && !cell._fromHub) {
+        this.deletedCells.set(cell._model.id, cell);
+        this.ui.viewHandler.cellMap.delete(cell._model.id);
+      } else {
+        delete cell._tempInsert;
+        delete cell._fromHub;
+      }
+    });
+    /* update snack bar title */
+    this.setSnackbarTitle();
+  };
+  
+  MarksService.prototype.updatePosterLayer = function () {
+    /* lock or unlock other layers */
+    const layerCount = this.graph.model.getChildCount(this.graph.model.root);
+    for (let i = 0; i < layerCount; i++) {
+      /* get the layer */
+      const layer = this.graph.model.getChildAt(this.graph.model.root, i);
+      /* check if this layer is not the marks layer */
+      if (layer.mxObjectId === this.marksLayer.mxObjectId) continue;
+      /* set locked style */
+      this.graph.model.beginUpdate();
+      try {
+        this.graph.setCellStyles('locked', null, [layer]);
+        this.graph.setCellStyles('locked', '1', [layer]);
+      } finally {
+        this.graph.model.endUpdate();
+      }
+    }
+  };
+  
+  MarksService.prototype.toggleMode = function () {
+    if (!this.modeEnabled) {
+      this.insertedCells.clear();
+      this.editedCells.clear();
+      this.deletedCells.clear();
+    }
+    /* CREATE */
+    if (this.modeEnabled && this.insertedCells.size > 0) {
+      const postersData = [];
+      const dispatcherMarksData = [];
+      const tempCells = []; // need this because insertedCells is a map
+  
+      /* fill data arrays */
+      this.insertedCells.forEach((cell) => {
+        const type = this.getCellType(cell);
+        if (type === this.TYPES.POSTER) {
+          postersData.push(cell._model.data);
+        } else if (type === this.TYPES.MARK) {
+          dispatcherMarksData.push(cell._model.data);
+        }
+        tempCells.push(cell);
+      });
+  
+      /* POST to server */
+      if (postersData.length > 0) {
+        AJAX.post(
+          'api/scheme/posters',
+          //--->fix---//
+           null,
+           //'schemeId=' + viewer.scheme.id,
+          //--->fix---//
+          postersData,
+          (xhr, res) => {},
+          // (xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+         
+        );
+      }
+      if (dispatcherMarksData.length > 0) {
+        AJAX.post(
+          'api/scheme/marks',
+         //--->fix---//
          null,
          //'schemeId=' + viewer.scheme.id,
         //--->fix---//
-        postersData,
-        (xhr, res) => {},
-        // (xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-       
-      );
+          dispatcherMarksData,
+          (xhr, res) => {},
+          // (xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+        );
+      }
+  
+      /* new cells will be inserted from hub event, so we need to remove temp cells */
+      try {
+        this.graph.model.beginUpdate();
+        this.graph.removeCells(tempCells);
+      } finally {
+        this.graph.model.endUpdate();
+        this.insertedCells.clear();
+      }
     }
-    if (dispatcherMarksData.length > 0) {
-      AJAX.post(
-        'api/scheme/marks',
-       //--->fix---//
-       null,
-       //'schemeId=' + viewer.scheme.id,
-      //--->fix---//
-        dispatcherMarksData,
-        (xhr, res) => {},
-        // (xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-      );
+  
+    /* UPDATE */
+    if (this.modeEnabled && this.editedCells.size > 0) {
+      const posters = [];
+      const dispatcherMarks = [];
+  
+      this.editedCells.forEach((cell) => {
+        const type = this.getCellType(cell);
+        if (type === this.TYPES.POSTER) {
+          posters.push(cell._model);
+        } else if (type === this.TYPES.MARK) {
+          dispatcherMarks.push(cell._model);
+        }
+      });
+  
+      /* PATCH to server */
+      if (posters.length > 0) {
+        AJAX.patch(
+          'api/scheme/posters',
+          //--->fix---//
+          null,
+          //'schemeId=' + viewer.scheme.id,
+         //--->fix---//
+          posters,
+          (xhr, res) => {},
+          // (xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+        );
+      }
+      if (dispatcherMarks.length > 0) {
+        AJAX.patch(
+          'api/scheme/marks',
+          //--->fix---//
+          null,
+          //'schemeId=' + viewer.scheme.id,
+         //--->fix---//
+          dispatcherMarks,
+          (xhr, res) => {},
+          //(xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+        );
+      }
+  
+      /* cells will be updated from hub event */
+      this.editedCells.clear();
     }
-
-    /* new cells will be inserted from hub event, so we need to remove temp cells */
-    try {
+  
+    /* DELETE */
+    if (this.modeEnabled && this.deletedCells.size > 0) {
+      const postersIds = [];
+      const dispatcherMarksIds = [];
+  
+      this.deletedCells.forEach((cell) => {
+        const type = this.getCellType(cell);
+        if (type === this.TYPES.POSTER) {
+          postersIds.push(cell._model.id);
+        } else if (type === this.TYPES.MARK) {
+          dispatcherMarksIds.push(cell._model.id);
+        }
+      });
+  
+      /* DELETE to sever */
+      if (postersIds.length > 0) {
+        AJAX.delete(
+          'api/scheme/posters',
+         //--->fix---//
+         null,
+         //'schemeId=' + viewer.scheme.id,
+        //--->fix---//
+          postersIds,
+          (xhr, res) => {
+            if (res.posters.length > 0) {
+              res.posters.forEach((poster) => {
+                this.ui.viewHandler.cellMap.delete(poster.id);
+              });
+            }
+          },
+          //(xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+        );
+      }
+      if (dispatcherMarksIds.length > 0) {
+        AJAX.delete(
+          'api/scheme/marks',
+         //--->fix---//
+         null,
+         //'schemeId=' + viewer.scheme.id,
+        //--->fix---//
+          dispatcherMarksIds,
+          (xhr, res) => {
+            if (res.dispatcherMarks.length > 0) {
+              res.dispatcherMarks.forEach((mark) => {
+                this.ui.viewHandler.cellMap.delete(mark.id);
+              });
+            }
+          },
+          //(xhr, err) => messageError('Ошибка сохранения.')
+          (xhr, err) => console.log('Ошибка сохранения.')
+        );
+      }
+  
+      /* cells will be deleted from hub event */
+      this.deletedCells.clear();
+    }
+  
+    /* change mode */
+    this.modeEnabled = !this.modeEnabled;
+  
+    /* show sidebar panel */
+    if (!this.sidebarWindow) {
+      this.sidebarWindow = new SidebarWindow(this.ui, 256, 256, 170, 101);
+      this.sidebarWindow.window.setClosable(false);
+      this.sidebarWindow.window.setResizable(false);
+    } else {
+      this.sidebarWindow.window.setVisible(this.modeEnabled);
+    }
+  
+    /* reset selection */
+    this.graph.selectionModel.removeCells(this.graph.selectionModel.cells);
+  
+    /* lock or unlock other layers */
+    const layerCount = this.graph.model.getChildCount(this.graph.model.root);
+    for (let i = 0; i < layerCount; i++) {
+      /* get the layer */
+      const layer = this.graph.model.getChildAt(this.graph.model.root, i);
+      /* check if this layer is not the marks layer */
+      if (layer.mxObjectId === this.marksLayer.mxObjectId) continue;
+      /* set locked style */
       this.graph.model.beginUpdate();
-      this.graph.removeCells(tempCells);
-    } finally {
-      this.graph.model.endUpdate();
-      this.insertedCells.clear();
-    }
-  }
-
-  /* UPDATE */
-  if (this.modeEnabled && this.editedCells.size > 0) {
-    const posters = [];
-    const dispatcherMarks = [];
-
-    this.editedCells.forEach((cell) => {
-      const type = this.getCellType(cell);
-      if (type === this.TYPES.POSTER) {
-        posters.push(cell._model);
-      } else if (type === this.TYPES.MARK) {
-        dispatcherMarks.push(cell._model);
+      try {
+        this.graph.setCellStyles('locked', this.modeEnabled ? '1' : null, [layer]);
+      } finally {
+        this.graph.model.endUpdate();
       }
-    });
-
-    /* PATCH to server */
-    if (posters.length > 0) {
-      AJAX.patch(
-        'api/scheme/posters',
-        //--->fix---//
-        null,
-        //'schemeId=' + viewer.scheme.id,
-       //--->fix---//
-        posters,
-        (xhr, res) => {},
-        // (xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-      );
     }
-    if (dispatcherMarks.length > 0) {
-      AJAX.patch(
-        'api/scheme/marks',
-        //--->fix---//
-        null,
-        //'schemeId=' + viewer.scheme.id,
-       //--->fix---//
-        dispatcherMarks,
-        (xhr, res) => {},
-        //(xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-      );
+  
+    /* show snackbar */
+    if (!this.snackBar) {
+      this.createSnackBar();
     }
-
-    /* cells will be updated from hub event */
-    this.editedCells.clear();
-  }
-
-  /* DELETE */
-  if (this.modeEnabled && this.deletedCells.size > 0) {
-    const postersIds = [];
-    const dispatcherMarksIds = [];
-
-    this.deletedCells.forEach((cell) => {
-      const type = this.getCellType(cell);
-      if (type === this.TYPES.POSTER) {
-        postersIds.push(cell._model.id);
-      } else if (type === this.TYPES.MARK) {
-        dispatcherMarksIds.push(cell._model.id);
-      }
-    });
-
-    /* DELETE to sever */
-    if (postersIds.length > 0) {
-      AJAX.delete(
-        'api/scheme/posters',
-       //--->fix---//
-       null,
-       //'schemeId=' + viewer.scheme.id,
-      //--->fix---//
-        postersIds,
-        (xhr, res) => {
-          if (res.posters.length > 0) {
-            res.posters.forEach((poster) => {
-              this.ui.viewHandler.cellMap.delete(poster.id);
+    this.showSnackbar(this.modeEnabled);
+  };
+  
+  MarksService.prototype.onModeButtonClick = function () {
+    const title = 'Редактирование плакатов и пометок';
+    const entryMessage = this.modeEnabled ? 'Выйти из режима редактирования?' : 'Войти в режим редактирования?';
+    webix
+      .modalbox({
+        type: 'alert-warning',
+        title,
+        buttons: ['common.yes', 'common.no'],
+        width: 'auto',
+        text: entryMessage,
+      })
+      .then((result) => {
+        if (result !== '0') {
+          return;
+        } else if (!this.modeEnabled) {
+          this.toggleMode();
+        } else {
+          webix
+            .modalbox({
+              type: 'alert-warning',
+              title,
+              buttons: ['common.yes','common.no'],
+              width: 'auto',
+              text: 'Сохранить внесенные изменения?',
+            })
+            .then((result) => {
+              if (result === '0') {
+                this.toggleMode();
+              } else {
+                this.resetAndUpdate();
+              }
             });
-          }
-        },
-        //(xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-      );
+        }
+      });
+  };
+  
+  MarksService.prototype.addCells = function (items, type) {
+    if (!Array.isArray(items)) return;
+  
+    if (this.modeEnabled) {
+      this.onConflict();
+      return;
     }
-    if (dispatcherMarksIds.length > 0) {
-      AJAX.delete(
-        'api/scheme/marks',
-       //--->fix---//
-       null,
-       //'schemeId=' + viewer.scheme.id,
-      //--->fix---//
-        dispatcherMarksIds,
-        (xhr, res) => {
-          if (res.dispatcherMarks.length > 0) {
-            res.dispatcherMarks.forEach((mark) => {
-              this.ui.viewHandler.cellMap.delete(mark.id);
-            });
-          }
-        },
-        //(xhr, err) => messageError('Ошибка сохранения.')
-        (xhr, err) => console.log('Ошибка сохранения.')
-      );
-    }
-
-    /* cells will be deleted from hub event */
-    this.deletedCells.clear();
-  }
-
-  /* change mode */
-  this.modeEnabled = !this.modeEnabled;
-
-  /* show sidebar panel */
-  if (!this.sidebarWindow) {
-    this.sidebarWindow = new SidebarWindow(this.ui, 256, 256, 170, 101);
-    this.sidebarWindow.window.setClosable(false);
-    this.sidebarWindow.window.setResizable(false);
-  } else {
-    this.sidebarWindow.window.setVisible(this.modeEnabled);
-  }
-
-  /* reset selection */
-  this.graph.selectionModel.removeCells(this.graph.selectionModel.cells);
-
-  /* lock or unlock other layers */
-  const layerCount = this.graph.model.getChildCount(this.graph.model.root);
-  for (let i = 0; i < layerCount; i++) {
-    /* get the layer */
-    const layer = this.graph.model.getChildAt(this.graph.model.root, i);
-    /* check if this layer is not the marks layer */
-    if (layer.mxObjectId === this.marksLayer.mxObjectId) continue;
-    /* set locked style */
+  
+    this.graph.stopEditing();
+  
     this.graph.model.beginUpdate();
     try {
-      this.graph.setCellStyles('locked', this.modeEnabled ? '1' : null, [layer]);
+      items.forEach((item) => {
+        const cell = this.graph.insertVertex(this.marksLayer, null, null, Math.round(item.data.x), Math.round(item.data.y), Math.round(item.data.width), Math.round(item.data.height), this.getCellStyle(type));
+  
+        cell._model = item;
+  
+        if (!cell) return;
+  
+        // find scriptor
+        this.ui.viewHandler.scripts.setup(cell);
+        if (cell.scriptor == null) return;
+  
+        // save original cell params for dynamic changes
+        if (cell.origin == null) {
+          cell.origin = {};
+          cell.origin.style = this.graph.getCellStyle(cell);
+          cell.origin.state = this.graph.view.getState(cell, true).clone();
+          const geometry = this.graph.getCellGeometry(cell);
+          cell.origin.geometry = geometry != null ? geometry.clone() : null;
+        }
+  
+        // cell binding map
+        if (cell.bindingMap == null) cell.bindingMap = {};
+  
+        const map = { tag: [], eq: [] };
+        cell.scriptor.visit(cell, map);
+  
+        // process binding
+        if (this.ui.viewHandler.names.indexOf(item.id) < 0) this.ui.viewHandler.names.push(item.id);
+  
+        this.ui.viewHandler.updateCellMapping(cell, item.id);
+        this.ui.viewHandler.updateBindMapping(cell, item.id);
+  
+        this.graph.view.invalidate(cell, true);
+      });
     } finally {
       this.graph.model.endUpdate();
     }
-  }
-
-  /* show snackbar */
-  if (!this.snackBar) {
-    this.createSnackBar();
-  }
-  this.showSnackbar(this.modeEnabled);
-};
-
-MarksService.prototype.onModeButtonClick = function () {
-  const title = 'Редактирование плакатов и пометок';
-  const entryMessage = this.modeEnabled ? 'Выйти из режима редактирования?' : 'Войти в режим редактирования?';
-  webix
-    .modalbox({
-      type: 'alert-warning',
-      title,
-      buttons: ['common.yes', 'common.no'],
-      width: 'auto',
-      text: entryMessage,
-    })
-    .then((result) => {
-      if (result !== '0') {
-        return;
-      } else if (!this.modeEnabled) {
-        this.toggleMode();
-      } else {
-        webix
-          .modalbox({
-            type: 'alert-warning',
-            title,
-            buttons: ['common.yes','common.no'],
-            width: 'auto',
-            text: 'Сохранить внесенные изменения?',
-          })
-          .then((result) => {
-            if (result === '0') {
-              this.toggleMode();
-            } else {
-              this.resetAndUpdate();
+  };
+  
+  MarksService.prototype.updateCells = function (item, type) {
+    if (this.modeEnabled) {
+      this.onConflict();
+      return;
+    }
+  
+    const targetCells = this.ui.viewHandler.findMappedCells(item.id);
+    targetCells.forEach((targetCell) => {
+      targetCell._fromHub = true; // custom source property for update cell event handler
+      const bounds = new mxRectangle(item.data.x, item.data.y, item.data.width, item.data.height);
+      this.graph.resizeCells([targetCell], [bounds]);
+      targetCell.scriptor.state(targetCell, null, item);
+    });
+    /* add new item if cell was deleted in editing mode */
+    if (targetCells.length === 0 && this.deletedCells.has(item.id)) {
+      this.addCells([item], type);
+      this.deletedCells.delete(item.id);
+    }
+  };
+  
+  MarksService.prototype.removeCells = function (item) {
+    if (this.modeEnabled) {
+      this.onConflict();
+      return;
+    }
+  
+    const targetCells = this.ui.viewHandler.findMappedCells(item.id);
+    targetCells.forEach((cell) => (cell._fromHub = true)); // custom source property for CELLS_REMOVED event handler
+    this.graph.removeCells(targetCells);
+    this.ui.viewHandler.cellMap.delete(item.id);
+  };
+  
+  MarksService.prototype.addPosters = function (posters) {
+    this.addCells(posters, this.TYPES.POSTER);
+  };
+  
+  MarksService.prototype.updatePoster = function (poster) {
+    this.updateCells(poster, this.TYPES.POSTER);
+  };
+  
+  MarksService.prototype.removePoster = function (poster) {
+    this.removeCells(poster);
+  };
+  
+  MarksService.prototype.addDispatcherMarks = function (marks) {
+    this.addCells(marks, this.TYPES.MARK);
+  };
+  
+  MarksService.prototype.updateDispatcherMark = function (mark) {
+    this.updateCells(mark, this.TYPES.MARK);
+  };
+  
+  MarksService.prototype.removeDispatcherMark = function (mark) {
+    this.removeCells(mark);
+  };
+  
+    MarksService.prototype.fetchPosters = function () {
+      //---->fix<--------//
+      AJAX.get(
+        null,
+        null,
+        (xhr, res) => {
+        //render posters 
+        res = {
+          "posters": [
+            {
+              "id": "277972a7-96c2-4c1d-9af7-b7dbbbc7573f",
+              "data": {
+                "title": "2",
+                "message": "2",
+                "type": "grounded",
+                "x": 590.5,
+                "y": 596.0,
+                "width": 194.0,
+                "height": 98.0
+              },
+              "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
+              "modifiedBy": "система",
+              "createdBy": "система",
+              "ts": "2023-07-21T13:32:10.3376830Z",
+              "createdAt": "2023-07-21T13:32:10.3376830Z",
+              "isRemoved": false
+            },
+            {
+              "id": "7404ab0f-b86e-4147-b074-235d025337b5",
+              "data": {
+                "title": "1",
+                "message": "",
+                "type": "workOnLine",
+                "x": 313.0,
+                "y": 469.0,
+                "width": 141.0,
+                "height": 71.0
+              },
+              "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
+              "modifiedBy": "система",
+              "createdBy": "система",
+              "ts": "2023-07-21T13:32:10.4776802Z",
+              "createdAt": "2023-07-20T11:11:50.6344934Z",
+              "isRemoved": false
+            },
+            {
+              "id": "818cc327-bb3a-4724-a6a5-77ca72e07ce4",
+              "data": {
+                "title": "3",
+                "message": "3",
+                "type": "workUnderVoltage-transit",
+                "x": 559.5,
+                "y": 320.5,
+                "width": 171.0,
+                "height": 86.0
+              },
+              "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
+              "modifiedBy": "система",
+              "createdBy": "система",
+              "ts": "2023-07-21T13:32:10.5847440Z",
+              "createdAt": "2023-07-21T13:32:10.5847440Z",
+              "isRemoved": false
             }
-          });
-      }
-    });
-};
-
-MarksService.prototype.addCells = function (items, type) {
-  if (!Array.isArray(items)) return;
-
-  if (this.modeEnabled) {
-    this.onConflict();
-    return;
-  }
-
-  this.graph.stopEditing();
-
-  this.graph.model.beginUpdate();
-  try {
-    items.forEach((item) => {
-      const cell = this.graph.insertVertex(this.marksLayer, null, null, Math.round(item.data.x), Math.round(item.data.y), Math.round(item.data.width), Math.round(item.data.height), this.getCellStyle(type));
-
-      cell._model = item;
-
-      if (!cell) return;
-
-      // find scriptor
-      this.ui.viewHandler.scripts.setup(cell);
-      if (cell.scriptor == null) return;
-
-      // save original cell params for dynamic changes
-      if (cell.origin == null) {
-        cell.origin = {};
-        cell.origin.style = this.graph.getCellStyle(cell);
-        cell.origin.state = this.graph.view.getState(cell, true).clone();
-        const geometry = this.graph.getCellGeometry(cell);
-        cell.origin.geometry = geometry != null ? geometry.clone() : null;
-      }
-
-      // cell binding map
-      if (cell.bindingMap == null) cell.bindingMap = {};
-
-      const map = { tag: [], eq: [] };
-      cell.scriptor.visit(cell, map);
-
-      // process binding
-      if (this.ui.viewHandler.names.indexOf(item.id) < 0) this.ui.viewHandler.names.push(item.id);
-
-      this.ui.viewHandler.updateCellMapping(cell, item.id);
-      this.ui.viewHandler.updateBindMapping(cell, item.id);
-
-      this.graph.view.invalidate(cell, true);
-    });
-  } finally {
-    this.graph.model.endUpdate();
-  }
-};
-
-MarksService.prototype.updateCells = function (item, type) {
-  if (this.modeEnabled) {
-    this.onConflict();
-    return;
-  }
-
-  const targetCells = this.ui.viewHandler.findMappedCells(item.id);
-  targetCells.forEach((targetCell) => {
-    targetCell._fromHub = true; // custom source property for update cell event handler
-    const bounds = new mxRectangle(item.data.x, item.data.y, item.data.width, item.data.height);
-    this.graph.resizeCells([targetCell], [bounds]);
-    targetCell.scriptor.state(targetCell, null, item);
-  });
-  /* add new item if cell was deleted in editing mode */
-  if (targetCells.length === 0 && this.deletedCells.has(item.id)) {
-    this.addCells([item], type);
-    this.deletedCells.delete(item.id);
-  }
-};
-
-MarksService.prototype.removeCells = function (item) {
-  if (this.modeEnabled) {
-    this.onConflict();
-    return;
-  }
-
-  const targetCells = this.ui.viewHandler.findMappedCells(item.id);
-  targetCells.forEach((cell) => (cell._fromHub = true)); // custom source property for CELLS_REMOVED event handler
-  this.graph.removeCells(targetCells);
-  this.ui.viewHandler.cellMap.delete(item.id);
-};
-
-MarksService.prototype.addPosters = function (posters) {
-  this.addCells(posters, this.TYPES.POSTER);
-};
-
-MarksService.prototype.updatePoster = function (poster) {
-  this.updateCells(poster, this.TYPES.POSTER);
-};
-
-MarksService.prototype.removePoster = function (poster) {
-  this.removeCells(poster);
-};
-
-MarksService.prototype.addDispatcherMarks = function (marks) {
-  this.addCells(marks, this.TYPES.MARK);
-};
-
-MarksService.prototype.updateDispatcherMark = function (mark) {
-  this.updateCells(mark, this.TYPES.MARK);
-};
-
-MarksService.prototype.removeDispatcherMark = function (mark) {
-  this.removeCells(mark);
-};
-
-  MarksService.prototype.fetchPosters = function () {
-    //---->fix<--------//
+          ]
+        }
+          if (Array.isArray(res.posters)) {
+            this.addPosters(res.posters);
+          } else {
+            console.log('Ошибка получения плакатов')
+            // messageError('Ошибка получения плакатов');
+          }
+          /* if we have poster id in query */
+          const posterId = HELP.queryStringParam('poster');
+          const cells = posterId ? this.ui.viewHandler.cellMap.get(posterId) : null;
+          if (Array.isArray(cells) && cells.length > 0) {
+            this.graph.addSelectionCells(cells);
+            API.POSTERS.openPosterViewer(cells[0]._model, this.graph, cells[0]);
+          }
+        },
+        // (xhr, err) => messageError('Ошибка получения плакатов')
+        (xhr, err) => console.log('Ошибка получения плакатов')
+      );
+       //---->fix<--------//
+    };
+  
+  
+  MarksService.prototype.fetchMarks = function () {
+     //---->fix<--------//
     AJAX.get(
       null,
       null,
       (xhr, res) => {
-      //render posters 
-      res = {
-        "posters": [
-          {
-            "id": "277972a7-96c2-4c1d-9af7-b7dbbbc7573f",
-            "data": {
-              "title": "2",
-              "message": "2",
-              "type": "grounded",
-              "x": 590.5,
-              "y": 596.0,
-              "width": 194.0,
-              "height": 98.0
-            },
-            "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
-            "modifiedBy": "система",
-            "createdBy": "система",
-            "ts": "2023-07-21T13:32:10.3376830Z",
-            "createdAt": "2023-07-21T13:32:10.3376830Z",
-            "isRemoved": false
+        /* render marks */
+          res = {
+          dispatcherMarks:[
+            {
+              "id": "decbc6fd-0bd1-4ea2-8219-79b0728bf60c",
+              "data": {
+                  "title": "1",
+                  "message": "1",
+                  "number": "",
+                  "type": "portableGrounding",
+                  "x": 891,
+                  "y": 583,
+                  "width": 124,
+                  "height": 124
+              },
+              "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
+              "modifiedBy": "система",
+              "createdBy": "система",
+              "ts": "2023-07-21T13:32:10.3532889Z",
+              "createdAt": "2023-07-21T13:32:10.3532889Z",
+              "isRemoved": false
           },
           {
-            "id": "7404ab0f-b86e-4147-b074-235d025337b5",
-            "data": {
-              "title": "1",
-              "message": "",
-              "type": "workOnLine",
-              "x": 313.0,
-              "y": 469.0,
-              "width": 141.0,
-              "height": 71.0
-            },
-            "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
-            "modifiedBy": "система",
-            "createdBy": "система",
-            "ts": "2023-07-21T13:32:10.4776802Z",
-            "createdAt": "2023-07-20T11:11:50.6344934Z",
-            "isRemoved": false
-          },
-          {
-            "id": "818cc327-bb3a-4724-a6a5-77ca72e07ce4",
-            "data": {
-              "title": "3",
-              "message": "3",
-              "type": "workUnderVoltage-transit",
-              "x": 559.5,
-              "y": 320.5,
-              "width": 171.0,
-              "height": 86.0
-            },
-            "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
-            "modifiedBy": "система",
-            "createdBy": "система",
-            "ts": "2023-07-21T13:32:10.5847440Z",
-            "createdAt": "2023-07-21T13:32:10.5847440Z",
-            "isRemoved": false
-          }
-        ]
-      }
-        if (Array.isArray(res.posters)) {
-          this.addPosters(res.posters);
-        } else {
-          console.log('Ошибка получения плакатов')
-          // messageError('Ошибка получения плакатов');
-        }
-        /* if we have poster id in query */
-        const posterId = HELP.queryStringParam('poster');
-        const cells = posterId ? this.ui.viewHandler.cellMap.get(posterId) : null;
-        if (Array.isArray(cells) && cells.length > 0) {
-          this.graph.addSelectionCells(cells);
-          API.POSTERS.openPosterViewer(cells[0]._model, this.graph, cells[0]);
-        }
-      },
-      // (xhr, err) => messageError('Ошибка получения плакатов')
-      (xhr, err) => console.log('Ошибка получения плакатов')
-    );
-     //---->fix<--------//
-  };
-
-
-MarksService.prototype.fetchMarks = function () {
-   //---->fix<--------//
-  AJAX.get(
-    null,
-    null,
-    (xhr, res) => {
-      /* render marks */
-        res = {
-        dispatcherMarks:[
-          {
-            "id": "decbc6fd-0bd1-4ea2-8219-79b0728bf60c",
+            "id": "3bcb8734-11d0-47d0-bd71-3b4ae0ef5fc9",
             "data": {
                 "title": "1",
-                "message": "1",
+                "message": "",
                 "number": "",
-                "type": "portableGrounding",
-                "x": 891,
-                "y": 583,
-                "width": 124,
-                "height": 124
+                "type": "info",
+                "x": 822.5,
+                "y": 344.5,
+                "width": 200,
+                "height": 200
             },
             "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
             "modifiedBy": "система",
             "createdBy": "система",
-            "ts": "2023-07-21T13:32:10.3532889Z",
-            "createdAt": "2023-07-21T13:32:10.3532889Z",
+            "ts": "2023-07-21T13:32:10.5261483Z",
+            "createdAt": "2023-07-20T11:11:50.6494786Z",
             "isRemoved": false
         },
         {
-          "id": "3bcb8734-11d0-47d0-bd71-3b4ae0ef5fc9",
+          "id": "7a1d9e14-29ba-4ba8-a529-ea4683526f53",
           "data": {
-              "title": "1",
-              "message": "",
+              "title": "2",
+              "message": "2",
               "number": "",
-              "type": "info",
-              "x": 822.5,
-              "y": 344.5,
-              "width": 200,
-              "height": 200
+              "type": "relayProtection",
+              "x": 1035,
+              "y": 263.5,
+              "width": 125,
+              "height": 125
           },
           "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
           "modifiedBy": "система",
           "createdBy": "система",
-          "ts": "2023-07-21T13:32:10.5261483Z",
-          "createdAt": "2023-07-20T11:11:50.6494786Z",
+          "ts": "2023-07-21T13:32:10.5867107Z",
+          "createdAt": "2023-07-21T13:32:10.5867107Z",
           "isRemoved": false
+      }
+          ]
+        }
+        if (Array.isArray(res.dispatcherMarks)) {
+          this.addDispatcherMarks(res.dispatcherMarks);
+        } else {
+          console.log('Ошибка получения пометок')
+          // messageError('Ошибка получения пометок');
+        }
+        /* if we have mark id in query */
+        const markId = HELP.queryStringParam('mark');
+        const cells = markId ? this.ui.viewHandler.cellMap.get(markId) : null;
+        if (Array.isArray(cells) && cells.length > 0) {
+          this.graph.addSelectionCells(cells);
+          API.DISPATCHER_MARKS.openMarkViewer(cells[0]._model, this.graph, cells[0]);
+        }
       },
-      {
-        "id": "7a1d9e14-29ba-4ba8-a529-ea4683526f53",
-        "data": {
-            "title": "2",
-            "message": "2",
-            "number": "",
-            "type": "relayProtection",
-            "x": 1035,
-            "y": 263.5,
-            "width": 125,
-            "height": 125
-        },
-        "schemeId": "2251b1c0-f0a3-4979-99c3-caa251ff3cd2",
-        "modifiedBy": "система",
-        "createdBy": "система",
-        "ts": "2023-07-21T13:32:10.5867107Z",
-        "createdAt": "2023-07-21T13:32:10.5867107Z",
-        "isRemoved": false
-    }
-        ]
-      }
-      if (Array.isArray(res.dispatcherMarks)) {
-        this.addDispatcherMarks(res.dispatcherMarks);
-      } else {
-        console.log('Ошибка получения пометок')
-        // messageError('Ошибка получения пометок');
-      }
-      /* if we have mark id in query */
-      const markId = HELP.queryStringParam('mark');
-      const cells = markId ? this.ui.viewHandler.cellMap.get(markId) : null;
-      if (Array.isArray(cells) && cells.length > 0) {
-        this.graph.addSelectionCells(cells);
-        API.DISPATCHER_MARKS.openMarkViewer(cells[0]._model, this.graph, cells[0]);
-      }
-    },
-    // (xhr, err) => messageError('Ошибка получения пометок')
-    (xhr, err) => console.log('Ошибка получения пометок')
-  );
-   //---->fix<--------//
-};
-
+      // (xhr, err) => messageError('Ошибка получения пометок')
+      (xhr, err) => console.log('Ошибка получения пометок')
+    );
+     //---->fix<--------//
+  };
 //Markservice.js end
 
  export {
